@@ -4533,35 +4533,7 @@ function parseRichText(text) {
     // ── FEATS ────────────────────────────────────────────────────
     let feats = [];
 
-    function renderFeats() {
-      const list = document.getElementById('feats-list');
-      if (!list) return;
-      list.innerHTML = '';
-      feats.forEach((f, i) => {
-        const block = document.createElement('div');
-        block.className = 'feat-block' + (f.open ? ' open' : '');
-        block.innerHTML = `
-      <div class="feat-header" onclick="toggleFeat(${i})">
-        <input class="feat-name-input" type="text" value="${escapeHTML(f.name)}"
-          placeholder="Nome do talento..."
-          onclick="event.stopPropagation()"
-          oninput="feats[${i}].name=this.value">
-        <span class="feat-toggle">▾</span>
-        <span class="feat-del" onclick="event.stopPropagation();removeFeat(${i})">×</span>
-      </div>
-      <div class="feat-body">
-        <div class="rn-wrap">
-          <div class="rn-bar">  
-          </div>
-          <textarea id="feat-desc-${i}" rows="3" placeholder="Descrição, efeitos, pré-requisitos..."
-            oninput="feats[${i}].desc=this.value"
-            style="min-height:50px;">${escapeHTML(f.desc||'')}</textarea>
-          <div class="rn-preview" id="rn-feat-desc-${i}" onclick="editRN('feat-desc-${i}',this)"></div>
-        </div>
-      </div>`;
-        list.appendChild(block);
-      });
-    }
+Codex-Simulacra-5E.V.html
 
     function addFeat() {
       feats.push({
