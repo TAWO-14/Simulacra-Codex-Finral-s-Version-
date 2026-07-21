@@ -2508,6 +2508,8 @@
       <div class="h-divider"></div>
       <button class="h-btn" id="custom-theme-btn" onclick="openThemeModal()" title="Editar Tema" style="display:none;">🎨</button>
       <button class="h-btn" onclick="exportarHTML()" title="Salvar Ficha no PC" id="export-btn">💾</button>
+      <button class="h-btn" onclick="document.getElementById('import-input').click()" title="Importar Ficha Antiga">📂</button>
+      <input type="file" id="import-input" accept=".html" style="display:none;" onchange="importarHTML(event)">
     </div>
   </div>
 
@@ -4171,6 +4173,81 @@
         showToast('Erro ao exportar HTML.');
       }
     }
+
+    function importarHTML(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(e.target.result, 'text/html');
+      const scriptData = doc.querySelector('#__dados_exportados__');
+
+      if (!scriptData || !scriptData.textContent) {
+        showToast('❌ Ficha inválida ou sem dados salvos.');
+        return;
+      }
+
+      // Substitui os dados da página pelos dados importados
+      window.SHEET_DATA = JSON.parse(scriptData.textContent);
+
+      // Reutiliza a lógica de carregamento já existente na sua ficha
+      profStates = window.SHEET_DATA._profStates || {};
+      saveProfs = window.SHEET_DATA._saveProfs || {};
+      attacks = window.SHEET_DATA._attacks || [];
+      spellSlots = window.SHEET_DATA._spellSlots || {};
+      spells = window.SHEET_DATA._spells || {};
+      limitedResources = window.SHEET_DATA._limitedResources || [];
+      feats = window.SHEET_DATA._feats || [];
+      initiativeOverride = window.SHEET_DATA._initiativeOverride || false;
+      passivePercOverride = window.SHEET_DATA._passivePercOverride || false;
+
+      // Preenche os campos do formulário
+      Object.entries(window.SHEET_DATA).forEach(([k, v]) => {
+        if (k.startsWith('_')) return;
+        const el = document.getElementById(k);
+        if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT')) {
+          el.value = v;
+        }
+      });
+
+      // Atualiza os componentes visuais
+      renderFeats();
+      buildAttrs();
+      buildSaves();
+      buildSkills();
+      if (attacks.length === 0) addAttack(); else renderAttacks();
+      buildSpells();
+      buildSlotOverview();
+      renderLimitedResources();
+      onAttrChange();
+      updateHeader();
+      updateProfBonus();
+      updateHPBar();
+
+      if (window.SHEET_DATA._theme) changeTheme(window.SHEET_DATA._theme);
+      if (window.SHEET_DATA._avatar) {
+        const img = document.getElementById('char-avatar');
+        const ph = document.getElementById('avatar-placeholder');
+        const btn = document.getElementById('avatar-reset-btn');
+        if (img && ph) {
+          img.src = window.SHEET_DATA._avatar;
+          img.style.display = 'block';
+          ph.style.display = 'none';
+          if (btn) btn.style.display = 'block';
+        }
+      }
+
+      showToast('📂 Ficha carregada com sucesso!');
+    } catch (err) {
+      console.error(err);
+      showToast('❌ Erro ao ler a ficha.');
+    }
+  };
+  reader.readAsText(file);
+}
 
     function showToast(msg) {
       const t = document.getElementById('toast');
