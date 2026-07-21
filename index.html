@@ -4190,10 +4190,9 @@
         return;
       }
 
-      // Substitui os dados da página pelos dados importados
       window.SHEET_DATA = JSON.parse(scriptData.textContent);
 
-      // Reutiliza a lógica de carregamento já existente na sua ficha
+      // 1. Restaura variáveis globais e estados
       profStates = window.SHEET_DATA._profStates || {};
       saveProfs = window.SHEET_DATA._saveProfs || {};
       attacks = window.SHEET_DATA._attacks || [];
@@ -4203,8 +4202,20 @@
       feats = window.SHEET_DATA._feats || [];
       initiativeOverride = window.SHEET_DATA._initiativeOverride || false;
       passivePercOverride = window.SHEET_DATA._passivePercOverride || false;
+      inspiration = window.SHEET_DATA._inspiration || false;
+      deathSaves = window.SHEET_DATA._deathSaves || { s: [false, false, false], f: [false, false, false] };
 
-      // Preenche os campos do formulário
+      // 2. Reconstrói as estruturas HTML primeiro
+      buildAttrs();
+      buildSaves();
+      buildSkills();
+      renderFeats();
+      buildSpells();
+      buildSlotOverview();
+      renderLimitedResources();
+      if (attacks.length === 0) addAttack(); else renderAttacks();
+
+      // 3. Preenche os valores nos campos do formulário
       Object.entries(window.SHEET_DATA).forEach(([k, v]) => {
         if (k.startsWith('_')) return;
         const el = document.getElementById(k);
@@ -4213,18 +4224,24 @@
         }
       });
 
-      // Atualiza os componentes visuais
-      renderFeats();
-      buildAttrs();
-      buildSaves();
-      buildSkills();
-      if (attacks.length === 0) addAttack(); else renderAttacks();
-      buildSpells();
-      buildSlotOverview();
-      renderLimitedResources();
+      // 4. Restaura estados visuais específicos
+      ATTRS.forEach(a => {
+        const check = document.getElementById('save-check-' + a.id);
+        if (check) check.className = 'save-check' + (saveProfs[a.id] ? ' active' : '');
+      });
+
+      const insp = document.getElementById('insp-box');
+      if (insp) insp.className = 'insp-box' + (inspiration ? ' active' : '');
+
+      ['s', 'f'].forEach(t => deathSaves[t].forEach((v, i) => {
+        const ds = document.getElementById(`ds-${t}${i+1}`);
+        if (ds) ds.classList.toggle('filled', v);
+      }));
+
+      // 5. Recalcula modificadores, testes, PV e cabeçalho
       onAttrChange();
-      updateHeader();
       updateProfBonus();
+      updateHeader();
       updateHPBar();
 
       if (window.SHEET_DATA._theme) changeTheme(window.SHEET_DATA._theme);
