@@ -4736,18 +4736,6 @@ function renderFeats() {
       document.head.appendChild(dataScript);
     }
 
-// --- AUTO-MARKDOWN (CORRIGIDO) ---
-    document.addEventListener('focusout', (e) => {
-      if (e.target.tagName === 'TEXTAREA' && e.target.closest('.rn-wrap')) {
-        // Procura o botão no bloco do talento ou no elemento pai padrão
-        const container = e.target.closest('.feat-block') || e.target.parentElement;
-        const btn = container.querySelector('.rn-toggle');
-        
-        if (btn && !btn.classList.contains('active')) {
-          toggleRN(e.target.id, btn);
-        }
-      }
-    });
   </script>
 
 
