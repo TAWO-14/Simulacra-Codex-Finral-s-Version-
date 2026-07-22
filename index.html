@@ -4716,6 +4716,38 @@ function renderFeats() {
       e.returnValue = '';
     });
     
+    // --- SALVAMENTO AUTOMÁTICO ---
+    const SAVE_KEY = 'ficha_dnd_autosave';
+
+    // Salva a cada interação
+    document.addEventListener('input', () => {
+      localStorage.setItem(SAVE_KEY, JSON.stringify(collectData()));
+    });
+
+    // Injeta os dados salvos antes da ficha carregar
+    const savedData = localStorage.getItem(SAVE_KEY);
+    const existingData = document.getElementById('__dados_exportados__');
+    
+    if (savedData && (!existingData || !existingData.textContent)) {
+      let dataScript = document.createElement('script');
+      dataScript.id = '__dados_exportados__';
+      dataScript.type = 'application/json';
+      dataScript.textContent = savedData;
+      document.head.appendChild(dataScript);
+    }
+
+// --- AUTO-MARKDOWN (CORRIGIDO) ---
+    document.addEventListener('focusout', (e) => {
+      if (e.target.tagName === 'TEXTAREA' && e.target.closest('.rn-wrap')) {
+        // Procura o botão no bloco do talento ou no elemento pai padrão
+        const container = e.target.closest('.feat-block') || e.target.parentElement;
+        const btn = container.querySelector('.rn-toggle');
+        
+        if (btn && !btn.classList.contains('active')) {
+          toggleRN(e.target.id, btn);
+        }
+      }
+    });
   </script>
 
 
