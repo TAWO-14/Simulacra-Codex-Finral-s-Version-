@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 
 <head>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
   <meta charset="UTF-8">
   <meta name="robots" content="noindex, nofollow">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2547,10 +2547,9 @@
         style="display:none;">🎨</button>
       <button class="h-btn" onclick="exportarHTML()" title="Salvar Ficha no PC" id="export-btn">💾</button>
       <button class="h-btn" onclick="document.getElementById('import-input').click()"
-        title="Importar Ficha Antiga">📂</button>
-      <input type="file" id="pdf-upload" accept="application/pdf" style="display:none;" onchange="importarPDF(this)">
-      <button class="h-btn" onclick="document.getElementById('pdf-upload').click()" title="Importar PDF">📄</button>
-      <input type="file" id="import-input" accept=".html" style="display:none;" onchange="importarHTML(event)">
+        title="Importar Ficha (HTML ou PDF)">📂</button>
+      <input type="file" id="import-input" accept=".html, .pdf, application/pdf" style="display:none;"
+        onchange="lidarComImportacao(event)">
     </div>
   </div>
 
@@ -3330,7 +3329,8 @@
             style="height: 533px;">
             <img id="char-avatar" alt="Avatar" src="" style="display: none;">
             <div id="avatar-placeholder" class="avatar-placeholder" style="display: flex;">
-              <span>🖼️</span><span>Carregar Imagem</span></div>
+              <span>🖼️</span><span>Carregar Imagem</span>
+            </div>
           </div>
           <input type="file" id="avatar-input" accept="image/*" style="display:none;" onchange="uploadAvatar(this)">
           <button id="avatar-reset-btn" onclick="resetAvatar()"
@@ -5257,6 +5257,26 @@
         alert("Erro na importação. Verifique a aba Console.");
       } finally {
         input.value = "";
+      }
+    }
+
+    function lidarComImportacao(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const fileName = file.name.toLowerCase();
+
+      if (fileName.endsWith('.pdf') || file.type === 'application/pdf') {
+        importarPDF(event.target);
+      } else if (fileName.endsWith('.html') || file.type === 'text/html') {
+        importarHTML(event);
+      } else {
+        if (typeof showToast === 'function') {
+          showToast('❌ Formato de arquivo não suportado.');
+        } else {
+          alert('Formato de arquivo não suportado.');
+        }
+        event.target.value = ''; // Limpa o input
       }
     }
   </script>
