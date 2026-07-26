@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR"><head>
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
   <meta charset="UTF-8">
   <meta name="robots" content="noindex, nofollow">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2512,6 +2513,8 @@
       <button class="h-btn" id="custom-theme-btn" onclick="openThemeModal()" title="Editar Tema" style="display:none;">🎨</button>
       <button class="h-btn" onclick="exportarHTML()" title="Salvar Ficha no PC" id="export-btn">💾</button>
       <button class="h-btn" onclick="document.getElementById('import-input').click()" title="Importar Ficha Antiga">📂</button>
+      <input type="file" id="pdf-upload" accept="application/pdf" style="display:none;" onchange="importarPDF(this)">
+      <button class="h-btn" onclick="document.getElementById('pdf-upload').click()" title="Importar PDF">📄</button>
       <input type="file" id="import-input" accept=".html" style="display:none;" onchange="importarHTML(event)">
     </div>
   </div>
@@ -4738,7 +4741,93 @@ function renderFeats() {
       dataScript.textContent = savedData;
       document.head.appendChild(dataScript);
     }
+// --- DRAG & DROP SIMPLIFICADO ---
+    document.addEventListener('DOMContentLoaded', () => {
+      // Permite soltar em qualquer lugar válido
+      document.addEventListener('dragover', e => e.preventDefault());
 
+      document.addEventListener('drop', (e) => {
+        // Verifica se o alvo é uma textarea ou o bloco de pré-visualização
+        let ta = e.target.tagName === 'TEXTAREA' ? e.target : null;
+        if (!ta && e.target.closest('.rn-preview')) {
+          ta = e.target.closest('.rn-wrap').querySelector('textarea');
+        }
+        
+        if (!ta) return;
+        e.preventDefault();
+        
+        const data = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('URL');
+        if (data) {
+          ta.value += (ta.value ? '\n' : '') + data;
+          // Dispara a atualização visual
+          ta.dispatchEvent(new Event('input'));
+          ta.dispatchEvent(new Event('focusout'));
+        }
+      });
+    });
+
+    async function importarPDF(input) {
+  if (!input.files[0]) return;
+  
+  try {
+    const arrayBuffer = await input.files[0].arrayBuffer();
+    const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+    const form = pdfDoc.getForm();
+    console.log("Campos lidos:", form.getFields().map(f => f.getName()));
+    
+    // Extração segura baseada no tipo do campo
+    const getVal = (name) => {
+      try {
+        const field = form.getField(name);
+        if (!field) return '';
+        // Verifica se é campo de texto
+        if (field.constructor.name === 'PDFTextField') return field.getText() || '';
+        // Verifica se é dropdown
+        if (field.constructor.name === 'PDFDropdown') return field.getSelected()[0] || '';
+        return '';
+      } catch (e) { 
+        return ''; 
+      }
+    };
+
+    // Mapeamento principal (adicione os demais aqui)
+    const map = {
+      'char-name': 'Character Name',
+      'char-class': 'Class',
+      'char-race': 'Race',
+      'char-bg': 'Background',
+      'attr-score-str': 'STR1',
+      'attr-score-dex': 'DEX1',
+      'attr-score-con': 'CON1',
+      'attr-score-int': 'INT1',
+      'attr-score-wis': 'WIS1',
+      'attr-score-cha': 'CHA1',
+      'armor-class': 'Armor Class',
+      'hp-max': 'Max Hit Points',
+      'hp-current': 'Current Hit Points'
+    };
+
+    // Injeta os valores
+    for (const [idHTML, idPDF] of Object.entries(map)) {
+      const el = document.getElementById(idHTML);
+      const val = getVal(idPDF);
+      if (el && val) el.value = val;
+    }
+    
+    // Atualiza a interface
+    if (typeof onAttrChange === 'function') onAttrChange(); 
+    if (typeof updateHPBar === 'function') updateHPBar();
+    if (typeof updateHeader === 'function') updateHeader();
+    
+    showToast("📄 PDF importado com sucesso!");
+    
+  } catch (err) {
+    console.error("Erro ao importar PDF:", err);
+    alert("Erro na importação. Pressione F12 e verifique a aba Console para detalhes.");
+  } finally {
+    input.value = ""; // Reseta o input para permitir nova importação
+  }
+}
   </script>
 
 
