@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha de Personagem — D&D 5e</title>
+
+    <!-- 1. Fontes do Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=MedievalSharp&display=swap"
+        rel="stylesheet">
+
+    <!-- 2. CSS da Aplicação -->
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/themes.css"> <!-- Se na pasta for no singular, mude para theme.css -->
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/responsive.css">
+
+    <!-- 3. CSS de Bibliotecas Externas -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+
+    <!-- 4. JS de Bibliotecas Externas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <!-- 5. Utilitários Globais -->
+    <script src="js/utils/logger.js" defer></script>
+    <script src="js/utils/dom-cache.js" defer></script>
+    <script src="js/utils/dependency-loader.js" defer></script>
+
+    <!-- 6. Configurações -->
+    <script src="js/config.js" defer></script>
+
+    <!-- 7. Interface (UI) -->
+    <script src="js/ui/toast.js" defer></script>
+    <script src="js/ui/theme-manager.js" defer></script>
+    <script src="js/ui/image-cropper.js" defer></script>
+
+    <!-- 8. Funcionalidades (Features) -->
+    <script src="js/features/rich-notes.js" defer></script>
+    <script src="js/features/feats.js" defer></script>
+    <script src="js/features/html-generator.js"></script>
+    <script src="js/features/character-data.js" defer></script>
+    <script src="js/features/combat-system.js" defer></script>
+    <script src="js/features/spell-system.js" defer></script>
+    <script src="field-extractor-browser.js"></script>
+    <script src="pdf-field-detector.js"></script>
+    <script src="pdf-auto-mapper.js"></script>
+    <script src="js/features/pdf-field-mapping.js" defer></script>
+    <script src="js/features/export-import.js" defer></script>
+</head>
+
+<div class="app-header">
+    <div class="app-logo">D<span>&amp;</span>D <span style="font-size: 14px; color: var(--text3);">5e</span></div>
+    <div class="char-name-header">
+        <strong id="header-name">Nome do Personagem</strong>
+        <input class="header-subtitle-input" id="header-subtitle" placeholder="Classe · Raça · Alinhamento"
+            title="Clique para editar subtítulo">
+    </div>
+
+    <div id="custom-theme-panel" style="display:none;">
+        <input type="color" id="picker-bg" value="#1a1510" oninput="updateCustomColor('--bg',this.value)"
+            style="display:none;">
+        <input type="color" id="picker-bg2" value="#221e17" oninput="updateCustomColor('--bg2',this.value)"
+            style="display:none;">
+        <input type="color" id="picker-panel" value="#17130e" oninput="updateCustomColor('--panel',this.value)"
+            style="display:none;">
+        <input type="color" id="picker-bg3" value="#2c2620" oninput="updateCustomColor('--bg3',this.value)"
+            style="display:none;">
+        <input type="color" id="picker-border" value="#6b4e1e" oninput="updateCustomColor('--border',this.value)"
+            style="display:none;">
+        <input type="color" id="picker-border2" value="#8a6828" oninput="updateCustomColor('--border2',this.value)"
+            style="display:none;">
+        <input type="color" id="picker-accent" value="#c8922a" oninput="updateCustomColor('--accent',this.value)"
+            style="display:none;">
+        <input type="color" id="picker-accent2" value="#e8b84b" oninput="updateCustomColor('--accent2',this.value)"
+            style="display:none;">
+        <input type="color" id="picker-input-bg" value="#0e0c09" oninput="updateCustomColor('--input-bg',this.value)"
+            style="display:none;">
+        <input type="color" id="picker-input-border" value="#4a3510"
+            oninput="updateCustomColor('--input-border',this.value)" style="display:none;">
+        <input type="color" id="picker-header-top" value="#0a0804"
+            oninput="updateCustomColor('--header-top',this.value)" style="display:none;">
+        <input type="color" id="picker-header-bot" value="#1a1510"
+            oninput="updateCustomColor('--header-bot',this.value)" style="display:none;">
+        <input type="color" id="picker-text" value="#e8d5b0" oninput="updateCustomColor('--text',this.value)"
+            style="display:none;">
+        <input type="color" id="picker-text2" value="#b09060" oninput="updateCustomColor('--text2',this.value)"
+            style="display:none;">
+        <input type="color" id="picker-text3" value="#7a6040" oninput="updateCustomColor('--text3',this.value)"
+            style="display:none;">
+        <input type="color" id="picker-shadow" value="#000000" oninput="updateCustomColor('--shadow',this.value)"
+            style="display:none;">
+        <input type="color" id="picker-glow" value="#c8922a" oninput="updateCustomColor('--glow',this.value)"
+            style="display:none;">
+        <input type="color" id="picker-red" value="#c0392b" oninput="updateCustomColor('--red',this.value)"
+            style="display:none;">
+        <input type="color" id="picker-red2" value="#e74c3c" oninput="updateCustomColor('--red2',this.value)"
+            style="display:none;">
+        <input type="color" id="picker-green" value="#27ae60" oninput="updateCustomColor('--green',this.value)"
+            style="display:none;">
+    </div>
+
+    <div class="header-actions">
+        <select class="h-select" id="theme-selector" onchange="changeTheme(this.value)" title="Tema de cores">
+            <option value="default">📜 Clássico</option>
+            <option value="dark-elf">🌌 Elfo Negro</option>
+            <option value="necromancer">💀 Necromante</option>
+            <option value="paladin">☀️ Paladino</option>
+            <option value="barbarian">🪓 Bárbaro</option>
+            <option value="moon-druid">🌙 Druida da Lua</option>
+            <option value="fighter">🐆 Guerreiro</option>
+            <option value="Ébano">🐦‍⬛ Ébano</option>
+            <option value="Monocromático">♟️ Xeque-Mate</option>
+            <option value="mage">🔮 Mago</option>
+            <option value="mystic">👁️ Místico</option>
+            <option value="owl">🦉Sábio</option>
+            <option value="sunset-noir">⛅Sunset</option>
+            <option value="samurai">🌸Samurai</option>
+            <option value="nord">❄️ Nórdico</option>
+            <option value="Midnights">🌌 midnight</option>
+            <option value="redtv">🧣 Outono</option>
+            <option value="chocolate-sand">🍫 Chocolate</option>
+            <option value="retro">📻 Retrô</option>
+            <option value="americana">🇺🇸 Americana</option>
+            <option value="cinema-retro">🎥Cinema</option>
+            <option value="lasertag">⭐ Fliperama</option>
+            <option value="cyberpunk">🤖 Cyberpunk</option>
+            <option value="custom">🎨 Personalizado</option>
+        </select>
+        <div class="h-divider"></div>
+        <button class="h-btn" id="custom-theme-btn" onclick="openThemeModal()" title="Editar Tema"
+            style="display:none;">🎨</button>
+        <button class="h-btn" id="bg-image-btn" onclick="document.getElementById('bg-image-input').click()"
+            title="Imagem de Fundo" style="display:none;">🖼️</button>
+        <input type="file" id="bg-image-input" accept="image/*" style="display:none;"
+            onchange="abrirCropper(this, 'bg')">
+        <button class="h-btn" onclick="ExportImportSystem.exportarHTML()" title="Salvar Ficha no PC"
+            id="export-btn">💾</button>
+        <button class="h-btn" onclick="document.getElementById('import-input').click()"
+            title="Importar Ficha (HTML ou PDF)">📂</button>
+        <input type="file" id="import-input" accept=".html, .pdf, application/pdf" style="display:none;"
+            onchange="ExportImportSystem.lidarComImportacao(event)">
+    </div>
+</div>
+
+<div id="theme-modal-overlay" class="hidden"
+    style="position: fixed; inset: 0px; background: rgba(0, 0, 0, 0.75); z-index: 9999; align-items: center; justify-content: center;">
+    <div id="theme-modal"
+        style="background: var(--bg2); border: 2px solid var(--border2); border-radius: 10px; width: min(900px, 96vw); max-height: 90vh; overflow-y: auto; box-shadow: rgba(0, 0, 0, 0.9) 0px 20px 60px; padding: 0px;">
+
+        <div
+            style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0px; background: var(--bg2); z-index: 1; border-radius: 10px 10px 0px 0px;">
+            <div
+                style="font-family: &quot;Cinzel&quot;, serif; font-size: 15px; font-weight: 700; color: var(--accent2); letter-spacing: 2px;">
+                🎨 TEMA PERSONALIZADO</div>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <button onclick="resetCustomTheme()"
+                    style="font-family: &quot;Cinzel&quot;, serif; font-size: 10px; letter-spacing: 1px; background: transparent; border: 1px solid var(--border); border-radius: 4px; color: var(--text3); padding: 5px 12px; cursor: pointer;">↺
+                    Resetar</button>
+                <button onclick="closeThemeModal()"
+                    style="font-family: &quot;Cinzel&quot;, serif; font-size: 13px; background: transparent; border: 1px solid var(--border2); border-radius: 4px; color: var(--accent2); padding: 5px 14px; cursor: pointer;">✕
+                    Fechar</button>
+            </div>
+        </div>
+
+        <div style="padding:20px; display:flex; flex-direction:column; gap:20px;">
+
+            <div id="theme-preview-bar"
+                style="border-radius: 8px; padding: 16px; border: 1px solid var(--border); background: var(--bg3); display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+                <div
+                    style="font-family: &quot;Cinzel&quot;, serif; font-size: 10px; color: var(--text3); letter-spacing: 2px; width: 100%; margin-bottom: 4px;">
+                    PRÉ-VISUALIZAÇÃO</div>
+                <div
+                    style="background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 16px; flex: 1 1 0%; min-width: 120px;">
+                    <div style="font-family: &quot;Cinzel&quot;, serif; font-size: 11px; color: var(--accent2);">
+                        Painel
+                        Principal</div>
+                    <div style="font-size: 12px; color: var(--text); margin-top: 4px;">Texto normal</div>
+                    <div style="font-size: 11px; color: var(--text2); margin-top: 2px;">Texto secundário</div>
+                    <div style="font-size: 10px; color: var(--text3); margin-top: 2px;">Label / categoria</div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                    <div
+                        style="background: var(--accent); color: var(--bg); border-radius: 4px; padding: 4px 12px; font-family: &quot;Cinzel&quot;, serif; font-size: 11px;">
+                        Destaque 1</div>
+                    <div
+                        style="background: var(--accent2); color: var(--bg); border-radius: 4px; padding: 4px 12px; font-family: &quot;Cinzel&quot;, serif; font-size: 11px;">
+                        Destaque 2</div>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <div
+                        style="width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--border2); background: var(--panel); display: flex; align-items: center; justify-content: center; font-family: &quot;Cinzel&quot;, serif; font-size: 14px; font-weight: 700; color: var(--accent2);">
+                        +2</div>
+                    <div
+                        style="width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--accent); background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                        ✦</div>
+                </div>
+                <div style="display:flex; gap:6px; align-items:center;">
+                    <div
+                        style="width: 14px; height: 14px; border-radius: 50%; background: var(--green); border: 1px solid var(--accent2);">
+                    </div>
+                    <span style="font-size: 11px; color: var(--text2);">Sucesso</span>
+                    <div
+                        style="width: 14px; height: 14px; border-radius: 50%; background: var(--red2); border: 1px solid var(--red);">
+                    </div>
+                    <span style="font-size: 11px; color: var(--text2);">Falha</span>
+                    <div
+                        style="width: 14px; height: 14px; border-radius: 3px; background: linear-gradient(135deg,var(--accent),var(--accent2)); border: 1px solid var(--accent2);">
+                    </div>
+                    <span style="font-size: 11px; color: var(--text2);">Espaço</span>
+                </div>
+                <input type="text" placeholder="Campo de texto"
+                    style="background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 3px; color: var(--text); font-size: 13px; padding: 5px 10px; width: 140px; font-family: &quot;Crimson Text&quot;, serif; outline: none;">
+                <div
+                    style="height: 6px; width: 120px; background: var(--input-bg); border-radius: 4px; border: 1px solid var(--input-border); overflow: hidden;">
+                    <div style="height: 100%; width: 65%; background: linear-gradient(90deg,var(--green),#6ed97a);">
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div
+                    style="font-family: &quot;Cinzel&quot;, serif; font-size: 10px; letter-spacing: 3px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 12px;">
+                    🌑 CAMADAS DE FUNDO</div>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px;">
+                    <div class="tcol">
+                        <div class="tprev" id="prev-bg"></div>
+                        <label class="tlbl">Fundo Principal</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Cor base da página
+                            inteira</div>
+                        <input type="color" class="tpicker" id="mpicker-bg" value="#1a1510"
+                            oninput="syncPicker('bg',this.value)">
+                    </div>
+                    <div class="tcol">
+                        <div class="tprev" id="prev-bg2"></div>
+                        <label class="tlbl">Fundo dos Painéis</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Cards e seções
+                            internas</div>
+                        <input type="color" class="tpicker" id="mpicker-bg2" value="#221e17"
+                            oninput="syncPicker('bg2',this.value)">
+                    </div>
+                    <div class="tcol">
+                        <div class="tprev" id="prev-bg3"></div>
+                        <label class="tlbl">Fundo de Blocos</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Atributos, slots,
+                            badges</div>
+                        <input type="color" class="tpicker" id="mpicker-bg3" value="#2c2620"
+                            oninput="syncPicker('bg3',this.value)">
+                    </div>
+                    <div class="tcol">
+                        <div class="tprev" id="prev-panel"></div>
+                        <label class="tlbl">Background das Abas</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Barra de tabs e
+                            header</div>
+                        <input type="color" class="tpicker" id="mpicker-panel" value="#17130e"
+                            oninput="syncPicker('panel',this.value)">
+                    </div>
+                    <div class="tcol">
+                        <div class="tprev" id="prev-input-bg"></div>
+                        <label class="tlbl">Fundo dos Inputs</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Campos de texto e
+                            número</div>
+                        <input type="color" class="tpicker" id="mpicker-input-bg" value="#0e0c09"
+                            oninput="syncPicker('input-bg',this.value)">
+                    </div>
+                    <div class="tcol">
+                        <div class="tprev" id="prev-header-top"
+                            style="background: linear-gradient(rgb(10, 8, 4), rgb(26, 21, 16));"></div>
+                        <label class="tlbl">Header — Topo</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Cor escura no topo do
+                            gradiente
+                        </div>
+                        <input type="color" class="tpicker" id="mpicker-header-top" value="#0a0804"
+                            oninput="syncPickerHeader('header-top',this.value)">
+                    </div>
+                    <div class="tcol">
+                        <div class="tprev" id="prev-header-bot"
+                            style="background: linear-gradient(rgb(26, 21, 16), rgb(26, 21, 16));"></div>
+                        <label class="tlbl">Header — Base</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Cor na base do
+                            gradiente do header
+                        </div>
+                        <input type="color" class="tpicker" id="mpicker-header-bot" value="#1a1510"
+                            oninput="syncPickerHeader('header-bot',this.value)">
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div
+                    style="font-family: &quot;Cinzel&quot;, serif; font-size: 10px; letter-spacing: 3px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 12px;">
+                    🔲 BORDAS &amp; DIVISORES</div>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px;">
+                    <div class="tcol">
+                        <div class="tprev" id="prev-border"></div>
+                        <label class="tlbl">Borda Principal dos Blocos</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Cards, painéis,
+                            seções</div>
+                        <input type="color" class="tpicker" id="mpicker-border" value="#6b4e1e"
+                            oninput="syncPicker('border',this.value)">
+                    </div>
+                    <div class="tcol">
+                        <div class="tprev" id="prev-border2"></div>
+                        <label class="tlbl">Borda de Destaque</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Círculos, badges,
+                            foco</div>
+                        <input type="color" class="tpicker" id="mpicker-border2" value="#8a6828"
+                            oninput="syncPicker('border2',this.value)">
+                    </div>
+                    <div class="tcol">
+                        <div class="tprev" id="prev-input-border"></div>
+                        <label class="tlbl">Borda dos Inputs</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Campos e selects
+                        </div>
+                        <input type="color" class="tpicker" id="mpicker-input-border" value="#4a3510"
+                            oninput="syncPicker('input-border',this.value)">
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div
+                    style="font-family: &quot;Cinzel&quot;, serif; font-size: 10px; letter-spacing: 3px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 12px;">
+                    ✨ CORES DE DESTAQUE</div>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px;">
+                    <div class="tcol">
+                        <div class="tprev" id="prev-accent"></div>
+                        <label class="tlbl">Destaque Principal</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Títulos, proficiência
+                            ativa, ícones
+                        </div>
+                        <input type="color" class="tpicker" id="mpicker-accent" value="#c8922a"
+                            oninput="syncPicker('accent',this.value)">
+                    </div>
+                    <div class="tcol">
+                        <div class="tprev" id="prev-accent2"></div>
+                        <label class="tlbl">Destaque Secundário</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Modificadores,
+                            valores grandes
+                        </div>
+                        <input type="color" class="tpicker" id="mpicker-accent2" value="#e8b84b"
+                            oninput="syncPicker('accent2',this.value)">
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div
+                    style="font-family: &quot;Cinzel&quot;, serif; font-size: 10px; letter-spacing: 3px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 12px;">
+                    🖊 TIPOGRAFIA</div>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px;">
+                    <div class="tcol">
+                        <div class="tprev" id="prev-text"></div>
+                        <label class="tlbl">Principal</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Corpo de texto padrão
+                        </div>
+                        <input type="color" class="tpicker" id="mpicker-text" value="#e8d5b0"
+                            oninput="syncPicker('text',this.value)">
+                    </div>
+                    <div class="tcol">
+                        <div class="tprev" id="prev-text2"></div>
+                        <label class="tlbl">Secundário</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Nomes de perícias,
+                            info</div>
+                        <input type="color" class="tpicker" id="mpicker-text2" value="#b09060"
+                            oninput="syncPicker('text2',this.value)">
+                    </div>
+                    <div class="tcol">
+                        <div class="tprev" id="prev-text3"></div>
+                        <label class="tlbl">Labels / Rótulos</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Textos de categoria e
+                            label</div>
+                        <input type="color" class="tpicker" id="mpicker-text3" value="#7a6040"
+                            oninput="syncPicker('text3',this.value)">
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div
+                    style="font-family: &quot;Cinzel&quot;, serif; font-size: 10px; letter-spacing: 3px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 12px;">
+                    ❤ INDICADORES DE STATUS</div>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px;">
+                    <div class="tcol">
+                        <div class="tprev" id="prev-green"></div>
+                        <label class="tlbl">Sucesso</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Barra de vida,
+                            Sucesso de Saving
+                            Throw</div>
+                        <input type="color" class="tpicker" id="mpicker-green" value="#27ae60"
+                            oninput="syncPicker('green',this.value)">
+                    </div>
+                    <div class="tcol">
+                        <div class="tprev" id="prev-red"></div>
+                        <label class="tlbl">Dano</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Barra crítica, zona
+                            de perigo</div>
+                        <input type="color" class="tpicker" id="mpicker-red" value="#c0392b"
+                            oninput="syncPicker('red',this.value)">
+                    </div>
+                    <div class="tcol">
+                        <div class="tprev" id="prev-red2"></div>
+                        <label class="tlbl">Falha</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Ícones de falha, HP
+                            muito baixo
+                        </div>
+                        <input type="color" class="tpicker" id="mpicker-red2" value="#e74c3c"
+                            oninput="syncPicker('red2',this.value)">
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div
+                    style="font-family: &quot;Cinzel&quot;, serif; font-size: 10px; letter-spacing: 3px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 12px;">
+                    🔡 FONTE DECORATIVA</div>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px;">
+                    <div class="tcol" style="min-width:180px;">
+                        <label class="tlbl">Fonte do Documento (Google Fonts)</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 6px;">Digite o nome exato
+                            (ex: Roboto,
+                            Oswald)</div>
+                        <input type="text" id="custom-font-input" placeholder="Ex: Roboto"
+                            onchange="importarFonte(this.value)"
+                            style="background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 3px; color: var(--text); font-size: 13px; padding: 5px 8px; width: 100%; outline: none; font-family: &quot;Crimson Text&quot;, serif;">
+                        <div id="font-preview"
+                            style="margin-top: 8px; font-family: &quot;Cinzel&quot;, serif; font-size: 16px; color: var(--accent2); text-align: center; padding: 6px; background: var(--bg3); border-radius: 4px; border: 1px solid var(--border);">
+                            D&amp;D 5e · Ficha</div>
+                    </div>
+                    <div class="tcol" style="min-width:180px;">
+                        <label class="tlbl">Tamanho Base do Texto</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 6px;">Afeta todo o corpo de
+                            texto</div>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <input type="range" id="mpicker-fontsize" min="12" max="18" value="15"
+                                oninput="applyFontSize(this.value)" style="flex:1; accent-color:var(--accent);">
+                            <span id="fontsize-label"
+                                style="font-family: &quot;Cinzel&quot;, serif; font-size: 12px; color: var(--accent2); min-width: 30px;">15px</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div
+                    style="font-family: &quot;Cinzel&quot;, serif; font-size: 10px; letter-spacing: 3px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 12px;">
+                    ⚡ EFEITOS ESPECIAIS</div>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px;">
+                    <div class="tcol">
+                        <label class="tlbl">Textura de Fundo</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 6px;">Padrão decorativo na
+                            página</div>
+                        <select id="bg-pattern" onchange="applyBgPattern(this.value)"
+                            style="background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 3px; color: var(--text); font-size: 13px; padding: 5px 8px; width: 100%; font-family: &quot;Crimson Text&quot;, serif;">
+                            <option value="none">✕ Nenhuma</option>
+                            <option value="topography">🐾Topográfia</option>
+                            <option value="clouds">☁️ Nuvens</option>
+                            <option value="crosses">✚ Cruzes (padrão)</option>
+                            <option value="dots">● Pontos</option>
+                            <option value="grid">▦ Grade</option>
+                            <option value="diamonds">◆ Diamantes</option>
+                            <option value="spiderweb">🕸 Teia</option>
+                            <option value="scales">🐉 Escamas</option>
+                            <option value="hexagons">⬡ Hexágonos</option>
+                            <option value="waves">🌊 Ondas</option>
+                            <option value="leaf">🌿Folhas</option>
+                            <option value="stars">⭐ Estrelas</option>
+                            <option value="radiant">☀️ Radiante</option>
+                            <option value="skull">💀 Cranios</option>
+                            <option value="padrão">📐 Padrão</option>
+                            <option value="triangles">🔺 Triangular</option>
+                            <option value="eyes">👁️ Psi</option>
+                        </select>
+                    </div>
+                    <div class="tcol">
+                        <label class="tlbl">Raio das Bordas</label>
+                        <div style="font-size: 10px; color: var(--text3); margin-bottom: 6px;">Arredondamento dos
+                            painéis</div>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <input type="range" id="border-radius-ctrl" min="0" max="16" value="6"
+                                oninput="applyBorderRadius(this.value)" style="flex:1; accent-color:var(--accent);">
+                            <span id="border-radius-label"
+                                style="font-family: &quot;Cinzel&quot;, serif; font-size: 12px; color: var(--accent2); min-width: 30px;">6px</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                style="display: flex; gap: 10px; justify-content: flex-end; padding-top: 8px; border-top: 1px solid var(--border);">
+                <button onclick="resetCustomTheme()"
+                    style="font-family: &quot;Cinzel&quot;, serif; font-size: 11px; letter-spacing: 1px; background: transparent; border: 1px solid var(--border); border-radius: 4px; color: var(--text3); padding: 8px 18px; cursor: pointer;">↺
+                    Resetar Padrão</button>
+                <button onclick="closeThemeModal()"
+                    style="font-family: &quot;Cinzel&quot;, serif; font-size: 12px; letter-spacing: 1px; background: linear-gradient(135deg,var(--accent),var(--accent2)); border: medium; border-radius: 4px; color: var(--bg); padding: 9px 24px; cursor: pointer; font-weight: 700;">✔
+                    Aplicar &amp; Fechar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="tabs">
+    <div class="tab active" onclick="switchTab(0)">⚔ Principal</div>
+    <div class="tab" onclick="switchTab(1)">👤 Personagem</div>
+    <div class="tab" onclick="switchTab(2)">✨ Magias</div>
+</div>
+
+<div class="page active" id="page0">
+    <div class="panel mb16">
+        <div class="grid-6" style="gap:8px;">
+            <div><label>Nome</label><input type="text" id="char-name" oninput="updateHeader()" placeholder="Aragorn...">
+            </div>
+            <div><label>Classe &amp; Nível</label><input type="text" id="char-class" oninput="updateHeader()"
+                    placeholder="Guerreiro 5"></div>
+            <div><label>Raça</label><input type="text" id="char-race" oninput="updateHeader()" placeholder="Humano">
+            </div>
+            <div><label>Antecedente</label><input type="text" id="char-bg" placeholder="Soldado"></div>
+            <div><label>Alinhamento</label>
+                <select id="char-align" onchange="updateHeader()">
+                    <option value="">—</option>
+                    <option value="Leal e Bom">Leal e Bom</option>
+                    <option value="Neutro e Bom">Neutro e Bom</option>
+                    <option value="Caótico e Bom">Caótico e Bom</option>
+                    <option value="Leal e Neutro">Leal e Neutro</option>
+                    <option value="Neutro Puro">Neutro Puro</option>
+                    <option value="Caótico e Neutro">Caótico e Neutro</option>
+                    <option value="Leal e Mau">Leal e Mau</option>
+                    <option value="Neutro e Mau">Neutro e Mau</option>
+                    <option value="Caótico e Mau">Caótico e Mau</option>
+                </select>
+            </div>
+            <div><label>Experiência</label><input type="number" id="char-xp" min="0" placeholder="0"></div>
+        </div>
+    </div>
+
+    <div class="page1-layout">
+        <div>
+            <div class="panel mb12">
+                <div class="section-title mb12">Atributos</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;" id="attrs-grid">
+                    <div class="attr-box">
+                        <div class="attr-name">Força</div>
+                        <input type="number" class="attr-score" id="attr-score-str" value="10" min="1" max="30"
+                            oninput="onAttrChange()">
+                        <div class="attr-mod" id="attr-mod-str">+0</div>
+                    </div>
+                    <div class="attr-box">
+                        <div class="attr-name">Destreza</div>
+                        <input type="number" class="attr-score" id="attr-score-dex" value="10" min="1" max="30"
+                            oninput="onAttrChange()">
+                        <div class="attr-mod" id="attr-mod-dex">+0</div>
+                    </div>
+                    <div class="attr-box">
+                        <div class="attr-name">Constituição</div>
+                        <input type="number" class="attr-score" id="attr-score-con" value="10" min="1" max="30"
+                            oninput="onAttrChange()">
+                        <div class="attr-mod" id="attr-mod-con">+0</div>
+                    </div>
+                    <div class="attr-box">
+                        <div class="attr-name">Inteligência</div>
+                        <input type="number" class="attr-score" id="attr-score-int" value="10" min="1" max="30"
+                            oninput="onAttrChange()">
+                        <div class="attr-mod" id="attr-mod-int">+0</div>
+                    </div>
+                    <div class="attr-box">
+                        <div class="attr-name">Sabedoria</div>
+                        <input type="number" class="attr-score" id="attr-score-wis" value="10" min="1" max="30"
+                            oninput="onAttrChange()">
+                        <div class="attr-mod" id="attr-mod-wis">+0</div>
+                    </div>
+                    <div class="attr-box">
+                        <div class="attr-name">Carisma</div>
+                        <input type="number" class="attr-score" id="attr-score-cha" value="10" min="1" max="30"
+                            oninput="onAttrChange()">
+                        <div class="attr-mod" id="attr-mod-cha">+0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel mb12">
+                <div class="grid-2" style="align-items:start;">
+                    <div>
+                        <div class="section-title mb8">Prof.</div>
+                        <div class="prof-badge">
+                            <div class="pb-num" id="prof-bonus">+2</div>
+                            <div class="pb-label">Bônus</div>
+                        </div>
+                        <div style="text-align:center; margin-top:6px;">
+                            <label>Nível</label>
+                            <input type="number" id="char-level" min="1" max="20" value="1" oninput="updateProfBonus()"
+                                style="width:60px; text-align:center; margin:0 auto; display:block;">
+                        </div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div class="section-title mb8">Inspiração</div>
+                        <div class="insp-box" id="insp-box" onclick="toggleInspiration()" title="Clique para alternar">✦
+                        </div>
+                        <div style="font-size: 11px; color: var(--text3); margin-top: 6px;">Clique p/ ativar</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="section-title mb4">Percepção Passiva</div>
+                <input type="number" id="passive-perc" value="10"
+                    style="font-family: &quot;Cinzel&quot;, serif; font-size: 28px; font-weight: 700; color: var(--accent2); text-align: center; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 4px; padding: 4px; width: 100%; box-sizing: border-box;"
+                    oninput="onPassivePercInput()" title="Calculado automaticamente; edite para sobrescrever">
+                <div style="font-size: 11px; color: var(--text3); text-align: center;">10 + Mod Percepção</div>
+            </div>
+        </div>
+
+        <div>
+            <div class="panel mb12">
+                <div class="section-title mb8">Testes de Resistência</div>
+                <div id="saves-list">
+                    <div class="save-row">
+                        <div class="save-check" id="save-check-str" onclick="toggleSaveProf('str')"></div>
+                        <div class="save-value" id="save-val-str">+0</div>
+                        <div class="save-label">Força <span style="font-size:10px; color:var(--text3);">(For)</span>
+                        </div>
+                    </div>
+                    <div class="save-row">
+                        <div class="save-check" id="save-check-dex" onclick="toggleSaveProf('dex')"></div>
+                        <div class="save-value" id="save-val-dex">+0</div>
+                        <div class="save-label">Destreza <span style="font-size:10px; color:var(--text3);">(Des)</span>
+                        </div>
+                    </div>
+                    <div class="save-row">
+                        <div class="save-check" id="save-check-con" onclick="toggleSaveProf('con')"></div>
+                        <div class="save-value" id="save-val-con">+0</div>
+                        <div class="save-label">Constituição <span
+                                style="font-size:10px; color:var(--text3);">(Con)</span></div>
+                    </div>
+                    <div class="save-row">
+                        <div class="save-check" id="save-check-int" onclick="toggleSaveProf('int')"></div>
+                        <div class="save-value" id="save-val-int">+0</div>
+                        <div class="save-label">Inteligência <span
+                                style="font-size:10px; color:var(--text3);">(Int)</span></div>
+                    </div>
+                    <div class="save-row">
+                        <div class="save-check" id="save-check-wis" onclick="toggleSaveProf('wis')"></div>
+                        <div class="save-value" id="save-val-wis">+0</div>
+                        <div class="save-label">Sabedoria <span style="font-size:10px; color:var(--text3);">(Sab)</span>
+                        </div>
+                    </div>
+                    <div class="save-row">
+                        <div class="save-check" id="save-check-cha" onclick="toggleSaveProf('cha')"></div>
+                        <div class="save-value" id="save-val-cha">+0</div>
+                        <div class="save-label">Carisma <span style="font-size:10px; color:var(--text3);">(Car)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel mb12">
+                <div class="section-title mb8">Perícias</div>
+                <div id="skills-list">
+                    <div class="skill-row">
+                        <div class="skill-prof" id="skill-prof-acrobatics" onclick="cycleSkillProf('acrobatics')">
+                        </div>
+                        <div class="skill-val" id="skill-val-acrobatics">+0</div>
+                        <div class="skill-name">Acrobacia</div>
+                        <div class="skill-attr">Des</div>
+                    </div>
+                    <div class="skill-row">
+                        <div class="skill-prof" id="skill-prof-arcana" onclick="cycleSkillProf('arcana')"></div>
+                        <div class="skill-val" id="skill-val-arcana">+0</div>
+                        <div class="skill-name">Arcanismo</div>
+                        <div class="skill-attr">Int</div>
+                    </div>
+                    <div class="skill-row">
+                        <div class="skill-prof" id="skill-prof-athletics" onclick="cycleSkillProf('athletics')">
+                        </div>
+                        <div class="skill-val" id="skill-val-athletics">+0</div>
+                        <div class="skill-name">Atletismo</div>
+                        <div class="skill-attr">For</div>
+                    </div>
+                    <div class="skill-row">
+                        <div class="skill-prof" id="skill-prof-deception" onclick="cycleSkillProf('deception')">
+                        </div>
+                        <div class="skill-val" id="skill-val-deception">+0</div>
+                        <div class="skill-name">Enganação</div>
+                        <div class="skill-attr">Car</div>
+                    </div>
+                    <div class="skill-row">
+                        <div class="skill-prof" id="skill-prof-stealth" onclick="cycleSkillProf('stealth')"></div>
+                        <div class="skill-val" id="skill-val-stealth">+0</div>
+                        <div class="skill-name">Furtividade</div>
+                        <div class="skill-attr">Des</div>
+                    </div>
+                    <div class="skill-row">
+                        <div class="skill-prof" id="skill-prof-history" onclick="cycleSkillProf('history')"></div>
+                        <div class="skill-val" id="skill-val-history">+0</div>
+                        <div class="skill-name">História</div>
+                        <div class="skill-attr">Int</div>
+                    </div>
+                    <div class="skill-row">
+                        <div class="skill-prof" id="skill-prof-insight" onclick="cycleSkillProf('insight')"></div>
+                        <div class="skill-val" id="skill-val-insight">+0</div>
+                        <div class="skill-name">Intuição</div>
+                        <div class="skill-attr">Sab</div>
+                    </div>
+                    <div class="skill-row">
+                        <div class="skill-prof" id="skill-prof-intimidation" onclick="cycleSkillProf('intimidation')">
+                        </div>
+                        <div class="skill-val" id="skill-val-intimidation">+0</div>
+                        <div class="skill-name">Intimidação</div>
+                        <div class="skill-attr">Car</div>
+                    </div>
+                    <div class="skill-row">
+                        <div class="skill-prof" id="skill-prof-investigation" onclick="cycleSkillProf('investigation')">
+                        </div>
+                        <div class="skill-val" id="skill-val-investigation">+0</div>
+                        <div class="skill-name">Investigação</div>
+                        <div class="skill-attr">Int</div>
+                    </div>
+                    <div class="skill-row">
+                        <div class="skill-prof" id="skill-prof-animal" onclick="cycleSkillProf('animal')"></div>
+                        <div class="skill-val" id="skill-val-animal">+0</div>
+                        <div class="skill-name">Lidar c/ Animais</div>
+                        <div class="skill-attr">Sab</div>
+                    </div>
+                    <div class="skill-row">
+                        <div class="skill-prof" id="skill-prof-medicine" onclick="cycleSkillProf('medicine')"></div>
+                        <div class="skill-val" id="skill-val-medicine">+0</div>
+                        <div class="skill-name">Medicina</div>
+                        <div class="skill-attr">Sab</div>
+                    </div>
+                    <div class="skill-row">
+                        <div class="skill-prof" id="skill-prof-nature" onclick="cycleSkillProf('nature')"></div>
+                        <div class="skill-val" id="skill-val-nature">+0</div>
+                        <div class="skill-name">Natureza</div>
+                        <div class="skill-attr">Int</div>
+                    </div>
+                    <div class="skill-row">
+                        <div class="skill-prof" id="skill-prof-perception" onclick="cycleSkillProf('perception')">
+                        </div>
+                        <div class="skill-val" id="skill-val-perception">+0</div>
+                        <div class="skill-name">Percepção</div>
+                        <div class="skill-attr">Sab</div>
+                    </div>
+                    <div class="skill-row">
+                        <div class="skill-prof" id="skill-prof-performance" onclick="cycleSkillProf('performance')">
+                        </div>
+                        <div class="skill-val" id="skill-val-performance">+0</div>
+                        <div class="skill-name">Performance</div>
+                        <div class="skill-attr">Car</div>
+                    </div>
+                    <div class="skill-row">
+                        <div class="skill-prof" id="skill-prof-persuasion" onclick="cycleSkillProf('persuasion')">
+                        </div>
+                        <div class="skill-val" id="skill-val-persuasion">+0</div>
+                        <div class="skill-name">Persuasão</div>
+                        <div class="skill-attr">Car</div>
+                    </div>
+                    <div class="skill-row">
+                        <div class="skill-prof" id="skill-prof-sleight" onclick="cycleSkillProf('sleight')"></div>
+                        <div class="skill-val" id="skill-val-sleight">+0</div>
+                        <div class="skill-name">Prestidigitação</div>
+                        <div class="skill-attr">Des</div>
+                    </div>
+                    <div class="skill-row">
+                        <div class="skill-prof" id="skill-prof-religion" onclick="cycleSkillProf('religion')"></div>
+                        <div class="skill-val" id="skill-val-religion">+0</div>
+                        <div class="skill-name">Religião</div>
+                        <div class="skill-attr">Int</div>
+                    </div>
+                    <div class="skill-row">
+                        <div class="skill-prof" id="skill-prof-survival" onclick="cycleSkillProf('survival')"></div>
+                        <div class="skill-val" id="skill-val-survival">+0</div>
+                        <div class="skill-name">Sobrevivência</div>
+                        <div class="skill-attr">Sab</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="section-title mb8" style="position: relative;">
+                    Talentos (Feats)
+                    <button class="add-btn"
+                        style="position: absolute; right: 0; bottom: 4px; width: auto; padding: 2px 5px; margin: 0;"
+                        onclick="addFeat()">+ Adicionar</button>
+                </div>
+                <div id="feats-list"></div>
+            </div>
+        </div>
+
+        <div>
+            <div class="panel mb12">
+                <div class="section-title mb8">Combate</div>
+                <div class="grid-3 mb12" style="gap:8px;">
+                    <div class="combat-stat">
+                        <label>CA</label>
+                        <input type="number" class="big-num" id="armor-class" min="0" value="10" style="width:100%;">
+                    </div>
+                    <div class="combat-stat">
+                        <label>Iniciativa</label>
+                        <input type="number" class="big-num" id="initiative" value="0" style="width:100%;"
+                            oninput="onInitiativeInput()"
+                            title="Calculado automaticamente por Des; edite para sobrescrever">
+                    </div>
+                    <div class="combat-stat">
+                        <label>Deslocamento</label>
+                        <div style="position: relative; width: 100%;">
+                            <input type="number" class="big-num" id="speed" min="0" value="9"
+                                style="width: 100%; padding-right: 15px;">
+                            <span
+                                style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 16px; color: var(--text3); pointer-events: none;">m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title mb8">Pontos de Vida</div>
+                <div class="grid-2 mb8" style="gap:8px;">
+                    <div><label>PV Máximos</label><input type="number" id="hp-max" min="0" value="10"
+                            oninput="updateHPBar()" style="text-align:center;"></div>
+                    <div><label>PV Temporários</label><input type="number" id="hp-temp" min="0" value="0"
+                            oninput="updateHPBar()" style="text-align:center;"></div>
+                </div>
+                <div class="hp-bar mb4">
+                    <div class="hp-bar-fill" id="hp-bar-fill" style="width: 100%;"></div>
+                    <div class="hp-bar-temp" id="hp-bar-temp" style="width:0%;"></div>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span style="font-size: 10px; color: var(--text3); letter-spacing: 1px;">VIDA ATUAL</span>
+                    <span id="hp-temp-badge" class="hp-temp-badge" style="display:none;">✦ <span
+                            id="hp-temp-label">0</span>
+                        temp</span>
+                </div>
+                <div class="hp-section">
+                    <div class="hp-row">
+                        <button class="hp-btn dmg" onclick="changeHP(-1)" title="Sofrer 1 dano">−</button>
+                        <input type="number" class="hp-current" id="hp-current" value="10" oninput="updateHPBar()"
+                            min="0">
+                        <button class="hp-btn" onclick="changeHP(1)" title="Curar 1">+</button>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <input type="number" id="hp-delta" value="1" min="1" style="width:60px; text-align:center;"
+                            placeholder="Qtd">
+                        <button class="hp-btn dmg" onclick="changeHPBy(-1)" style="flex:1; width:auto;">Dano</button>
+                        <button class="hp-btn" onclick="changeHPBy(1)" style="flex:1; width:auto;">Cura</button>
+                    </div>
+                </div>
+
+                <div class="mt12 mb8">
+                    <div class="grid-3" style="gap:6px;">
+                        <div><label>Dados de Vida</label><input type="text" id="hd-die" placeholder="d8"></div>
+                        <div><label>Total</label><input type="number" id="hd-total" min="0" value="0"></div>
+                        <div><label>Restantes</label><input type="number" id="hd-left" min="0" value="0"></div>
+                    </div>
+                </div>
+
+                <div class="section-title mb8 mt8">Testes Contra a Morte</div>
+                <div class="death-saves">
+                    <div class="ds-group">
+                        <span class="ds-label" style="color: var(--green);">Sucessos</span>
+                        <div class="ds-box success" id="ds-s1" onclick="toggleDS('s',1)"></div>
+                        <div class="ds-box success" id="ds-s2" onclick="toggleDS('s',2)"></div>
+                        <div class="ds-box success" id="ds-s3" onclick="toggleDS('s',3)"></div>
+                    </div>
+                    <div class="ds-group">
+                        <span class="ds-label" style="color: var(--red2);">Falhas</span>
+                        <div class="ds-box failure" id="ds-f1" onclick="toggleDS('f',1)"></div>
+                        <div class="ds-box failure" id="ds-f2" onclick="toggleDS('f',2)"></div>
+                        <div class="ds-box failure" id="ds-f3" onclick="toggleDS('f',3)"></div>
+                    </div>
+                </div>
+
+                <div class="section-title mb8 mt12">Características Limitadas</div>
+                <div id="limited-resources-list" style="display:flex; flex-direction:column; gap:4px;"></div>
+                <button class="add-btn mt8" onclick="addLimitedResource()" style="margin-top:6px;">+ Adicionar
+                    Recurso</button>
+            </div>
+
+            <div class="panel mb12">
+                <div class="section-title mb8">Ataques &amp; Magia</div>
+                <table class="attack-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Bônus Atq</th>
+                            <th>Dano / Tipo</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="attacks-body">
+                        <tr>
+                            <td><input type="text" value="" placeholder="Espada Longa"
+                                    oninput="attacks[0].name=this.value"></td>
+                            <td style="width:80px;"><input type="text" value="" placeholder="+5"
+                                    oninput="attacks[0].bonus=this.value"></td>
+                            <td><input type="text" value="" placeholder="1d8+3 / Cortante"
+                                    oninput="attacks[0].damage=this.value">
+                            </td>
+                            <td class="attack-row-del" onclick="removeAttack(0)">×</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="add-btn" onclick="addAttack()">+ Adicionar Ataque</button>
+            </div>
+
+            <div class="panel">
+                <div class="section-title mb8">Proficiências &amp; Línguas</div>
+                <div class="mb8"><label>Armaduras</label><input type="text" id="prof-armor"
+                        placeholder="Leves, Médias, Pesadas, Escudos"></div>
+                <div class="mb8"><label>Armas</label><input type="text" id="prof-weapons"
+                        placeholder="Simples, Marciais">
+                </div>
+                <div class="mb8"><label>Ferramentas</label><input type="text" id="prof-tools"
+                        placeholder="Ferramentas de artesão..."></div>
+                <div><label>Línguas</label><input type="text" id="prof-langs" placeholder="Comum, Élfico..."></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page" id="page1">
+    <div class="char-grid-3">
+
+        <!-- COLUNA 1 -->
+        <div>
+            <div class="panel mb12">
+                <div class="section-title mb8">Traços &amp; Personalidade</div>
+                <div class="mb8"><label>Traços da Personalidade</label><input type="text" id="trait-personality"
+                        placeholder="Como você age, fala ou pensa..."></div>
+                <div class="mb8"><label>Ideais</label><input type="text" id="trait-ideals"
+                        placeholder="O que guia suas ações..."></div>
+                <div class="mb8"><label>Laços</label><input type="text" id="trait-bonds"
+                        placeholder="O que o conecta ao mundo..."></div>
+                <div><label>Manias</label><input type="text" id="trait-quirks" placeholder="Comportamentos incomuns...">
+                </div>
+            </div>
+
+            <div class="panel mb12">
+                <div class="section-title mb8">Aparência</div>
+                <div class="grid-2 mb8">
+                    <div><label>Idade</label><input type="text" id="app-age" placeholder="30 anos"></div>
+                    <div><label>Altura</label><input type="text" id="app-height" placeholder="1,80 m"></div>
+                </div>
+                <div class="grid-2 mb8">
+                    <div><label>Peso</label><input type="text" id="app-weight" placeholder="80 kg"></div>
+                    <div><label>Olhos</label><input type="text" id="app-eyes" placeholder="Castanhos"></div>
+                </div>
+                <div class="grid-2 mb8">
+                    <div><label>Cabelo</label><input type="text" id="app-hair" placeholder="Negro"></div>
+                    <div><label>Pele</label><input type="text" id="app-skin" placeholder="Oliva"></div>
+                </div>
+            </div>
+
+            <!-- HISTÓRIA (Movida para cá) -->
+            <div class="panel">
+                <div class="section-title mb8">Descrição</div>
+                <div class="rn-wrap">
+                    <div class="rn-bar" style="top: -34px;"><button class="rn-toggle"
+                            onclick="toggleRN('char-history',this)">👁</button></div>
+                    <textarea id="char-history" rows="15" placeholder="Escreva sobre o seu personagem..."
+                        style="resize: vertical;"></textarea>
+                    <div class="rn-preview" id="rn-char-history" onclick="editRN('char-history',this)"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUNA 2 -->
+        <div>
+            <div class="panel mb12" style="text-align: center; height: 100%;">
+                <div class="section-title mb8">Retrato do Personagem</div>
+                <div class="avatar-container" onclick="document.getElementById('avatar-input').click()"
+                    style="height: 533px;">
+                    <img id="char-avatar" alt="Avatar" src="" style="display: none;">
+                    <div id="avatar-placeholder" class="avatar-placeholder" style="display: flex;">
+                        <span>🖼️</span><span>Carregar Imagem</span>
+                    </div>
+                </div>
+                <input type="file" id="avatar-input" accept="image/*" style="display:none;"
+                    onchange="abrirCropper(this, 'avatar')">
+                <button id="avatar-reset-btn" onclick="resetAvatar()"
+                    style="display:none; margin-top:8px; width:100%; background:transparent; border:1px solid var(--border); border-radius:4px; color:var(--text3); font-family:'Cinzel',serif; font-size:10px; letter-spacing:1.5px; padding:6px; cursor:pointer; transition:all 0.2s;"
+                    onmouseover="this.style.borderColor='var(--border2)';this.style.color='var(--accent2)'"
+                    onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text3)'">× Remover
+                    Retrato</button>
+            </div>
+        </div>
+        <!-- COLUNA 3 -->
+        <div>
+            <div class="panel mb12" style="padding-bottom: 2%;">
+                <div class="section-title mb8">Características de Classe &amp; Raça</div>
+                <div class="rn-wrap">
+                    <div class="rn-bar" style="top: -34px;"><button class="rn-toggle"
+                            onclick="toggleRN('class-features',this)">👁</button></div>
+                    <textarea id="class-features" rows="10" placeholder="# Ataque Extra..."
+                        style="resize: vertical;"></textarea>
+                    <div class="rn-preview" id="rn-class-features" onclick="editRN('class-features',this)"></div>
+                </div>
+            </div>
+            <div class="panel" style="padding-bottom: 1.9%;">
+                <div class="section-title mb8">Equipamento &amp; Inventário</div>
+                <div class="grid-4 mb8" style="gap:8px;">
+                    <div><label>PC</label><input type="number" id="coin-cp" min="0" value="0"></div>
+                    <div><label>PP</label><input type="number" id="coin-sp" min="0" value="0"></div>
+                    <div><label>PO</label><input type="number" id="coin-gp" min="0" value="0"></div>
+                    <div><label>PL</label><input type="number" id="coin-pp" min="0" value="0"></div>
+                </div>
+                <div class="rn-wrap">
+                    <div class="rn-bar" style="top: -86.5px;"><button class="rn-toggle"
+                            onclick="toggleRN('equipment',this)">👁</button></div>
+                    <textarea id="equipment" rows="12" placeholder="# Armas..." style="resize: vertical;"></textarea>
+                    <div class="rn-preview" id="rn-equipment" onclick="editRN('equipment',this)"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page" id="page2">
+    <style>
+        .page2-layout {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 20px;
+            align-items: start;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Garante 1 coluna inteira para caber os losangos no Desktop */
+        #slots-grid {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 6px !important;
+        }
+
+        #slots-grid .slot-block {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            padding: 6px 12px !important;
+            margin: 0 !important;
+        }
+
+        #slots-grid .sl-num {
+            margin-bottom: 0 !important;
+            font-size: 11px !important;
+        }
+
+        #slots-grid .sl-pips {
+            display: flex !important;
+            gap: 6px !important;
+            justify-content: flex-end !important;
+            flex-wrap: wrap !important;
+        }
+
+        .sl-pip {
+            width: 16px !important;
+            height: 14px !important;
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none !important;
+            background: var(--input-bg);
+            display: inline-block;
+        }
+
+        .sl-pip.used {
+            background: var(--bg) !important;
+            opacity: 0.4;
+        }
+
+        .sl-pip.avail {
+            background: linear-gradient(135deg, var(--accent), var(--accent2)) !important;
+            box-shadow: 0 0 6px var(--glow) !important;
+        }
+
+        /* Mobile */
+        @media (max-width: 800px) {
+            .page2-layout {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+            }
+        }
+    </style>
+    <div class="page2-layout">
+        <div class="panel" style="padding-bottom: 10px;">
+            <div class="section-title mb8" style="text-align: center;">Codex de Magias</div>
+            <div class="rn-wrap">
+                <div class="rn-bar" style="top: -34px;">
+                    <button class="rn-toggle" onclick="toggleRN('spells-catalog',this)">👁</button>
+                </div>
+                <textarea id="spells-catalog" rows="5"
+                    placeholder="## Truques&#10;- Raio de Fogo&#10;- Mãos Mágicas&#10;&#10;## Nível 1&#10;- Escudo Arcano&#10;- Mísseis Mágicos"
+                    style="resize: vertical; width: 100%; min-height: 200px;"></textarea>
+
+                <div class="rn-preview" id="rn-spells-catalog" onclick="editRN('spells-catalog',this)"
+                    style="min-height: 200px; width: 100%;"></div>
+            </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="panel">
+                <div class="section-title mb8">Conjuração</div>
+                <div class="mb8"><label>Classe Mágica</label><input type="text" id="spell-class"
+                        placeholder="Mago, Clérigo..."></div>
+                <div class="mb8"><label>Habilidade</label>
+                    <select id="spell-ability" onchange="updateSpellDC()">
+                        <option value="">—</option>
+                        <option value="int">Inteligência</option>
+                        <option value="wis">Sabedoria</option>
+                        <option value="cha">Carisma</option>
+                    </select>
+                </div>
+                <div class="grid-2">
+                    <div class="combat-stat">
+                        <label>CD de Resistência</label>
+                        <input type="number" id="spell-dc" oninput="spellDCOverride=true"
+                            title="Calculado automaticamente; edite para sobrescrever"
+                            style="font-family: 'Cinzel', serif; font-size: 24px; font-weight: 700; color: var(--accent2); text-align: center; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 4px; padding: 4px; width: 100%; height: 42px;">
+                    </div>
+                    <div class="combat-stat">
+                        <label>Bônus de Ataque</label>
+                        <div id="spell-atk"
+                            style="font-family: 'Cinzel', serif; font-size: 24px; font-weight: 700; color: var(--accent2); background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 4px; padding: 4px; height: 42px; display: flex; align-items: center; justify-content: center;">
+                            —</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="section-title mb10">Espaços de Magia</div>
+                <div id="slots-grid"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast">📄 Ficha salva no PC!</div>
+<!-- INÍCIO DO RODAPÉ -->
+<div
+    style="text-align: center; padding: 20px; margin-top: 20px; border-top: 1px solid var(--border); color: var(--text3); font-family: 'Cinzel', serif; font-size: 11px;">
+    <p>Desenvolvido por <strong>TAWO</strong> (Licença MIT).</p>
+    <p style="margin-top: 8px; font-family: 'Crimson Text', serif; font-size: 10px; opacity: 0.8;">
+        Este projeto não é oficial e é permitido pela Política de Conteúdo de Fãs da Wizards of the Coast. Não é
+        aprovado
+        ou endossado pela Wizards. Partes dos materiais utilizados são propriedade da Wizards of the Coast. ©Wizards
+        of
+        the Coast LLC.
+    </p>
+</div>
+<!-- FIM DO RODAPÉ -->
+
+<div id="crop-modal"
+    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(5px); z-index:10000; align-items:center; justify-content:center;">
+    <div
+        style="background:var(--bg2); padding:24px; border:2px solid var(--border2); border-radius:8px; width:90%; max-width:500px; box-shadow:0 10px 40px rgba(0,0,0,0.8);">
+        <div
+            style="font-family:'Cinzel', serif; font-size:16px; font-weight:700; color:var(--accent2); text-align:center; margin-bottom:16px; letter-spacing:2px;">
+            ✂️ AJUSTAR IMAGEM
+        </div>
+
+        <div
+            style="width:100%; height:400px; background:var(--bg); border:1px solid var(--border); border-radius:4px; overflow:hidden;">
+            <img id="crop-image" style="display:block; max-width:100%;">
+        </div>
+
+        <div style="margin-top:20px; display:flex; justify-content:center; gap:16px;">
+            <button class="h-btn" onclick="fecharCropper()"
+                style="width:140px; border-color:var(--red); color:var(--red2); font-family:'Cinzel', serif;">✕
+                Cancelar</button>
+            <button class="h-btn active" onclick="aplicarCrop()"
+                style="width:140px; border-color:var(--green); color:var(--green); font-family:'Cinzel', serif; font-weight:bold;">✔
+                Cortar</button>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
