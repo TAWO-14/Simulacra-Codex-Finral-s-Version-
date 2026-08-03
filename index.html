@@ -155,7 +155,7 @@
                     <div class="theme-option" data-value="fliper">🕹️ Fliperama</div>
                     <div class="theme-option" data-value="neon">📔 Neon</div>
                     <div class="theme-option" data-value="retro">📻 Retrô</div>
-                    <div class="theme-option" data-value="monster">  X Monster</div>
+                    <div class="theme-option" data-value="monster"> X Monster</div>
 
                     <div class="theme-category">Ferramentas</div>
                     <div class="theme-option" data-value="custom">🎨 Personalizado</div>
@@ -176,9 +176,10 @@
 
         <input type="file" id="import-input" accept=".html, .pdf, application/pdf" style="display:none;"
             onchange="ExportImportSystem.lidarComImportacao(event)">
-        <input type="file" id="bg-image-input" accept="image/*" style="display:none;" onchange="abrirCropper(this, 'bg')">
+        <input type="file" id="bg-image-input" accept="image/*" style="display:none;"
+            onchange="abrirCropper(this, 'bg')">
     </div> <!-- Fecha a header-actions -->
- <!-- FECHA O APP-HEADER (Essa div estava faltando e quebrou o site!) -->
+    <!-- FECHA O APP-HEADER (Essa div estava faltando e quebrou o site!) -->
 
     <!-- O theme-modal-overlay continua aqui embaixo normalmente -->
     <div id="theme-modal-overlay" class="hidden"
@@ -1247,28 +1248,28 @@
     </div>
 
     <script>
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.theme-option').forEach(option => {
-        option.addEventListener('click', (e) => {
-            const value = e.target.getAttribute('data-value');
-            const text = e.target.innerText;
-            
-            // Atualiza o texto visualmente
-            document.querySelector('.selected-theme').innerText = text + ' ▼';
-            
-            // Força o fechamento do menu
-            const list = document.querySelector('.theme-list');
-            list.style.display = 'none';
-            setTimeout(() => list.style.display = '', 200);
-            
-            // Aplica o tema escolhido
-            if (typeof changeTheme === 'function') {
-                changeTheme(value);
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    const value = e.target.getAttribute('data-value');
+                    const text = e.target.innerText;
+
+                    // Atualiza o texto visualmente
+                    document.querySelector('.selected-theme').innerText = text + ' ▼';
+
+                    // Força o fechamento do menu
+                    const list = document.querySelector('.theme-list');
+                    list.style.display = 'none';
+                    setTimeout(() => list.style.display = '', 200);
+
+                    // Aplica o tema escolhido
+                    if (typeof changeTheme === 'function') {
+                        changeTheme(value);
+                    }
+                });
+            });
         });
-    });
-});
-</script>
+    </script>
 </body>
 
 </html>
