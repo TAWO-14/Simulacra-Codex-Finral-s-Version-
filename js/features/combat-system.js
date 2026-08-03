@@ -334,7 +334,7 @@ function collectData() {
         _spellSlots: typeof spellSlots !== 'undefined' ? spellSlots : {},
         _spells: typeof spells !== 'undefined' ? spells : {},
         _sanity: typeof sanity !== 'undefined' ? sanity : 10,
-        _theme: document.getElementById('theme-selector')?.value || 'default',
+        _theme: document.body.getAttribute('data-theme') || 'default',
         _avatar: avatarSrc,
         _limitedResources: limitedResources,
         _feats: typeof feats !== 'undefined' ? feats : [],

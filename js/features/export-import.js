@@ -295,8 +295,7 @@ const ExportImportSystem = (() => {
     if (!input.files[0]) return;
 
     try {
-      const libsOk = await DependencyLoader.ensureEssentials();
-      if (!libsOk) {
+if (typeof PDFLib === 'undefined') {
         Toast.error('❌ Erro: Bibliotecas de PDF não carregaram.');
         return false;
       }

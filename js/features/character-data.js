@@ -410,7 +410,7 @@ function collectData() {
         _spellSlots: spellSlots,
         _spells: spells,
         _sanity: sanity,
-        _theme: document.getElementById('theme-selector')?.value || 'default',
+        _theme: document.body.getAttribute('data-theme') || 'default',
         _avatar: avatarSrc,
         _limitedResources: limitedResources,
         _feats: feats,
