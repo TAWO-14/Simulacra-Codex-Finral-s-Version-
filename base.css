@@ -1,0 +1,148 @@
+* {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Crimson Text', Georgia, serif;
+      font-size: 20px;
+      min-height: 100vh;
+      /* REMOVIDO: background-image hardcoded */
+      /* Agora o padrão é gerenciado pelo JS via applyBgPattern() */
+    }
+
+    :root {
+      --header-top: var(--bg);
+      --header-bot: var(--bg);
+    }
+
+    .app-header {
+      background: var(--bg) !important;
+      border-bottom: 2px solid var(--accent);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .app-logo {
+      font-family: 'Cinzel', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent2);
+      text-shadow: 0 0 20px var(--glow), 0 2px 8px var(--shadow);
+      letter-spacing: 2px;
+      flex-shrink: 0;
+    }
+
+    .app-logo span {
+      color: var(--accent);
+    }
+
+    .char-name-header {
+      font-family: 'Cinzel', serif;
+      font-size: 14px;
+      color: var(--text2);
+      border-left: 1px solid var(--border);
+      padding-left: 16px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .char-name-header strong {
+      color: var(--accent);
+      font-size: 17px;
+      display: block;
+    }
+
+    .header-subtitle-input {
+      background: transparent;
+      border: none;
+      border-bottom: 1px dashed transparent;
+      color: var(--text2);
+      font-family: 'Crimson Text', serif;
+      font-size: 13px;
+      width: 100%;
+      outline: none;
+      padding: 1px 2px;
+      transition: border-color 0.2s;
+    }
+
+    .header-subtitle-input:hover,
+    .header-subtitle-input:focus {
+      border-bottom-color: var(--border2);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+
+    input[type=text],
+    input[type=number],
+    textarea,
+    select {
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 3px;
+      color: var(--text);
+      font-family: 'Crimson Text', serif;
+      font-size: 14px;
+      padding: 4px 8px;
+      width: 100%;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    input[type=text]:focus,
+    input[type=number]:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--border2);
+      box-shadow: 0 0 8px var(--glow);
+    }
+
+    textarea {
+      resize: none;
+      min-height: 60px;
+    }
+
+    input[type=number] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+      text-align: center;
+    }
+
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+    }
+
+    label {
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text3);
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--border2);
+    }
