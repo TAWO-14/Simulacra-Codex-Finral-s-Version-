@@ -21,7 +21,8 @@
 
     <!-- 3. CSS de Bibliotecas Externas -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📔</text></svg>">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📔</text></svg>">
 
 
     <!-- 4. JS de Bibliotecas Externas -->
@@ -64,124 +65,13 @@
             <input class="header-subtitle-input" id="header-subtitle" placeholder="Classe · Raça · Alinhamento"
                 title="Clique para editar subtítulo">
         </div>
-        <style>
-            .custom-theme-select {
-                position: relative;
-                display: inline-block;
-            }
-
-            .selected-theme {
-                background: var(--input-bg);
-                border: 1px solid var(--border);
-                color: var(--accent2);
-                padding: 6px 15px;
-                cursor: pointer;
-                border-radius: 4px;
-                font-size: 14px;
-                font-family: 'Cinzel', serif;
-            }
-
-            .theme-list {
-                display: none;
-                position: absolute;
-                top: 100%;
-                right: 0;
-                background: var(--bg2);
-                border: 1px solid var(--border);
-                min-width: 200px;
-                max-height: 400px;
-                overflow-y: auto;
-                z-index: 1000;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.8);
-            }
-
-            .custom-theme-select:hover .theme-list {
-                display: block;
-            }
-
-            .theme-category {
-                background: var(--bg);
-                color: var(--text3);
-                font-size: 11px;
-                padding: 6px 12px;
-                text-transform: uppercase;
-                letter-spacing: 1px;
-                font-weight: bold;
-            }
-
-            .theme-option {
-                padding: 8px 15px;
-                color: var(--text);
-                cursor: pointer;
-                transition: all 0.2s ease;
-                font-size: 14px;
-            }
-
-            .theme-option:hover {
-                background: var(--accent);
-                color: var(--bg);
-            }
-        </style>
 
         <div class="header-actions">
-            <div class="custom-theme-select" title="Tema de cores">
-                <div class="selected-theme">📜 Clássico ▼</div>
-
-                <div class="theme-list">
-                    <div class="theme-category">Classes & Fantasia</div>
-                    <div class="theme-option" data-value="default">📜 Clássico</div>
-                    <div class="theme-option" data-value="barbarian">🪓 Bárbaro</div>
-                    <div class="theme-option" data-value="moon-druid">🌙 Druida da Lua</div>
-                    <div class="theme-option" data-value="dark-elf">🌌 Elfo Negro</div>
-                    <div class="theme-option" data-value="fighter">🐆 Guerreiro</div>
-                    <div class="theme-option" data-value="mage">🔮 Mago</div>
-                    <div class="theme-option" data-value="mystic">👁️ Místico</div>
-                    <div class="theme-option" data-value="necromancer">💀 Necromante</div>
-                    <div class="theme-option" data-value="nord">❄️ Nórdico</div>
-                    <div class="theme-option" data-value="paladin">⚔️ Paladino</div>
-                    <div class="theme-option" data-value="samurai">🌸 Samurai</div>
-                    <div class="theme-option" data-value="owl">🦉 Sábio</div>
-                    <div class="theme-option" data-value="royal">👑 Realeza</div>
-
-                    <div class="theme-category">Cores & Climas</div>
-                    <div class="theme-option" data-value="chocolate-sand">🍫 Chocolate</div>
-                    <div class="theme-option" data-value="Ébano">🐦‍⬛ Ébano</div>
-                    <div class="theme-option" data-value="Midnights">🌌 Midnight</div>
-                    <div class="theme-option" data-value="primavera">🌱Primavera</div>
-                    <div class="theme-option" data-value="verao">☀️ Verão</div>
-                    <div class="theme-option" data-value="redtv">🧣 Outono</div>
-                    <div class="theme-option" data-value="frost">❄️ Inverno</div>
-
-                    <div class="theme-option" data-value="sunset">⛅ Sunset</div>
-                    <div class="theme-option" data-value="Monocromático">♟️ Xeque-Mate</div>
-                    <div class="theme-option" data-value="lava">🌋Lava</div>
-
-                    <div class="theme-category">Retrô & Moderno</div>
-                    <div class="theme-option" data-value="americana">🇺🇸 Americana</div>
-                    <div class="theme-option" data-value="cinema-retro">🎥 Cinema</div>
-                    <div class="theme-option" data-value="cyberpunk">🤖 Cyberpunk</div>
-                    <div class="theme-option" data-value="fliper">🕹️ Fliperama</div>
-                    <div class="theme-option" data-value="neon">📔 Neon</div>
-                    <div class="theme-option" data-value="retro">📻 Retrô</div>
-                    <div class="theme-option" data-value="monster"> X Monster</div>
-                    
-
-
-                    <div class="theme-category">Jardim do Ranger</div>
-                    <div class="theme-option" data-value="lavanda">🪻Lavanda</div>
-                    <div class="theme-option" data-value="girassol">🌻Girassol</div>
-                    <div class="theme-option" data-value="roseiral">🌹Roseiral</div>
-                    <div class="theme-option" data-value="hortensia">🪻Hortensia</div>
-                    <div class="theme-option" data-value="lótus">🪷Lótus</div>
-                    <div class="theme-option" data-value="jasmim">🌼Jasmim</div>
-                    <div class="theme-option" data-value="cerejeira">🌸Cerejeira</div>
-                    <div class="theme-option" data-value="orquidea">🪻Orquidea</div>
-                    
-
-                    <div class="theme-category">Ferramentas</div>
-                    <div class="theme-option" data-value="custom">🎨 Personalizado</div>
-                </div>
-            </div>
+            <button class="theme-trigger selected-theme" id="theme-trigger-btn" type="button" title="Tema de cores">
+                <span id="theme-trigger-emoji">📜</span>
+                <span id="theme-trigger-label">Clássico</span>
+                <span class="theme-trigger-caret">▾</span>
+            </button>
 
             <div class="h-divider"></div>
 
@@ -201,6 +91,28 @@
             onchange="abrirCropper(this, 'bg')">
     </div> <!-- Fecha a header-actions -->
     <!-- FECHA O APP-HEADER (Essa div estava faltando e quebrou o site!) -->
+
+    <!-- Galeria de Temas (substitui o antigo dropdown por hover) -->
+    <div id="themes-modal-overlay" class="themes-modal-overlay hidden">
+        <div class="themes-modal" role="dialog" aria-label="Galeria de temas">
+            <div class="themes-modal-head">
+                <div class="themes-modal-title">🎭 GALERIA DE TEMAS</div>
+                <button class="themes-modal-close" id="themes-modal-close" type="button">✕</button>
+            </div>
+            <div class="themes-modal-body">
+                <input type="text" id="theme-search" class="theme-search-input" placeholder="Buscar tema..."
+                    autocomplete="off">
+                <div class="theme-tabs" id="theme-tabs"></div>
+                <div id="theme-recent"></div>
+                <div class="theme-grid" id="theme-grid"></div>
+                <div class="theme-empty hidden" id="theme-empty">Nenhum tema encontrado com esse termo 🔍</div>
+            </div>
+            <div class="themes-modal-foot">
+                <button class="theme-custom-btn" id="theme-custom-open" type="button">🎨 Criar / editar
+                    tema personalizado</button>
+            </div>
+        </div>
+    </div>
 
     <!-- O theme-modal-overlay continua aqui embaixo normalmente -->
     <div id="theme-modal-overlay" class="hidden"
@@ -1189,7 +1101,7 @@
                 </div>
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 16px;">
+<div style="display: flex; flex-direction: column; gap: 16px;">
                 <div class="panel">
                     <div class="section-title mb8">Conjuração</div>
                     <div class="mb8"><label>Classe Mágica</label><input type="text" id="spell-class"
@@ -1205,15 +1117,17 @@
                     <div class="grid-2">
                         <div class="combat-stat">
                             <label>CD de Resistência</label>
-                            <input type="number" id="spell-dc" oninput="spellDCOverride=true"
-                                title="Calculado automaticamente; edite para sobrescrever"
+                            <input type="number" id="spell-dc"
+                                oninput="if(this.value === '') { window.spellDCOverride = false; updateSpellDC(); } else { window.spellDCOverride = true; }"
+                                title="Calculado automaticamente; apague tudo para voltar ao cálculo automático"
                                 style="font-family: 'Cinzel', serif; font-size: 24px; font-weight: 700; color: var(--accent2); text-align: center; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 4px; padding: 4px; width: 100%; height: 42px;">
                         </div>
                         <div class="combat-stat">
                             <label>Bônus de Ataque</label>
-                            <div id="spell-atk"
-                                style="font-family: 'Cinzel', serif; font-size: 24px; font-weight: 700; color: var(--accent2); background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 4px; padding: 4px; height: 42px; display: flex; align-items: center; justify-content: center;">
-                                —</div>
+                            <input type="text" id="spell-atk"
+                                oninput="if(this.value === '') { window.spellAtkOverride = false; updateSpellDC(); } else { window.spellAtkOverride = true; }"
+                                title="Calculado automaticamente; apague tudo para voltar ao cálculo automático"
+                                style="font-family: 'Cinzel', serif; font-size: 24px; font-weight: 700; color: var(--accent2); text-align: center; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 4px; padding: 4px; width: 100%; height: 42px; box-sizing: border-box;">
                         </div>
                     </div>
                 </div>
@@ -1222,9 +1136,10 @@
                     <div class="section-title mb10">Espaços de Magia</div>
                     <div id="slots-grid"></div>
                 </div>
-
             </div>
+
         </div>
+    </div>
     </div>
 
     <div class="toast" id="toast">📄 Ficha salva no PC!</div>
@@ -1269,27 +1184,215 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.theme-option').forEach(option => {
-                option.addEventListener('click', (e) => {
-                    const value = e.target.getAttribute('data-value');
-                    const text = e.target.innerText;
+        (function () {
+            var THEMES = [
+                { v: 'default', label: 'Clássico', emoji: '📜', cat: 'fantasia' },
+                { v: 'barbarian', label: 'Bárbaro', emoji: '🪓', cat: 'fantasia' },
+                { v: 'moon-druid', label: 'Druida da Lua', emoji: '🌙', cat: 'fantasia' },
+                { v: 'dark-elf', label: 'Elfo Negro', emoji: '🌌', cat: 'fantasia' },
+                { v: 'fighter', label: 'Guerreiro', emoji: '🐆', cat: 'fantasia' },
+                { v: 'mage', label: 'Mago', emoji: '🔮', cat: 'fantasia' },
+                { v: 'mystic', label: 'Místico', emoji: '👁️', cat: 'fantasia' },
+                { v: 'necromancer', label: 'Necromante', emoji: '💀', cat: 'fantasia' },
+                { v: 'nord', label: 'Nórdico', emoji: '❄️', cat: 'fantasia' },
+                { v: 'paladin', label: 'Paladino', emoji: '⚔️', cat: 'fantasia' },
+                { v: 'samurai', label: 'Samurai', emoji: '🌸', cat: 'fantasia' },
+                { v: 'owl', label: 'Sábio', emoji: '🦉', cat: 'fantasia' },
+                { v: 'royal', label: 'Realeza', emoji: '👑', cat: 'fantasia' },
 
-                    // Atualiza o texto visualmente
-                    document.querySelector('.selected-theme').innerText = text + ' ▼';
+                { v: 'chocolate-sand', label: 'Chocolate', emoji: '🍫', cat: 'cores' },
+                { v: 'Ébano', label: 'Ébano', emoji: '🐦‍⬛', cat: 'cores' },
+                { v: 'Midnights', label: 'Midnight', emoji: '🌌', cat: 'cores' },
+                { v: 'primavera', label: 'Primavera', emoji: '🌱', cat: 'cores' },
+                { v: 'verao', label: 'Verão', emoji: '☀️', cat: 'cores' },
+                { v: 'redtv', label: 'Outono', emoji: '🧣', cat: 'cores' },
+                { v: 'frost', label: 'Inverno', emoji: '❄️', cat: 'cores' },
+                { v: 'sunset', label: 'Sunset', emoji: '⛅', cat: 'cores' },
+                { v: 'Monocromático', label: 'Xeque-Mate', emoji: '♟️', cat: 'cores' },
+                { v: 'lava', label: 'Lava', emoji: '🌋', cat: 'cores' },
 
-                    // Força o fechamento do menu
-                    const list = document.querySelector('.theme-list');
-                    list.style.display = 'none';
-                    setTimeout(() => list.style.display = '', 200);
+                { v: 'americana', label: 'Americana', emoji: '🇺🇸', cat: 'retro' },
+                { v: 'cinema-retro', label: 'Cinema', emoji: '🎥', cat: 'retro' },
+                { v: 'cyberpunk', label: 'Cyberpunk', emoji: '🤖', cat: 'retro' },
+                { v: 'fliper', label: 'Fliperama', emoji: '🕹️', cat: 'retro' },
+                { v: 'neon', label: 'Neon', emoji: '📔', cat: 'retro' },
+                { v: 'retro', label: 'Retrô', emoji: '📻', cat: 'retro' },
+                { v: 'monster', label: 'Monster', emoji: '👹', cat: 'retro' },
 
-                    // Aplica o tema escolhido
-                    if (typeof changeTheme === 'function') {
-                        changeTheme(value);
-                    }
+                { v: 'lavanda', label: 'Lavanda', emoji: '🪻', cat: 'jardim' },
+                { v: 'girassol', label: 'Girassol', emoji: '🌻', cat: 'jardim' },
+                { v: 'roseiral', label: 'Roseiral', emoji: '🌹', cat: 'jardim' },
+                { v: 'hortensia', label: 'Hortensia', emoji: '🪻', cat: 'jardim' },
+                { v: 'lótus', label: 'Lótus', emoji: '🪷', cat: 'jardim' },
+                { v: 'jasmim', label: 'Jasmim', emoji: '🌼', cat: 'jardim' },
+                { v: 'cerejeira', label: 'Cerejeira', emoji: '🌸', cat: 'jardim' },
+                { v: 'orquidea', label: 'Orquidea', emoji: '🪻', cat: 'jardim' }
+            ];
+
+            var CATS = [
+                { key: 'todos', label: 'Todos' },
+                { key: 'fantasia', label: 'Classes & Fantasia' },
+                { key: 'cores', label: 'Cores & Climas' },
+                { key: 'retro', label: 'Retrô & Moderno' },
+                { key: 'jardim', label: 'Jardim do Ranger' }
+            ];
+
+            var activeCat = 'todos';
+            var activeValue = 'default';
+            var recent = [];
+            try {
+                var saved = localStorage.getItem('themeGalleryRecent');
+                if (saved) recent = JSON.parse(saved);
+            } catch (e) { /* localStorage indisponível: segue sem histórico */ }
+
+            var overlay = document.getElementById('themes-modal-overlay');
+            var grid = document.getElementById('theme-grid');
+            var tabsEl = document.getElementById('theme-tabs');
+            var recentEl = document.getElementById('theme-recent');
+            var searchInput = document.getElementById('theme-search');
+            var emptyEl = document.getElementById('theme-empty');
+            var triggerBtn = document.getElementById('theme-trigger-btn');
+            var triggerEmoji = document.getElementById('theme-trigger-emoji');
+            var triggerLabel = document.getElementById('theme-trigger-label');
+
+            function renderTabs() {
+                tabsEl.innerHTML = '';
+                CATS.forEach(function (c) {
+                    var b = document.createElement('button');
+                    b.type = 'button';
+                    b.className = 'theme-tab' + (c.key === activeCat ? ' active' : '');
+                    b.textContent = c.label;
+                    b.addEventListener('click', function () {
+                        activeCat = c.key;
+                        renderTabs();
+                        renderGrid();
+                    });
+                    tabsEl.appendChild(b);
                 });
+            }
+
+            function renderRecent() {
+                if (!recent.length || searchInput.value.trim()) {
+                    recentEl.innerHTML = '';
+                    return;
+                }
+                var items = recent
+                    .map(function (v) { return THEMES.filter(function (t) { return t.v === v; })[0]; })
+                    .filter(Boolean)
+                    .slice(0, 6);
+                if (!items.length) {
+                    recentEl.innerHTML = '';
+                    return;
+                }
+                recentEl.innerHTML = '';
+                var label = document.createElement('div');
+                label.className = 'theme-recent-label';
+                label.textContent = 'Usados recentemente';
+                var row = document.createElement('div');
+                row.className = 'theme-recent-row';
+                items.forEach(function (t) {
+                    var chip = document.createElement('button');
+                    chip.type = 'button';
+                    chip.className = 'theme-recent-chip';
+                    chip.innerHTML = '<span>' + t.emoji + '</span><span>' + t.label + '</span>';
+                    chip.addEventListener('click', function () { selectTheme(t); });
+                    row.appendChild(chip);
+                });
+                recentEl.appendChild(label);
+                recentEl.appendChild(row);
+            }
+
+            function renderGrid() {
+                var q = searchInput.value.trim().toLowerCase();
+                var filtered = THEMES.filter(function (t) {
+                    var matchesCat = activeCat === 'todos' || t.cat === activeCat;
+                    var matchesQ = !q || t.label.toLowerCase().indexOf(q) !== -1;
+                    return matchesCat && matchesQ;
+                });
+                grid.innerHTML = '';
+                emptyEl.classList.toggle('hidden', filtered.length > 0);
+                filtered.forEach(function (t) {
+                    var card = document.createElement('button');
+                    card.type = 'button';
+                    card.className = 'theme-card' + (t.v === activeValue ? ' active' : '');
+                    card.innerHTML = '<span class="theme-card-emoji">' + t.emoji + '</span>' +
+                        '<span class="theme-card-label">' + t.label + '</span>';
+                    card.addEventListener('click', function () { selectTheme(t); });
+                    grid.appendChild(card);
+                });
+            }
+
+            function selectTheme(t) {
+                activeValue = t.v;
+                triggerEmoji.textContent = t.emoji;
+                triggerLabel.textContent = t.label;
+
+                recent = [t.v].concat(recent.filter(function (v) { return v !== t.v; })).slice(0, 6);
+                try { localStorage.setItem('themeGalleryRecent', JSON.stringify(recent)); } catch (e) { }
+
+                if (typeof changeTheme === 'function') changeTheme(t.v);
+                closeModal();
+            }
+
+            function openModal() {
+                overlay.classList.remove('hidden');
+                renderTabs();
+                renderRecent();
+                renderGrid();
+                searchInput.value = '';
+                setTimeout(function () { searchInput.focus(); }, 50);
+            }
+
+            function closeModal() {
+                overlay.classList.add('hidden');
+            }
+
+            triggerBtn.addEventListener('click', openModal);
+            document.getElementById('themes-modal-close').addEventListener('click', closeModal);
+            overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && !overlay.classList.contains('hidden')) closeModal();
             });
-        });
+            searchInput.addEventListener('input', function () { renderRecent(); renderGrid(); });
+            document.getElementById('theme-custom-open').addEventListener('click', function () {
+                closeModal();
+                if (typeof changeTheme === 'function') changeTheme('custom');
+                if (typeof openThemeModal === 'function') openThemeModal();
+            });
+
+            // Se o theme-manager.js expuser o tema atualmente salvo (ex: leitura de
+            // localStorage/cookie), sincronize aqui para o botão já abrir mostrando
+            // o tema certo em vez de sempre "Clássico". Exemplo:
+            // var saved = localStorage.getItem('dnd-theme');
+            // var found = THEMES.filter(function(t){ return t.v === saved; })[0];
+            // if (found) selectThemeSilently(found); // função a criar, sem chamar changeTheme de novo
+
+            // ... resto do seu código ...
+            document.getElementById('theme-custom-open').addEventListener('click', function () {
+                closeModal();
+                if (typeof changeTheme === 'function') changeTheme('custom');
+                if (typeof openThemeModal === 'function') openThemeModal();
+            });
+
+            // NOVA FUNÇÃO (Adicione aqui, dentro da IIFE):
+            window.updateThemeButtonUI = function (themeClass) {
+                var themeValue = themeClass.replace('theme-', '');
+
+                if (themeValue === 'custom') {
+                    triggerEmoji.textContent = '🎨';
+                    triggerLabel.textContent = 'Personalizado';
+                    return;
+                }
+
+                // Busca o tema na sua array THEMES que já existe
+                var found = THEMES.filter(function (t) { return t.v === themeValue; })[0];
+                if (found) {
+                    triggerEmoji.textContent = found.emoji;
+                    triggerLabel.textContent = found.label;
+                }
+            };
+
+        })(); // Fim da sua IIFE
     </script>
 </body>
 
