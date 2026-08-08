@@ -113,17 +113,29 @@ function updateSlotPips(level) {
     });
 }
 
+/* Variáveis de controle para saber se o jogador digitou manualmente */
+window.spellDCOverride = window.spellDCOverride || false;
+window.spellAtkOverride = window.spellAtkOverride || false;
+
 function updateSpellDC() {
     const ability = document.getElementById('spell-ability')?.value;
     const dcEl = document.getElementById('spell-dc');
     const atkEl = document.getElementById('spell-atk');
+
     if (!ability) {
-        if (!spellDCOverride && dcEl) dcEl.value = '';
-        if (atkEl) atkEl.textContent = '—';
+        if (!window.spellDCOverride && dcEl) dcEl.value = '';
+        if (!window.spellAtkOverride && atkEl) atkEl.value = ''; // Agora usa .value e respeita o override
         return;
     }
+
     const mod = getMod(getAttrVal(ability)),
         pb = getProfBonus();
-    if (!spellDCOverride && dcEl) dcEl.value = 8 + mod + pb;
-    if (atkEl) atkEl.textContent = fmtMod(mod + pb);
+
+    if (!window.spellDCOverride && dcEl) {
+        dcEl.value = 8 + mod + pb;
+    }
+
+    if (!window.spellAtkOverride && atkEl) {
+        atkEl.value = fmtMod(mod + pb); // Agora usa .value em vez de textContent
+    }
 }

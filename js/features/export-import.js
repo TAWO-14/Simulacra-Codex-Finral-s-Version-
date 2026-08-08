@@ -63,6 +63,14 @@ const ExportImportSystem = (() => {
    */
   const exportarHTML = () => {
     Logger.info('Iniciando exportação...');
+// 🪄 NOVO: Força o fechamento de todos os blocos de Markdown abertos
+    document.querySelectorAll('.rn-toggle').forEach(btn => {
+      // Se o botão exibe o olho, a área de edição está aberta
+      if (btn.textContent.trim() === '👁') {
+          btn.click(); // Simula o clique para compilar o Rich Text
+      }
+    });
+
     HTMLGenerator.download();
   };
 
@@ -181,7 +189,7 @@ const ExportImportSystem = (() => {
         }
       }
 
-      // 3️⃣ Preenche valores dos inputs
+// 3️⃣ Preenche valores dos inputs
       Object.entries(data).forEach(([key, value]) => {
         if (key.startsWith('_')) return; // Skip internos
 
@@ -190,6 +198,10 @@ const ExportImportSystem = (() => {
           try {
             if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
               el.value = value;
+              
+              // 🪄 NOVO: Força o disparo de eventos para atualizar scripts dependentes (como o Rich Text)
+              el.dispatchEvent(new Event('input', { bubbles: true }));
+              el.dispatchEvent(new Event('change', { bubbles: true }));
             }
           } catch (err) {
             Logger.debug(`Erro ao restaurar campo ${key}`, err);
@@ -220,10 +232,15 @@ const ExportImportSystem = (() => {
         }
       }
 
-      // 6️⃣ Restaurar tema
+// 6️⃣ Restaurar tema
       if (data._theme && typeof changeTheme === 'function') {
         try {
           changeTheme(data._theme);
+          
+          // NOVO: Sincroniza o botão da galeria na interface
+          if (typeof window.updateThemeButtonUI === 'function') {
+             window.updateThemeButtonUI(data._theme);
+          }
         } catch (err) {
           Logger.debug('Erro ao restaurar tema', err);
         }

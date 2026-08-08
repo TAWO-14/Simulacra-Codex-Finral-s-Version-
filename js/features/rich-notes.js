@@ -1,29 +1,10 @@
 // ── RICH NOTES ───────────────────────────────────────────────
-function escHtml(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
 function parseHeading(line) {
 
     const parts = line.split("::");
 
     const title = inlineFormat(parts.shift().trim());
 
-    const tags = parts
-        .map(t => t.trim())
-        .filter(Boolean)
-        .map(t => `<span class="src">${inlineFormat(t)}</span>`)
-        .join("");
-
-    return `
-        <button class="rn-collapse">▼</button>
-        ${title}
-        ${tags}
-    `;
-}
-
-function parseHeading(line) {
-    const parts = line.split("::");
-    const title = inlineFormat(parts.shift().trim());
     const tags = parts
         .map(t => t.trim())
         .filter(Boolean)
@@ -86,7 +67,7 @@ function parseRichText(text) {
                 inCodeBlock = true;
                 codeBlockLines = [];
             } else {
-                html += `<pre class="rn-pre"><code>${escHtml(codeBlockLines.join('\n'))}</code></pre>`;
+                html += `<pre class="rn-pre"><code>${escapeHTML(codeBlockLines.join('\n'))}</code></pre>`;
                 inCodeBlock = false;
             }
             return;
@@ -157,14 +138,14 @@ function parseRichText(text) {
 
     closeLists();
     closeBlockquote();
-    if (inCodeBlock) html += `<pre class="rn-pre"><code>${escHtml(codeBlockLines.join('\n'))}</code></pre>`;
+    if (inCodeBlock) html += `<pre class="rn-pre"><code>${escapeHTML(codeBlockLines.join('\n'))}</code></pre>`;
     closeHeadingsTo(0);
 
     return html;
 }
 
 function inlineFormat(s) {
-    let escaped = escHtml(s);
+    let escaped = escapeHTML(s);
 
     const codeSpans = [];
     escaped = escaped.replace(/`([^`]+)`/g, (_, code) => {
@@ -174,8 +155,7 @@ function inlineFormat(s) {
 
     let out = escaped
         .replace(/!\[([^\]]*)\]\((https?:\/\/[\w\.\/\-\?%&=]+|data:image\/[^;]+;base64,[\w\+\/=]+)\)/g, '<img class="rn-img" src="$2" alt="$1">')
-        .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a class="rn-link" href="$2" target="_blank" rel="noopener" onclick="event.stopPropagation()">$1</a>')
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\[([^\]]+)\]\((https?:\/\/[^\)\s]+|mailto:[^\)\s]+)\)/g, '<a class="rn-link" href="$2" target="_blank" rel="noopener" onclick="event.stopPropagation()">$1</a>').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
         .replace(/__(.+?)__/g, '<strong>$1</strong>')
         .replace(/\*(.+?)\*/g, '<em>$1</em>')
         .replace(/(?<![a-zA-Z0-9])_(.+?)_(?![a-zA-Z0-9])/g, '<em>$1</em>')
@@ -220,3 +200,21 @@ function editRN(id, preview) {
     }
     ta.focus();
 }
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.rn-preview').forEach(preview => {
+        // Extrai o ID do textarea correspondente (ex: 'rn-char-history' vira 'char-history')
+        const targetId = preview.id.replace('rn-', '');
+
+        // Remove a ação de clique único do HTML
+        preview.removeAttribute('onclick');
+
+        // Adiciona a ação de clique duplo
+        preview.addEventListener('dblclick', function () {
+            if (typeof editRN === 'function') {
+                editRN(targetId, this);
+            }
+        });
+    });
+});

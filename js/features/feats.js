@@ -44,10 +44,10 @@ function renderFeats() {
             oninput="feats[${i}].desc=this.value"
             style="min-height:50px;">${escapeHTML(f.desc || '')}</textarea>
 
-          <div
+         <div
             class="rn-preview"
             id="rn-feat-desc-${i}"
-            onclick="editRN('feat-desc-${i}',this)">
+            ondblclick="editRN('feat-desc-${i}',this)">
           </div>
         </div>
       </div>
