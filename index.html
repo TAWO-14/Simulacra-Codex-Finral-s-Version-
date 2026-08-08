@@ -959,7 +959,7 @@
                                 onclick="toggleRN('char-history',this)">👁</button></div>
                         <textarea id="char-history" rows="15" placeholder="Escreva sobre o seu personagem..."
                             style="resize: vertical;"></textarea>
-                        <div class="rn-preview" id="rn-char-history" onclick="editRN('char-history',this)"></div>
+                        <div class="rn-preview" id="rn-char-history" ondblclick="editRN('char-history',this)"></div>
                     </div>
                 </div>
             </div>
@@ -994,8 +994,7 @@
                                 onclick="toggleRN('class-features',this)">👁</button></div>
                         <textarea id="class-features" rows="10" placeholder="# Ataque Extra..."
                             style="resize: vertical;"></textarea>
-                        <div class="rn-preview" id="rn-class-features" onclick="editRN('class-features',this)">
-                        </div>
+                        <div class="rn-preview" id="rn-class-features" ondblclick="editRN('class-features',this)"></div>
                     </div>
                 </div>
                 <div class="panel" style="padding-bottom: 1.9%;">
@@ -1011,7 +1010,7 @@
                                 onclick="toggleRN('equipment',this)">👁</button></div>
                         <textarea id="equipment" rows="12" placeholder="# Armas..."
                             style="resize: vertical;"></textarea>
-                        <div class="rn-preview" id="rn-equipment" onclick="editRN('equipment',this)"></div>
+                        <div class="rn-preview" id="rn-equipment" ondblclick="editRN('equipment',this)"></div>
                     </div>
                 </div>
             </div>
@@ -1096,12 +1095,12 @@
                         placeholder="## Truques&#10;- Raio de Fogo&#10;- Mãos Mágicas&#10;&#10;## Nível 1&#10;- Escudo Arcano&#10;- Mísseis Mágicos"
                         style="resize: vertical; width: 100%; min-height: 200px;"></textarea>
 
-                    <div class="rn-preview" id="rn-spells-catalog" onclick="editRN('spells-catalog',this)"
+                    <div class="rn-preview" id="rn-spells-catalog" ondblclick="editRN('spells-catalog',this)"
                         style="min-height: 200px; width: 100%;"></div>
                 </div>
             </div>
 
-<div style="display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; flex-direction: column; gap: 16px;">
                 <div class="panel">
                     <div class="section-title mb8">Conjuração</div>
                     <div class="mb8"><label>Classe Mágica</label><input type="text" id="spell-class"
@@ -1217,7 +1216,7 @@
                 { v: 'fliper', label: 'Fliperama', emoji: '🕹️', cat: 'retro' },
                 { v: 'neon', label: 'Neon', emoji: '📔', cat: 'retro' },
                 { v: 'retro', label: 'Retrô', emoji: '📻', cat: 'retro' },
-                { v: 'monster', label: 'Monster', emoji: 'X', cat: 'retro' },
+                { v: 'monster', label: 'Monster', emoji: '👹', cat: 'retro' },
 
                 { v: 'lavanda', label: 'Lavanda', emoji: '🪻', cat: 'jardim' },
                 { v: 'girassol', label: 'Girassol', emoji: '🌻', cat: 'jardim' },
