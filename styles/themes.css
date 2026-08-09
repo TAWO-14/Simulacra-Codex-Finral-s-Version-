@@ -996,3 +996,312 @@ body.theme-orquidea {
   --header-top: #090207;
   --header-bot: #11040d;
 }
+
+body.theme-melodrama {
+  --bg: #080b18;
+  --bg2: #12162b;
+  --bg3: #1c2240;
+  --panel: #0a0e1f;
+  --input-bg: #05070d;
+  --border: #293873;
+  --border2: #ff3b7c; /* Rosa neon da bochecha/luzes */
+  --input-border: #3a4b8c;
+  --accent: #42d4f5; /* Ciano claro do fundo da pintura */
+  --accent2: #ff3b7c;
+  --glow: rgba(66, 212, 245, 0.2);
+  --text: #e6f0ff;
+  --text2: #9db2cc;
+  --text3: #42d4f5;
+  --red: #d12e5a;
+  --red2: #ff477e;
+  --green: #37d699;
+  --shadow: rgba(0, 0, 20, 0.9);
+  --header-top: #05070f;
+  --header-bot: #080b18;
+}
+
+/* 📸 1989 (Original) - Taylor Swift - Tons Ajustados */
+body.theme-1989 {
+  /* Fundos mais quentes, imitando a borda bege/amarelada da Polaroid */
+  --bg: #f2e9dc; 
+  --bg2: #fcf6ef;
+  --bg3: #e6d8c5;
+  --panel: #fcf6ef;
+  --input-bg: #ffffff;
+
+  /* Bordas com um tom de papel pardo suave */
+  --border: #d4c5b3;
+  --border2: #7a9ebf; /* Azul do suéter para bordas de destaque */
+  --input-border: #c9b9a6;
+
+  /* Destaques: Azul encorpado (suéter/céu) e Vermelho vivo (batom) */
+  --accent: #7a9ebf;
+  --accent2: #e3303c; 
+  --glow: rgba(122, 158, 191, 0.3);
+
+  /* Letras mais escuras, simulando a tinta forte do Sharpie */
+  --text: #262423;
+  --text2: #5c554e;
+  --text3: #7a9ebf; 
+
+  --red: #e3303c;
+  --red2: #ed555f;
+  --green: #59a67a;
+
+  /* Sombra ainda mais sutil */
+  --shadow: rgba(0, 0, 0, 0.05);
+
+  --header-top: #e6d8c5;
+  --header-bot: #f2e9dc;
+}
+
+/* 📼 Who Really Cares - TV Girl (Alto Contraste) */
+body.theme-tvgirl {
+  /* Fundo preto absoluto igual às sombras da capa */
+  --bg: #000000;
+  --bg2: #050508;
+  --bg3: #0a0a12;
+  --panel: #030305;
+  --input-bg: #000000;
+
+  /* Bordas em azul escuro e rosa neon */
+  --border: #151b8d;
+  --border2: #ff0055; 
+  --input-border: #2731f2;
+
+  /* Destaques: Rosa Neon (mulher) e Azul Ultramarino (homem) */
+  --accent: #ff0055;
+  --accent2: #2731f2;
+  --glow: rgba(255, 0, 85, 0.35);
+
+  /* Textos em branco brilhante para leitura, com azul claro para secundários */
+  --text: #ffffff;
+  --text2: #8c93f2;
+  --text3: #ff0055;
+
+  /* Cores de status adaptadas para não perder a usabilidade do D&D */
+  --red: #d91642;
+  --red2: #ff0055;
+  --green: #21e688;
+
+  --shadow: rgba(0, 0, 0, 0.95);
+
+  --header-top: #000000;
+  --header-bot: #050508;
+}
+
+/* 🪩 Blackout - Britney Spears */
+body.theme-blackout {
+  /* Fundo preto absoluto e tons de cinza muito escuros puxados para o roxo/magenta */
+  --bg: #050305;
+  --bg2: #0f0a0f;
+  --bg3: #1a111a;
+  --panel: #0a060a;
+  --input-bg: #000000;
+
+  /* Bordas escuras e o Rosa Neon (Shocking Pink) para saltar na tela */
+  --border: #3b223b;
+  --border2: #ff007f; 
+  --input-border: #4f2e4f;
+
+  /* Destaques: Rosa Neon e Branco puro para simular os flashes */
+  --accent: #ff007f;
+  --accent2: #ffffff; 
+  --glow: rgba(255, 0, 127, 0.35);
+
+  /* Textos bem claros para não cansar a leitura, com acentos em rosa */
+  --text: #f2edf2;
+  --text2: #bfa3bf;
+  --text3: #ff007f;
+
+  /* Cores de status com uma pegada um pouco mais sintética/neon */
+  --red: #d11141;
+  --red2: #ff2a5f;
+  --green: #00e676;
+
+  --shadow: rgba(0, 0, 0, 0.95);
+
+  --header-top: #000000;
+  --header-bot: #050305;
+}
+
+/* ⚗️ Apotecário (Apothecary) - Verde musgo, vidro âmbar e pergaminho */
+body.theme-apotecario {
+  --bg: #151813;
+  --bg2: #1d211a;
+  --bg3: #252b22;
+  --panel: #191d17;
+  --input-bg: #0d100c;
+
+  --border: #354030;
+  --border2: #c49150; /* Cor de vidro âmbar (frascos de poção) */
+  --input-border: #293325;
+
+  --accent: #7b9c65; /* Verde medicinal/musgo */
+  --accent2: #c49150;
+  --glow: rgba(123, 156, 101, 0.2);
+
+  --text: #e3dbcf; /* Papel envelhecido */
+  --text2: #a39b8c;
+  --text3: #7b9c65;
+
+  --red: #a8423f; /* Vermelho escuro/seco como folhas de outono */
+  --red2: #c45b59;
+  --green: #678c52;
+
+  --shadow: rgba(0, 0, 0, 0.9);
+
+  --header-top: #0d100c;
+  --header-bot: #151813;
+}
+
+/* 🍄 Cottagecore - Verde sálvia, tons rústicos e madeira clara */
+body.theme-cottagecore {
+  --bg: #1d201a;
+  --bg2: #262a22;
+  --bg3: #32382d;
+  --panel: #22261e;
+  --input-bg: #151812;
+
+  --border: #444c3c;
+  --border2: #d4a373; /* Madeira rústica/vime */
+  --input-border: #383f31;
+
+  --accent: #8f9e7b; /* Verde sálvia */
+  --accent2: #faedcd; /* Creme pastel */
+  --glow: rgba(143, 158, 123, 0.25);
+
+  --text: #fefae0;
+  --text2: #ccd5ae;
+  --text3: #d4a373;
+
+  --red: #d96c75;
+  --red2: #e6858d;
+  --green: #8f9e7b;
+
+  --shadow: rgba(0, 0, 0, 0.85);
+
+  --header-top: #151812;
+  --header-bot: #1d201a;
+}
+
+/* 🐸 Bruxa Verde (Green Witch) - Tons de pântano escuro e verde bioluminescente */
+body.theme-bruxa-verde {
+  --bg: #0a0f0d;
+  --bg2: #111a15;
+  --bg3: #18261e;
+  --panel: #0d1410;
+  --input-bg: #050806;
+
+  --border: #1c3024;
+  --border2: #52b788; /* Verde brilhante/tóxico */
+  --input-border: #14241a;
+
+  --accent: #40916c; /* Verde floresta profundo */
+  --accent2: #74c69d;
+  --glow: rgba(82, 183, 136, 0.25);
+
+  --text: #d8f3dc; /* Verde muito claro para contraste */
+  --text2: #95d5b2;
+  --text3: #52b788;
+
+  --red: #c23856;
+  --red2: #db5c77;
+  --green: #40916c;
+
+  --shadow: rgba(0, 0, 0, 0.95);
+
+  --header-top: #050806;
+  --header-bot: #0a0f0d;
+}
+
+/* 🍯 Colmeia (Mel & Âmbar) - Tons quentes, marrom escuro e amarelo dourado */
+body.theme-colmeia {
+  --bg: #17120a;
+  --bg2: #241c10;
+  --bg3: #332717;
+  --panel: #1c150c;
+  --input-bg: #0f0b05;
+
+  --border: #4a3821;
+  --border2: #ffb300; /* Amarelo Mel */
+  --input-border: #382915;
+
+  --accent: #ffc107; /* Dourado claro */
+  --accent2: #ff8f00; /* Âmbar / Laranja queimado */
+  --glow: rgba(255, 179, 0, 0.2);
+
+  --text: #fff3e0;
+  --text2: #ffcc80;
+  --text3: #ffb300;
+
+  --red: #d84315;
+  --red2: #ff5722;
+  --green: #7cb342;
+
+  --shadow: rgba(0, 0, 0, 0.9);
+
+  --header-top: #0f0b05;
+  --header-bot: #17120a;
+}
+
+/* 🏜️ Deserto (Areia & Ouro) - Tons empoeirados, amarelo mostarda e terracota */
+body.theme-deserto {
+  --bg: #1c1a17;
+  --bg2: #292520;
+  --bg3: #38332c;
+  --panel: #211e1a;
+  --input-bg: #12110e;
+
+  --border: #524a40;
+  --border2: #e6b741; /* Amarelo areia/mostarda */
+  --input-border: #3d372f;
+
+  --accent: #e6b741;
+  --accent2: #d97d2e; /* Terracota */
+  --glow: rgba(230, 183, 65, 0.2);
+
+  --text: #f2eadc;
+  --text2: #cfbfa3;
+  --text3: #e6b741;
+
+  --red: #c94f45;
+  --red2: #de6b62;
+  --green: #829e61;
+
+  --shadow: rgba(0, 0, 0, 0.85);
+
+  --header-top: #12110e;
+  --header-bot: #1c1a17;
+}
+
+/* ⚡ Cyber-Amarelo (Alta Voltagem) - Preto absoluto com amarelo neon gritante */
+body.theme-cyber-amarelo {
+  --bg: #080808;
+  --bg2: #141414;
+  --bg3: #1f1f1f;
+  --panel: #0d0d0d;
+  --input-bg: #000000;
+
+  --border: #333333;
+  --border2: #fce205; /* Amarelo Neon Cyber */
+  --input-border: #262626;
+
+  --accent: #fce205;
+  --accent2: #00f0ff; /* Ciano para criar um contraste tecnológico */
+  --glow: rgba(252, 226, 5, 0.25);
+
+  --text: #ffffff;
+  --text2: #b3b3b3;
+  --text3: #fce205;
+
+  --red: #ff003c;
+  --red2: #ff3366;
+  --green: #00ff66;
+
+  --shadow: rgba(0, 0, 0, 0.95);
+
+  --header-top: #000000;
+  --header-bot: #080808;
+}
+
