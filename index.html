@@ -13,6 +13,10 @@
         href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=MedievalSharp&display=swap"
         rel="stylesheet">
 
+    <!-- Coloris (Seletor de Cores Moderno) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css" />
+    <script src="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js"></script>
+
     <!-- 2. CSS da Aplicação -->
     <link rel="stylesheet" href="styles/base.css">
     <link rel="stylesheet" href="styles/themes.css"> <!-- Se na pasta for no singular, mude para theme.css -->
@@ -55,6 +59,28 @@
     <script src="js/features/pdf-field-mapping.js" defer></script>
     <script src="js/features/export-import.js" defer></script>
 </head>
+
+<style>
+        /* Garante que a paleta flutuante abra na frente de tudo */
+        #clr-picker {
+            z-index: 100000 !important;
+            border-radius: 8px !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important;
+        }
+
+        /* Deixa as bolinhas de cores prontas redondas e bonitas */
+        #clr-picker .clr-swatches button {
+            border-radius: 50% !important;
+            border: 1px solid rgba(255,255,255,0.2) !important;
+        }
+
+        /* Ajusta o campo de texto dentro do pop-up */
+        #clr-picker input {
+            background: var(--input-bg) !important;
+            color: var(--text) !important;
+            border: 1px solid var(--border) !important;
+        }
+    </style>
 
 <body>
 
@@ -120,6 +146,7 @@
         <div id="theme-modal"
             style="background: var(--bg2); border: 2px solid var(--border2); border-radius: 10px; width: min(900px, 96vw); max-height: 90vh; overflow-y: auto; box-shadow: rgba(0, 0, 0, 0.9) 0px 20px 60px; padding: 0px;">
 
+            <!-- CABEÇALHO DO MODAL -->
             <div
                 style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0px; background: var(--bg2); z-index: 1; border-radius: 10px 10px 0px 0px;">
                 <div
@@ -137,6 +164,7 @@
 
             <div style="padding:20px; display:flex; flex-direction:column; gap:20px;">
 
+                <!-- BARRA DE PRÉ-VISUALIZAÇÃO -->
                 <div id="theme-preview-bar"
                     style="border-radius: 8px; padding: 16px; border: 1px solid var(--border); background: var(--bg3); display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
                     <div
@@ -190,206 +218,42 @@
                     </div>
                 </div>
 
+                <!-- NOVA SEÇÃO: GERADOR DINÂMICO -->
                 <div>
                     <div
-                        style="font-family: &quot;Cinzel&quot;, serif; font-size: 10px; letter-spacing: 3px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 12px;">
-                        🌑 CAMADAS DE FUNDO</div>
-                    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px;">
-                        <div class="tcol">
-                            <div class="tprev" id="prev-bg"></div>
-                            <label class="tlbl">Fundo Principal</label>
-                            <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Cor base da
-                                página
-                                inteira</div>
-                            <input type="color" class="tpicker" id="mpicker-bg" value="#1a1510"
-                                oninput="syncPicker('bg',this.value)">
-                        </div>
-                        <div class="tcol">
-                            <div class="tprev" id="prev-bg2"></div>
-                            <label class="tlbl">Fundo dos Painéis</label>
-                            <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Cards e seções
-                                internas</div>
-                            <input type="color" class="tpicker" id="mpicker-bg2" value="#221e17"
-                                oninput="syncPicker('bg2',this.value)">
-                        </div>
-                        <div class="tcol">
-                            <div class="tprev" id="prev-bg3"></div>
-                            <label class="tlbl">Fundo de Blocos</label>
-                            <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Atributos, slots,
-                                badges</div>
-                            <input type="color" class="tpicker" id="mpicker-bg3" value="#2c2620"
-                                oninput="syncPicker('bg3',this.value)">
-                        </div>
-                        <div class="tcol">
-                            <div class="tprev" id="prev-panel"></div>
-                            <label class="tlbl">Background das Abas</label>
-                            <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Barra de tabs e
-                                header</div>
-                            <input type="color" class="tpicker" id="mpicker-panel" value="#17130e"
-                                oninput="syncPicker('panel',this.value)">
-                        </div>
-                        <div class="tcol">
-                            <div class="tprev" id="prev-input-bg"></div>
-                            <label class="tlbl">Fundo dos Inputs</label>
-                            <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Campos de texto e
-                                número</div>
-                            <input type="color" class="tpicker" id="mpicker-input-bg" value="#0e0c09"
-                                oninput="syncPicker('input-bg',this.value)">
-                        </div>
-                        <div class="tcol">
-                            <div class="tprev" id="prev-header-top"
-                                style="background: linear-gradient(rgb(10, 8, 4), rgb(26, 21, 16));"></div>
-                            <label class="tlbl">Header — Topo</label>
-                            <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Cor escura no
-                                topo do
-                                gradiente
-                            </div>
-                            <input type="color" class="tpicker" id="mpicker-header-top" value="#0a0804"
-                                oninput="syncPickerHeader('header-top',this.value)">
-                        </div>
-                        <div class="tcol">
-                            <div class="tprev" id="prev-header-bot"
-                                style="background: linear-gradient(rgb(26, 21, 16), rgb(26, 21, 16));"></div>
-                            <label class="tlbl">Header — Base</label>
-                            <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Cor na base do
-                                gradiente do header
-                            </div>
-                            <input type="color" class="tpicker" id="mpicker-header-bot" value="#1a1510"
-                                oninput="syncPickerHeader('header-bot',this.value)">
-                        </div>
+                        style="font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 3px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 12px;">
+                        🔮 GERADOR DINÂMICO
                     </div>
-                </div>
 
-                <div>
-                    <div
-                        style="font-family: &quot;Cinzel&quot;, serif; font-size: 10px; letter-spacing: 3px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 12px;">
-                        🔲 BORDAS &amp; DIVISORES</div>
-                    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px;">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom: 16px;">
                         <div class="tcol">
-                            <div class="tprev" id="prev-border"></div>
-                            <label class="tlbl">Borda Principal dos Blocos</label>
-                            <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Cards, painéis,
-                                seções</div>
-                            <input type="color" class="tpicker" id="mpicker-border" value="#6b4e1e"
-                                oninput="syncPicker('border',this.value)">
+                            <label class="tlbl">Cor do Fundo</label>
+                            <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Define a "vibe" da
+                                ficha</div>
+                            <!-- Note o type="text" e o data-coloris -->
+                            <input type="text" id="smart-base-color" class="tpicker" value="#1a1510" data-coloris
+                                oninput="applySmartTheme()">
                         </div>
+
                         <div class="tcol">
-                            <div class="tprev" id="prev-border2"></div>
-                            <label class="tlbl">Borda de Destaque</label>
-                            <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Círculos, badges,
+                            <label class="tlbl">Cor de Destaque</label>
+                            <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Títulos, ícones e
                                 foco</div>
-                            <input type="color" class="tpicker" id="mpicker-border2" value="#8a6828"
-                                oninput="syncPicker('border2',this.value)">
-                        </div>
-                        <div class="tcol">
-                            <div class="tprev" id="prev-input-border"></div>
-                            <label class="tlbl">Borda dos Inputs</label>
-                            <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Campos e selects
-                            </div>
-                            <input type="color" class="tpicker" id="mpicker-input-border" value="#4a3510"
-                                oninput="syncPicker('input-border',this.value)">
+                            <!-- Note o type="text" e o data-coloris -->
+                            <input type="text" id="smart-accent-color" class="tpicker" value="#c8922a" data-coloris
+                                oninput="applySmartTheme()">
                         </div>
                     </div>
+
+                    <button type="button" onclick="rollRandomTheme()"
+                        style="width: 100%; background: var(--bg3); border: 1px dashed var(--accent); border-radius: 6px; color: var(--accent2); padding: 12px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 14px; transition: all 0.2s;"
+                        onmouseover="this.style.background='var(--panel)'"
+                        onmouseout="this.style.background='var(--bg3)'">
+                        🎲 Rolar Tema Aleatório
+                    </button>
                 </div>
 
-                <div>
-                    <div
-                        style="font-family: &quot;Cinzel&quot;, serif; font-size: 10px; letter-spacing: 3px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 12px;">
-                        ✨ CORES DE DESTAQUE</div>
-                    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px;">
-                        <div class="tcol">
-                            <div class="tprev" id="prev-accent"></div>
-                            <label class="tlbl">Destaque Principal</label>
-                            <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Títulos,
-                                proficiência
-                                ativa, ícones
-                            </div>
-                            <input type="color" class="tpicker" id="mpicker-accent" value="#c8922a"
-                                oninput="syncPicker('accent',this.value)">
-                        </div>
-                        <div class="tcol">
-                            <div class="tprev" id="prev-accent2"></div>
-                            <label class="tlbl">Destaque Secundário</label>
-                            <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Modificadores,
-                                valores grandes
-                            </div>
-                            <input type="color" class="tpicker" id="mpicker-accent2" value="#e8b84b"
-                                oninput="syncPicker('accent2',this.value)">
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div
-                        style="font-family: &quot;Cinzel&quot;, serif; font-size: 10px; letter-spacing: 3px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 12px;">
-                        🖊 TIPOGRAFIA</div>
-                    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px;">
-                        <div class="tcol">
-                            <div class="tprev" id="prev-text"></div>
-                            <label class="tlbl">Principal</label>
-                            <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Corpo de texto
-                                padrão
-                            </div>
-                            <input type="color" class="tpicker" id="mpicker-text" value="#e8d5b0"
-                                oninput="syncPicker('text',this.value)">
-                        </div>
-                        <div class="tcol">
-                            <div class="tprev" id="prev-text2"></div>
-                            <label class="tlbl">Secundário</label>
-                            <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Nomes de
-                                perícias,
-                                info</div>
-                            <input type="color" class="tpicker" id="mpicker-text2" value="#b09060"
-                                oninput="syncPicker('text2',this.value)">
-                        </div>
-                        <div class="tcol">
-                            <div class="tprev" id="prev-text3"></div>
-                            <label class="tlbl">Labels / Rótulos</label>
-                            <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Textos de
-                                categoria e
-                                label</div>
-                            <input type="color" class="tpicker" id="mpicker-text3" value="#7a6040"
-                                oninput="syncPicker('text3',this.value)">
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div
-                        style="font-family: &quot;Cinzel&quot;, serif; font-size: 10px; letter-spacing: 3px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 12px;">
-                        ❤ INDICADORES DE STATUS</div>
-                    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px;">
-                        <div class="tcol">
-                            <div class="tprev" id="prev-green"></div>
-                            <label class="tlbl">Sucesso</label>
-                            <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Barra de vida,
-                                Sucesso de Saving
-                                Throw</div>
-                            <input type="color" class="tpicker" id="mpicker-green" value="#27ae60"
-                                oninput="syncPicker('green',this.value)">
-                        </div>
-                        <div class="tcol">
-                            <div class="tprev" id="prev-red"></div>
-                            <label class="tlbl">Dano</label>
-                            <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Barra crítica,
-                                zona
-                                de perigo</div>
-                            <input type="color" class="tpicker" id="mpicker-red" value="#c0392b"
-                                oninput="syncPicker('red',this.value)">
-                        </div>
-                        <div class="tcol">
-                            <div class="tprev" id="prev-red2"></div>
-                            <label class="tlbl">Falha</label>
-                            <div style="font-size: 10px; color: var(--text3); margin-bottom: 4px;">Ícones de falha,
-                                HP
-                                muito baixo
-                            </div>
-                            <input type="color" class="tpicker" id="mpicker-red2" value="#e74c3c"
-                                oninput="syncPicker('red2',this.value)">
-                        </div>
-                    </div>
-                </div>
-
+                <!-- SEÇÃO MANTIDA: FONTE DECORATIVA -->
                 <div>
                     <div
                         style="font-family: &quot;Cinzel&quot;, serif; font-size: 10px; letter-spacing: 3px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 12px;">
@@ -423,6 +287,7 @@
                     </div>
                 </div>
 
+                <!-- SEÇÃO MANTIDA: EFEITOS ESPECIAIS -->
                 <div>
                     <div
                         style="font-family: &quot;Cinzel&quot;, serif; font-size: 10px; letter-spacing: 3px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 12px;">
@@ -470,6 +335,7 @@
                     </div>
                 </div>
 
+                <!-- RODAPÉ DO MODAL -->
                 <div
                     style="display: flex; gap: 10px; justify-content: flex-end; padding-top: 8px; border-top: 1px solid var(--border);">
                     <button onclick="resetCustomTheme()"
@@ -1201,6 +1067,7 @@
 
                 { v: 'chocolate-sand', label: 'Chocolate', emoji: '🍫', cat: 'cores' },
                 { v: 'Ébano', label: 'Ébano', emoji: '🐦‍⬛', cat: 'cores' },
+                { v: 'deserto', label: 'Deserto', emoji: '🏜️', cat: 'cores' },
                 { v: 'Midnights', label: 'Midnight', emoji: '🌌', cat: 'cores' },
                 { v: 'primavera', label: 'Primavera', emoji: '🌱', cat: 'cores' },
                 { v: 'verao', label: 'Verão', emoji: '☀️', cat: 'cores' },
@@ -1209,6 +1076,10 @@
                 { v: 'sunset', label: 'Sunset', emoji: '⛅', cat: 'cores' },
                 { v: 'Monocromático', label: 'Xeque-Mate', emoji: '♟️', cat: 'cores' },
                 { v: 'lava', label: 'Lava', emoji: '🌋', cat: 'cores' },
+                { v: 'melodrama', label: 'Melodrama', emoji: '🌌', cat: 'cores' },
+                { v: '1989', label: '1989', emoji: '🕊️', cat: 'cores' },
+                { v: 'tvgirl', label: 'TV Girl', emoji: '📼', cat: 'cores' },
+                { v: 'blackout', label: 'Blackout', emoji: '🪩', cat: 'cores' },
 
                 { v: 'americana', label: 'Americana', emoji: '🇺🇸', cat: 'retro' },
                 { v: 'cinema-retro', label: 'Cinema', emoji: '🎥', cat: 'retro' },
@@ -1217,6 +1088,7 @@
                 { v: 'neon', label: 'Neon', emoji: '📔', cat: 'retro' },
                 { v: 'retro', label: 'Retrô', emoji: '📻', cat: 'retro' },
                 { v: 'monster', label: 'Monster', emoji: 'X', cat: 'retro' },
+                { v: 'cyber-amarelo', label: 'Cyber Yellow', emoji: '⚡', cat: 'retro' },
 
                 { v: 'lavanda', label: 'Lavanda', emoji: '🪻', cat: 'jardim' },
                 { v: 'girassol', label: 'Girassol', emoji: '🌻', cat: 'jardim' },
@@ -1225,7 +1097,11 @@
                 { v: 'lótus', label: 'Lótus', emoji: '🪷', cat: 'jardim' },
                 { v: 'jasmim', label: 'Jasmim', emoji: '🌼', cat: 'jardim' },
                 { v: 'cerejeira', label: 'Cerejeira', emoji: '🌸', cat: 'jardim' },
-                { v: 'orquidea', label: 'Orquidea', emoji: '🪻', cat: 'jardim' }
+                { v: 'orquidea', label: 'Orquidea', emoji: '🪻', cat: 'jardim' },
+                { v: 'apotecario', label: 'Apotecário', emoji: '⚗️', cat: 'jardim' },
+                { v: 'cottagecore', label: 'Cottagecore', emoji: '🍄', cat: 'jardim' },
+                { v: 'bruxa-verde', label: 'Bruxa Verde', emoji: '🐸', cat: 'jardim' },
+                { v: 'colmeia', label: 'Colmeia', emoji: '🍯', cat: 'jardim' },
             ];
 
             var CATS = [
