@@ -11,8 +11,11 @@ let spellSlots = {};
 let spells = {};
 let sanity = 10;
 let limitedResources = [];
+let feats = []; // ← Adicionado para evitar erro caso feats.js não carregue
 let initiativeOverride = false;
 let passivePercOverride = false;
+let spellDCOverride = false; // ← CORREÇÃO 1: Evita crash no updateSpellDC() e collectData()
+let imagemFundoCustomizada = ''; // ← CORREÇÃO 2: Evita crash no collectData()
 
 function getMod(score) {
     return Math.floor((score - 10) / 2);
@@ -28,6 +31,14 @@ function getProfBonus() {
 
 function getAttrVal(id) {
     return parseInt(document.getElementById('attr-score-' + id)?.value) || 10;
+}
+
+function escapeHTML(str) {
+    return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
 }
 
 function buildAttrs() {
@@ -193,9 +204,8 @@ function updateSkills() {
     });
     const ppEl = document.getElementById('passive-perc');
     if (ppEl) {
-        // Se estiver vazio ou não houver override, calcula automaticamente
         if (!passivePercOverride || ppEl.value === '') {
-            passivePercOverride = false; // Reseta o override caso estivesse vazio
+            passivePercOverride = false;
             const percProf = profStates['perception'] || 0;
             ppEl.value = 10 + getMod(getAttrVal('wis')) + (percProf === 2 ? pb * 2 : percProf === 1 ? pb : 0);
         }
@@ -205,9 +215,8 @@ function updateSkills() {
 function updateInitiative() {
     const el = document.getElementById('initiative');
     if (el) {
-        // Se estiver vazio ou não houver override, calcula automaticamente
         if (!initiativeOverride || el.value === '') {
-            initiativeOverride = false; // Reseta o override caso estivesse vazio
+            initiativeOverride = false;
             el.value = getMod(getAttrVal('dex'));
         }
     }
@@ -308,6 +317,7 @@ function removeAttack(i) {
 
 function renderAttacks() {
     const tbody = document.getElementById('attacks-body');
+    if (!tbody) return;
     tbody.innerHTML = '';
     attacks.forEach((atk, i) => {
         const tr = document.createElement('tr');
@@ -318,7 +328,6 @@ function renderAttacks() {
 
 function updateHeader() {
     document.getElementById('header-name').textContent = document.getElementById('char-name')?.value || 'Nome do Personagem';
-    // subtitle is now a free-form editable input — auto-populate only if empty
     const sub = document.getElementById('header-subtitle');
     if (sub && !sub.value) {
         sub.placeholder = [document.getElementById('char-class')?.value, document.getElementById('char-race')?.value, document.getElementById('char-align')?.value].filter(Boolean).join(' · ') || 'Classe · Raça · Alinhamento';
@@ -399,7 +408,7 @@ function collectData() {
         }
     });
     const avatarImg = document.getElementById('char-avatar');
-    const avatarSrc = (avatarImg && avatarImg.src.startsWith('data:image')) ? avatarImg.src : '';
+    const avatarSrc = (avatarImg && avatarImg.src && avatarImg.src.startsWith('data:image')) ? avatarImg.src : '';
     return {
         ...data,
         _profStates: profStates,
@@ -420,3 +429,8 @@ function collectData() {
         _bgImage: imagemFundoCustomizada,
     };
 }
+
+// ← CORREÇÃO 3: Garante ponte de compatibilidade com o HTMLGenerator
+const CharacterData = {
+    collectData: collectData
+};

@@ -5,16 +5,6 @@
  */
 
 const HTMLGenerator = (() => {
-  const escaparHTML = (str) => {
-    if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  };
-
   const removerScriptsDev = (rootEl) => {
     rootEl.querySelectorAll('script').forEach((sc) => {
       const conteudo = sc.textContent || '';
@@ -29,63 +19,8 @@ const HTMLGenerator = (() => {
     });
   };
 
-  const embutirCSSTotal = async (rootEl) => {
-    const linksCss = Array.from(rootEl.querySelectorAll('link[rel="stylesheet"]'));
-
-    for (const link of linksCss) {
-      const href = link.getAttribute('href') || '';
-      if (href && !href.startsWith('http') && !href.startsWith('//')) {
-        try {
-          const resp = await fetch(href);
-          if (resp.ok) {
-            const cssText = await resp.text();
-            const styleEl = document.createElement('style');
-            styleEl.setAttribute('data-origin', href);
-            styleEl.textContent = cssText;
-            link.replaceWith(styleEl);
-            continue;
-          }
-        } catch (err) {
-          console.warn(`[HTMLGenerator] Falha ao embutir CSS: ${href}`, err);
-        }
-        link.remove();
-      }
-    }
-  };
-
-  const embutirJSTotal = async (rootEl) => {
-    if (window.location.protocol === 'file:') {
-      console.error('[HTMLGenerator] Erro: Exporte rodando no Live Server (http://127.0.0.1)!');
-      return;
-    }
-
-    const scripts = Array.from(rootEl.querySelectorAll('script[src]'));
-
-    for (const sc of scripts) {
-      const src = sc.getAttribute('src') || '';
-
-      if (src && !src.startsWith('http') && !src.startsWith('//')) {
-        try {
-          const resp = await fetch(src);
-          if (resp.ok) {
-            const jsText = await resp.text();
-            const inlineSc = document.createElement('script');
-            inlineSc.setAttribute('data-origin', src);
-            inlineSc.textContent = jsText;
-            sc.replaceWith(inlineSc);
-            continue;
-          }
-        } catch (err) {
-          console.warn(`[HTMLGenerator] Falha ao embutir JS: ${src}`, err);
-        }
-        sc.remove();
-      }
-    }
-  };
-
   const generate = async (data) => {
     const clone = document.documentElement.cloneNode(true);
-
     removerScriptsDev(clone);
 
     const toastClone = clone.querySelector('#toast');
@@ -94,26 +29,21 @@ const HTMLGenerator = (() => {
       toastClone.textContent = '📄 Ficha salva no PC!';
     }
 
-    const oldDataScript = clone.querySelector('#__dados_exportados__');
-    if (oldDataScript) oldDataScript.remove();
-
-    const oldStyle = clone.querySelector('#__estilos_embutidos_standalone__');
-    if (oldStyle) oldStyle.remove();
+    // Remove scripts antigos de exportações anteriores
+    clone.querySelectorAll('#__dados_exportados__, #__motor_autonomo_offline__').forEach(el => el.remove());
 
     const jsonState = JSON.stringify(data || {})
       .replace(/</g, '\\u003c')
       .replace(/>/g, '\\u003e');
 
+    // Injeta os dados puros em JSON
     const dataScript = document.createElement('script');
     dataScript.id = '__dados_exportados__';
     dataScript.type = 'application/json';
     dataScript.textContent = jsonState;
-
     clone.querySelector('head')?.appendChild(dataScript);
 
-    await embutirCSSTotal(clone);
-    await embutirJSTotal(clone);
-
+    // Motor que roda automaticamente ao abrir o arquivo baixado
     const autoRestoreScript = document.createElement('script');
     autoRestoreScript.id = '__motor_autonomo_offline__';
     autoRestoreScript.textContent = `
@@ -136,19 +66,16 @@ const HTMLGenerator = (() => {
           if (typeof updateHeader === 'function') updateHeader();
           if (typeof updateProfBonus === 'function') updateProfBonus();
           
-          // 1º: Restaura o Tema Base
           if (dados._theme && typeof changeTheme === 'function') {
             changeTheme(dados._theme);
           }
 
-          // 2º: Restaura o Padrão de Fundo
           if (dados['bg-pattern'] && typeof applyBgPattern === 'function') {
             applyBgPattern(dados['bg-pattern']);
             const bgSelect = document.getElementById('bg-pattern');
             if (bgSelect) bgSelect.value = dados['bg-pattern'];
           }
 
-          // 3º: Restaura Imagem Customizada (se houver)
           if (dados._bgImage && typeof aplicarFundoCustomizado === 'function') {
             imagemFundoCustomizada = dados._bgImage;
             aplicarFundoCustomizado();
@@ -158,7 +85,6 @@ const HTMLGenerator = (() => {
         }
       });
     `;
-
     clone.querySelector('body')?.appendChild(autoRestoreScript);
 
     return '<!DOCTYPE html>\n' + clone.outerHTML;
@@ -167,13 +93,17 @@ const HTMLGenerator = (() => {
   const download = async () => {
     try {
       if (typeof Toast !== 'undefined' && Toast.show) {
-        Toast.show('⏳ Gerando arquivo standalone...');
+        Toast.show('⏳ Gerando arquivo...');
       }
 
-      const data = (typeof CharacterData !== 'undefined' && CharacterData.collectData)
-        ? CharacterData.collectData()
-        : (typeof collectData === 'function' ? collectData() : {});
+      // Fecha previews abertas de notas antes do dump
+      document.querySelectorAll('.rn-toggle').forEach(btn => {
+        if (btn.textContent.trim() === '👁') {
+          btn.click();
+        }
+      });
 
+      const data = typeof collectData === 'function' ? collectData() : {};
       const htmlContent = await generate(data);
 
       const rawName = data['char-name'] || document.getElementById('char-name')?.value || 'personagem';
@@ -184,25 +114,21 @@ const HTMLGenerator = (() => {
       const a = document.createElement('a');
       a.href = url;
       a.download = `Ficha_${safeName}.html`;
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
       if (typeof Toast !== 'undefined' && Toast.show) {
         Toast.show('📄 Ficha exportada com sucesso!');
-      } else if (typeof showToast === 'function') {
-        showToast('📄 Ficha exportada com sucesso!');
       }
     } catch (err) {
-      console.error('Erro ao gerar/baixar HTML:', err);
+      console.error('Erro ao salvar HTML:', err);
       if (typeof Toast !== 'undefined' && Toast.show) {
         Toast.show('❌ Erro ao exportar HTML.');
       }
     }
   };
 
-  return {
-    generate,
-    download,
-    escaparHTML
-  };
+  return { generate, download };
 })();
