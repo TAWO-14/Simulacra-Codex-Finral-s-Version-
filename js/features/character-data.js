@@ -9,11 +9,13 @@ let deathSaves = {
 let attacks = [];
 let spellSlots = {};
 let spells = {};
+let sanity = 10;
 let limitedResources = [];
+// 🗑️ Linha do 'feats' removida daqui!
 let initiativeOverride = false;
 let passivePercOverride = false;
 let spellDCOverride = false; 
-window.imagemFundoCustomizada = window.imagemFundoCustomizada || ''; 
+window.imagemFundoCustomizada = window.imagemFundoCustomizada || '';
 
 function getMod(score) {
     return Math.floor((score - 10) / 2);
