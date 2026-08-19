@@ -11,11 +11,11 @@ let spellSlots = {};
 let spells = {};
 let sanity = 10;
 let limitedResources = [];
-let feats = []; // ← Adicionado para evitar erro caso feats.js não carregue
+let feats = []; 
 let initiativeOverride = false;
 let passivePercOverride = false;
-let spellDCOverride = false; // ← CORREÇÃO 1: Evita crash no updateSpellDC() e collectData()
-let imagemFundoCustomizada = ''; // ← CORREÇÃO 2: Evita crash no collectData()
+let spellDCOverride = false; 
+window.imagemFundoCustomizada = window.imagemFundoCustomizada || ''; 
 
 function getMod(score) {
     return Math.floor((score - 10) / 2);
@@ -426,11 +426,10 @@ function collectData() {
         _initiativeOverride: initiativeOverride,
         _spellDCOverride: spellDCOverride,
         _passivePercOverride: passivePercOverride,
-        _bgImage: imagemFundoCustomizada,
+        _bgImage: window.imagemFundoCustomizada || '',
     };
 }
 
-// ← CORREÇÃO 3: Garante ponte de compatibilidade com o HTMLGenerator
 const CharacterData = {
     collectData: collectData
 };
