@@ -15,14 +15,12 @@ const HTMLGenerator = (() => {
       .replace(/'/g, '&#039;');
   };
 
-  const removerScriptsAntigos = (rootEl) => {
+  const limparLixoInjetado = (rootEl) => {
+    // 1. Limpa scripts do Live Server e os motores antigos de save
     const scripts = Array.from(rootEl.getElementsByTagName('script'));
     scripts.forEach((sc) => {
       const conteudo = sc.textContent || '';
       const src = sc.getAttribute('src') || '';
-      
-      // 🛑 CORREÇÃO 1: Palavras-chave separadas para o script não se autodestruir!
-      // 🛑 CORREÇÃO 2: Garante a remoção absoluta dos dados antigos (impede a ficha de engordar)
       if (
         conteudo.includes('IsThisFirstTime_' + 'Log_From_LiveServer') ||
         src.includes('dependency-' + 'loader') ||
@@ -33,6 +31,10 @@ const HTMLGenerator = (() => {
         if (sc.parentNode) sc.parentNode.removeChild(sc);
       }
     });
+
+    // 2. Limpa elementos de bibliotecas injetados dinamicamente (como o Coloris)
+    // Isso impede que a ficha crie múltiplas paletas invisíveis e engorde 1KB a cada save!
+    rootEl.querySelectorAll('#clr-picker, #clr-style').forEach(el => el.remove());
   };
 
   const embutirCSSTotal = async (rootEl) => {
@@ -82,8 +84,8 @@ const HTMLGenerator = (() => {
   const generate = async (data) => {
     const clone = document.documentElement.cloneNode(true);
     
-    // Roda a limpeza absoluta do clone
-    removerScriptsAntigos(clone);
+    // Roda a limpeza absoluta do clone (Live Server + Coloris + Lixos antigos)
+    limparLixoInjetado(clone);
 
     const toastClone = clone.querySelector('#toast');
     if (toastClone) {
@@ -198,7 +200,6 @@ const HTMLGenerator = (() => {
       a.href = url;
       a.download = `Ficha_${safeName}.html`;
       
-      // 🛑 CORREÇÃO 3: Aciona o download invisível sem atrelar ao DOM (Resolve o erro do Frame/CORS)
       a.click();
       URL.revokeObjectURL(url);
 
