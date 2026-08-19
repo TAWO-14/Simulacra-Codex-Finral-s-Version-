@@ -430,6 +430,6 @@ function collectData() {
     };
 }
 
-const CharacterData = {
+window.CharacterDataHelper = {
     collectData: collectData
 };
