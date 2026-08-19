@@ -23,10 +23,9 @@ function escapeHTML(str) {
     return String(str || '')
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')   // ← parênteses adicionados
+        .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
 }
-
 
 // ── Atributos, Testes e Perícias ──
 function buildAttrs() {
@@ -48,11 +47,6 @@ function buildAttrs() {
 function onPassivePercInput() {
     passivePercOverride = true;
 }
-
-function escapeHTML(str) {
-    return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
 
 function buildSaves() {
     const list = document.getElementById('saves-list');
@@ -323,7 +317,7 @@ function collectData() {
         }
     });
     const avatarImg = document.getElementById('char-avatar');
-    const avatarSrc = (avatarImg && avatarImg.src.startsWith('data:image')) ? avatarImg.src : '';
+    const avatarSrc = (avatarImg && avatarImg.src && avatarImg.src.startsWith('data:image')) ? avatarImg.src : '';
     return {
         ...data,
         _profStates: profStates,
@@ -341,9 +335,14 @@ function collectData() {
         _initiativeOverride: initiativeOverride,
         _spellDCOverride: typeof spellDCOverride !== 'undefined' ? spellDCOverride : false,
         _passivePercOverride: passivePercOverride,
-        _bgImage: typeof imagemFundoCustomizada !== 'undefined' ? imagemFundoCustomizada : '',
+        _bgImage: window.imagemFundoCustomizada || '',
     };
 }
+
+// Ponte de compatibilidade global
+const CharacterData = {
+    collectData: collectData
+};
 
 // ── Inicialização (DOMContentLoaded) ──
 window.addEventListener('DOMContentLoaded', () => {
@@ -380,7 +379,7 @@ window.addEventListener('DOMContentLoaded', () => {
     feats = window.SHEET_DATA._feats || [];
     initiativeOverride = window.SHEET_DATA._initiativeOverride || false;
     passivePercOverride = window.SHEET_DATA._passivePercOverride || false;
-    imagemFundoCustomizada = window.SHEET_DATA._bgImage || '';
+    window.imagemFundoCustomizada = window.SHEET_DATA._bgImage || '';
 
     // Renderizações base
     if (typeof aplicarFundoCustomizado === 'function') safeStep('fundo customizado', aplicarFundoCustomizado);
