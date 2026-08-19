@@ -51,7 +51,7 @@ function aplicarCrop() {
         const btn = document.getElementById('avatar-reset-btn');
         if (btn) btn.style.display = 'block';
     } else if (cropTarget === 'bg') {
-        imagemFundoCustomizada = base64;
+        window.imagemFundoCustomizada = base64; // ← Atualizado com window.
         aplicarFundoCustomizado();
     }
 
@@ -59,14 +59,14 @@ function aplicarCrop() {
 }
 
 function aplicarFundoCustomizado() {
-    if (!imagemFundoCustomizada) return;
+    if (!window.imagemFundoCustomizada) return; // ← Atualizado com window.
     let st = document.getElementById('__bg-image-override__');
     if (!st) {
         st = document.createElement('style');
         st.id = '__bg-image-override__';
         document.head.appendChild(st);
     }
-    st.textContent = `body { background-image: url("${imagemFundoCustomizada}") !important; background-size: cover !important; background-attachment: fixed !important; background-position: center !important; }`;
+    st.textContent = `body { background-image: url("${window.imagemFundoCustomizada}") !important; background-size: cover !important; background-attachment: fixed !important; background-position: center !important; }`;
 }
 
 async function listarCamposDoPDF(input) {
