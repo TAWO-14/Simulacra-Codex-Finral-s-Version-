@@ -9,7 +9,6 @@ let deathSaves = {
 let attacks = [];
 let spellSlots = {};
 let spells = {};
-let sanity = 10;
 let limitedResources = [];
 let feats = []; 
 let initiativeOverride = false;
