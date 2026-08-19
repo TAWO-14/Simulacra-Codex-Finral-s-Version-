@@ -317,7 +317,7 @@ function collectData() {
         }
     });
     const avatarImg = document.getElementById('char-avatar');
-    const avatarSrc = (avatarImg && avatarImg.src && avatarImg.src.startsWith('data:image')) ? avatarImg.src : '';
+    const avatarSrc = (avatarImg && avatarImg.src.startsWith('data:image')) ? avatarImg.src : '';
     return {
         ...data,
         _profStates: profStates,
@@ -335,7 +335,7 @@ function collectData() {
         _initiativeOverride: initiativeOverride,
         _spellDCOverride: typeof spellDCOverride !== 'undefined' ? spellDCOverride : false,
         _passivePercOverride: passivePercOverride,
-        _bgImage: window.imagemFundoCustomizada || '',
+        _bgImage: window.imagemFundoCustomizada || '', // ← AQUI ESTÁ A CORREÇÃO
     };
 }
 
