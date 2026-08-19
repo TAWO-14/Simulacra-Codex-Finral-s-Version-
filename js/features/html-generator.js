@@ -15,19 +15,22 @@ const HTMLGenerator = (() => {
       .replace(/'/g, '&#039;');
   };
 
-  const removerScriptsDev = (rootEl) => {
-    rootEl.querySelectorAll('script').forEach((sc) => {
+  const removerScriptsAntigos = (rootEl) => {
+    const scripts = Array.from(rootEl.getElementsByTagName('script'));
+    scripts.forEach((sc) => {
       const conteudo = sc.textContent || '';
       const src = sc.getAttribute('src') || '';
       
-      // 🛑 CORREÇÃO DA AUTODESTRUIÇÃO: As strings foram divididas
-      // para o script não encontrar a palavra inteira e se apagar!
+      // 🛑 CORREÇÃO 1: Palavras-chave separadas para o script não se autodestruir!
+      // 🛑 CORREÇÃO 2: Garante a remoção absoluta dos dados antigos (impede a ficha de engordar)
       if (
         conteudo.includes('IsThisFirstTime_' + 'Log_From_LiveServer') ||
         src.includes('dependency-' + 'loader') ||
-        src.includes('live-' + 'server')
+        src.includes('live-' + 'server') ||
+        sc.id === '__dados_exportados__' ||
+        sc.id === '__motor_autonomo_offline__'
       ) {
-        sc.remove();
+        if (sc.parentNode) sc.parentNode.removeChild(sc);
       }
     });
   };
@@ -45,12 +48,10 @@ const HTMLGenerator = (() => {
             styleEl.setAttribute('data-origin', href);
             styleEl.textContent = cssText;
             link.replaceWith(styleEl);
-            continue;
           }
         } catch (err) {
           console.warn(`[HTMLGenerator] Falha ao embutir CSS: ${href}`, err);
         }
-        link.remove();
       }
     }
   };
@@ -70,27 +71,25 @@ const HTMLGenerator = (() => {
             inlineSc.setAttribute('data-origin', src);
             inlineSc.textContent = jsText;
             sc.replaceWith(inlineSc);
-            continue;
           }
         } catch (err) {
           console.warn(`[HTMLGenerator] Falha ao embutir JS: ${src}`, err);
         }
-        sc.remove();
       }
     }
   };
 
   const generate = async (data) => {
     const clone = document.documentElement.cloneNode(true);
-    removerScriptsDev(clone);
+    
+    // Roda a limpeza absoluta do clone
+    removerScriptsAntigos(clone);
 
     const toastClone = clone.querySelector('#toast');
     if (toastClone) {
       toastClone.classList.remove('show');
       toastClone.textContent = '📄 Ficha salva no PC!';
     }
-
-    clone.querySelectorAll('#__dados_exportados__, #__motor_autonomo_offline__').forEach(el => el.remove());
 
     Object.entries(data || {}).forEach(([key, val]) => {
       if (key.startsWith('_')) return;
@@ -199,7 +198,7 @@ const HTMLGenerator = (() => {
       a.href = url;
       a.download = `Ficha_${safeName}.html`;
       
-      // 🛑 CORREÇÃO 2: Removido o appendChild para evitar o bloqueio de segurança (Frame error) no file:///
+      // 🛑 CORREÇÃO 3: Aciona o download invisível sem atrelar ao DOM (Resolve o erro do Frame/CORS)
       a.click();
       URL.revokeObjectURL(url);
 
