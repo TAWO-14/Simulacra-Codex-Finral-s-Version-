@@ -1,6 +1,6 @@
 let cropper;
 let cropTarget = '';
-let imagemFundoCustomizada = '';
+window.imagemFundoCustomizada = window.imagemFundoCustomizada || '';
 
 function abrirCropper(input, target) {
     if (!input.files || !input.files[0]) return;
