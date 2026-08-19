@@ -19,10 +19,13 @@ const HTMLGenerator = (() => {
     rootEl.querySelectorAll('script').forEach((sc) => {
       const conteudo = sc.textContent || '';
       const src = sc.getAttribute('src') || '';
+      
+      // 🛑 CORREÇÃO DA AUTODESTRUIÇÃO: As strings foram separadas para 
+      // que o próprio script não seja apagado por conter as palavras-chave!
       if (
-        conteudo.includes('IsThisFirstTime_Log_From_LiveServer') ||
-        src.includes('dependency-loader') ||
-        src.includes('live-server')
+        conteudo.includes('IsThisFirstTime_' + 'Log_From_LiveServer') ||
+        src.includes('dependency-' + 'loader') ||
+        src.includes('live-' + 'server')
       ) {
         sc.remove();
       }
@@ -93,7 +96,9 @@ const HTMLGenerator = (() => {
     // Atualiza explicitamente os atributos 'value' no clone para que o HTML visual reflita o estado atual
     Object.entries(data || {}).forEach(([key, val]) => {
       if (key.startsWith('_')) return;
-      const el = clone.querySelector(`#${key}`);
+      
+      // 🛑 CORREÇÃO DE SELETOR CSS: Usar [id="key"] evita crash no querySelector
+      const el = clone.querySelector(`[id="${key}"]`);
       if (el) {
         if (el.tagName === 'TEXTAREA') {
           el.textContent = val;
@@ -117,6 +122,53 @@ const HTMLGenerator = (() => {
     dataScript.type = 'application/json';
     dataScript.textContent = jsonState;
     clone.querySelector('head')?.appendChild(dataScript);
+
+    // Motor que roda automaticamente ao abrir o arquivo baixado
+    const autoRestoreScript = document.createElement('script');
+    autoRestoreScript.id = '__motor_autonomo_offline__';
+    autoRestoreScript.textContent = `
+      window.addEventListener('DOMContentLoaded', () => {
+        const scriptDados = document.getElementById('__dados_exportados__');
+        if (!scriptDados || !scriptDados.textContent) return;
+
+        try {
+          const dados = JSON.parse(scriptDados.textContent);
+          window.SHEET_DATA = dados;
+
+          Object.entries(dados).forEach(([key, value]) => {
+            if (key.startsWith('_')) return;
+            const el = document.getElementById(key);
+            if (el && 'value' in el) el.value = value;
+          });
+
+          if (typeof onAttrChange === 'function') onAttrChange();
+          if (typeof updateHPBar === 'function') updateHPBar();
+          if (typeof updateHeader === 'function') updateHeader();
+          if (typeof updateProfBonus === 'function') updateProfBonus();
+          
+          if (dados._theme && typeof changeTheme === 'function') {
+            changeTheme(dados._theme);
+            if (typeof window.updateThemeButtonUI === 'function') {
+               window.updateThemeButtonUI(dados._theme);
+            }
+          }
+
+          if (dados['bg-pattern'] && typeof applyBgPattern === 'function') {
+            applyBgPattern(dados['bg-pattern']);
+            const bgSelect = document.getElementById('bg-pattern');
+            if (bgSelect) bgSelect.value = dados['bg-pattern'];
+          }
+
+          if (dados._bgImage && typeof aplicarFundoCustomizado === 'function') {
+            window.imagemFundoCustomizada = dados._bgImage;
+            aplicarFundoCustomizado();
+          }
+        } catch (e) {
+          console.error('Erro na restauração offline:', e);
+        }
+      });
+    `;
+    clone.querySelector('body')?.appendChild(autoRestoreScript);
 
     // Embutir dependências para o HTML ser 100% offline
     await embutirCSSTotal(clone);
@@ -153,9 +205,9 @@ const HTMLGenerator = (() => {
       const a = document.createElement('a');
       a.href = url;
       a.download = `Ficha_${safeName}.html`;
-      document.body.appendChild(a);
+      
+      // Aciona o download direto (evita erro de Frame em arquivos locais)
       a.click();
-      document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
       if (typeof Toast !== 'undefined' && Toast.show) {
