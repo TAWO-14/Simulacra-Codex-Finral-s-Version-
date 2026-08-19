@@ -20,8 +20,8 @@ const HTMLGenerator = (() => {
       const conteudo = sc.textContent || '';
       const src = sc.getAttribute('src') || '';
       
-      // 🛑 CORREÇÃO DA AUTODESTRUIÇÃO: As strings foram separadas para 
-      // que o próprio script não seja apagado por conter as palavras-chave!
+      // 🛑 CORREÇÃO DA AUTODESTRUIÇÃO: As strings foram divididas
+      // para o script não encontrar a palavra inteira e se apagar!
       if (
         conteudo.includes('IsThisFirstTime_' + 'Log_From_LiveServer') ||
         src.includes('dependency-' + 'loader') ||
@@ -56,7 +56,7 @@ const HTMLGenerator = (() => {
   };
 
   const embutirJSTotal = async (rootEl) => {
-    if (window.location.protocol === 'file:') return; // Evita erros se já for um arquivo local
+    if (window.location.protocol === 'file:') return; 
 
     const scripts = Array.from(rootEl.querySelectorAll('script[src]'));
     for (const sc of scripts) {
@@ -90,14 +90,11 @@ const HTMLGenerator = (() => {
       toastClone.textContent = '📄 Ficha salva no PC!';
     }
 
-    // Limpa scripts injetados de salvamentos anteriores para evitar duplicação
     clone.querySelectorAll('#__dados_exportados__, #__motor_autonomo_offline__').forEach(el => el.remove());
 
-    // Atualiza explicitamente os atributos 'value' no clone para que o HTML visual reflita o estado atual
     Object.entries(data || {}).forEach(([key, val]) => {
       if (key.startsWith('_')) return;
       
-      // 🛑 CORREÇÃO DE SELETOR CSS: Usar [id="key"] evita crash no querySelector
       const el = clone.querySelector(`[id="${key}"]`);
       if (el) {
         if (el.tagName === 'TEXTAREA') {
@@ -123,7 +120,6 @@ const HTMLGenerator = (() => {
     dataScript.textContent = jsonState;
     clone.querySelector('head')?.appendChild(dataScript);
 
-    // Motor que roda automaticamente ao abrir o arquivo baixado
     const autoRestoreScript = document.createElement('script');
     autoRestoreScript.id = '__motor_autonomo_offline__';
     autoRestoreScript.textContent = `
@@ -170,7 +166,6 @@ const HTMLGenerator = (() => {
     `;
     clone.querySelector('body')?.appendChild(autoRestoreScript);
 
-    // Embutir dependências para o HTML ser 100% offline
     await embutirCSSTotal(clone);
     await embutirJSTotal(clone);
 
@@ -183,14 +178,12 @@ const HTMLGenerator = (() => {
         Toast.show('⏳ Gerando arquivo standalone...');
       }
 
-      // Fecha previews abertas de notas antes do dump
       document.querySelectorAll('.rn-toggle').forEach(btn => {
         if (btn.textContent.trim() === '👁') {
           btn.click();
         }
       });
 
-      // Usa a ponte global segura para buscar os dados
       const data = (typeof window.CharacterDataHelper !== 'undefined' && window.CharacterDataHelper.collectData)
         ? window.CharacterDataHelper.collectData()
         : (typeof collectData === 'function' ? collectData() : {});
@@ -206,7 +199,7 @@ const HTMLGenerator = (() => {
       a.href = url;
       a.download = `Ficha_${safeName}.html`;
       
-      // Aciona o download direto (evita erro de Frame em arquivos locais)
+      // 🛑 CORREÇÃO 2: Removido o appendChild para evitar o bloqueio de segurança (Frame error) no file:///
       a.click();
       URL.revokeObjectURL(url);
 
