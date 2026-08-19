@@ -10,7 +10,6 @@ let attacks = [];
 let spellSlots = {};
 let spells = {};
 let limitedResources = [];
-let feats = []; 
 let initiativeOverride = false;
 let passivePercOverride = false;
 let spellDCOverride = false; 
