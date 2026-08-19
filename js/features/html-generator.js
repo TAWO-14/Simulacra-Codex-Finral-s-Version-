@@ -1,15 +1,13 @@
 /**
  * ============================================================================
- * HTML-GENERATOR.JS - Módulo Clássico (Rehidratação via JSON)
+ * HTML-GENERATOR.JS - Ficha OSS Monolítica (Rehidratação + CSS/JS Embutidos)
  * ============================================================================
  */
 
 const HTMLGenerator = (() => {
   const limparEsqueleto = (rootEl) => {
-    // Remove o lixo dinâmico para garantir que o "esqueleto" fique limpo
     rootEl.querySelectorAll('#clr-picker, #clr-style').forEach(el => el.remove());
     
-    // Remove scripts antigos ou de desenvolvimento para não duplicar
     const scripts = Array.from(rootEl.getElementsByTagName('script'));
     scripts.forEach((sc) => {
       const conteudo = sc.textContent || '';
@@ -22,15 +20,53 @@ const HTMLGenerator = (() => {
     });
   };
 
+  // NOVA FUNÇÃO: Transforma links e scripts externos em código embutido
+  const embutirRecursosLocais = async (clone) => {
+    // 1. Embutir CSS local
+    const linksCss = Array.from(clone.querySelectorAll('link[rel="stylesheet"]'));
+    for (const link of linksCss) {
+      const href = link.getAttribute('href');
+      // Ignora links externos (como Google Fonts e Coloris CDN)
+      if (href && !href.startsWith('http')) {
+        try {
+          const resposta = await fetch(href);
+          const cssTexto = await resposta.text();
+          const tagStyle = document.createElement('style');
+          tagStyle.textContent = cssTexto;
+          link.replaceWith(tagStyle);
+        } catch (erro) {
+          console.warn(`⚠️ Não foi possível embutir o CSS: ${href}`, erro);
+        }
+      }
+    }
+
+    // 2. Embutir JS local
+    const scriptsJs = Array.from(clone.querySelectorAll('script[src]'));
+    for (const script of scriptsJs) {
+      const src = script.getAttribute('src');
+      // Ignora links externos (como PDF.js e Cropper.js CDNs)
+      if (src && !src.startsWith('http')) {
+        try {
+          const resposta = await fetch(src);
+          const jsTexto = await resposta.text();
+          const tagScript = document.createElement('script');
+          tagScript.textContent = jsTexto;
+          script.replaceWith(tagScript);
+        } catch (erro) {
+          console.warn(`⚠️ Não foi possível embutir o JS: ${src}`, erro);
+        }
+      }
+    }
+  };
+
   const generate = async (data) => {
-    // 1. Clona o DOM atual. (O clone não copia os valores digitados nativamente, 
-    // o que é perfeito para criar um template HTML "limpo")
     const clone = document.documentElement.cloneNode(true);
     
-    // 2. Limpa o esqueleto HTML
+    // Transforma a ficha em um arquivo único (Monolito)
+    await embutirRecursosLocais(clone);
+
     limparEsqueleto(clone);
 
-    // 3. A mágica da ficha antiga: Empacota TUDO em um único Script JSON estático
     const jsonState = JSON.stringify(data || {})
       .replace(/</g, '\\u003c')
       .replace(/>/g, '\\u003e');
@@ -40,7 +76,6 @@ const HTMLGenerator = (() => {
     dataScript.type = 'application/json';
     dataScript.textContent = jsonState;
     
-    // Injeta o "cofre de dados" no head da ficha
     clone.querySelector('head')?.appendChild(dataScript);
 
     return '<!DOCTYPE html>\n' + clone.outerHTML;
@@ -48,20 +83,17 @@ const HTMLGenerator = (() => {
 
   const download = async () => {
     try {
-      if (typeof Toast !== 'undefined' && Toast.show) Toast.show('⏳ Salvando dados da ficha...');
+      if (typeof Toast !== 'undefined' && Toast.show) Toast.show('⏳ Empacotando ficha completa...');
 
-      // Coleta os dados usando a função do seu sistema
       const data = (typeof window.CharacterDataHelper !== 'undefined' && window.CharacterDataHelper.collectData)
         ? window.CharacterDataHelper.collectData()
         : (typeof collectData === 'function' ? collectData() : {});
 
-      // Gera o HTML usando a lógica de JSON
       const htmlContent = await generate(data);
 
       const rawName = data['char-name'] || document.getElementById('char-name')?.value || 'personagem';
       const safeName = rawName.trim().replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '') || 'ficha';
 
-      // Cria e dispara o download
       const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -71,7 +103,7 @@ const HTMLGenerator = (() => {
       a.click();
       URL.revokeObjectURL(url);
 
-      if (typeof Toast !== 'undefined' && Toast.show) Toast.show('📄 Ficha exportada (Modo JSON)!');
+      if (typeof Toast !== 'undefined' && Toast.show) Toast.show('📄 Ficha exportada com sucesso!');
     } catch (err) {
       console.error('Erro ao gerar/baixar HTML:', err);
       if (typeof Toast !== 'undefined' && Toast.show) Toast.show('❌ Erro ao exportar.');
