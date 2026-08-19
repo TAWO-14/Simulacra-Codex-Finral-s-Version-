@@ -1,60 +1,51 @@
 /**
  * ============================================================================
- * HTML-GENERATOR.JS - Ficha OSS Monolítica (Rehidratação + CSS/JS Embutidos)
+ * HTML-GENERATOR.JS - OSS Dinâmico (Rehidratação JSON + Embutir CSS/JS)
  * ============================================================================
  */
 
 const HTMLGenerator = (() => {
   const limparEsqueleto = (rootEl) => {
+    // Remove interface dinâmica
     rootEl.querySelectorAll('#clr-picker, #clr-style').forEach(el => el.remove());
     
+    // Remove scripts de dados antigos
     const scripts = Array.from(rootEl.getElementsByTagName('script'));
     scripts.forEach((sc) => {
-      const conteudo = sc.textContent || '';
-      if (
-        sc.id === '__dados_exportados__' || 
-        conteudo.includes('IsThisFirstTime_Log_From_LiveServer')
-      ) {
+      if (sc.id === '__dados_exportados__' || sc.textContent.includes('LiveServer')) {
         if (sc.parentNode) sc.parentNode.removeChild(sc);
       }
     });
   };
 
-  // NOVA FUNÇÃO: Transforma links e scripts externos em código embutido
   const embutirRecursosLocais = async (clone) => {
-    // 1. Embutir CSS local
+    // 1. Embutir CSS
     const linksCss = Array.from(clone.querySelectorAll('link[rel="stylesheet"]'));
     for (const link of linksCss) {
       const href = link.getAttribute('href');
-      // Ignora links externos (como Google Fonts e Coloris CDN)
       if (href && !href.startsWith('http')) {
         try {
-          const resposta = await fetch(href);
-          const cssTexto = await resposta.text();
-          const tagStyle = document.createElement('style');
-          tagStyle.textContent = cssTexto;
-          link.replaceWith(tagStyle);
-        } catch (erro) {
-          console.warn(`⚠️ Não foi possível embutir o CSS: ${href}`, erro);
-        }
+          const resp = await fetch(href);
+          const css = await resp.text();
+          const style = document.createElement('style');
+          style.textContent = css;
+          link.replaceWith(style);
+        } catch (e) { console.warn(`Falha no CSS: ${href}`, e); }
       }
     }
 
-    // 2. Embutir JS local
+    // 2. Embutir JS
     const scriptsJs = Array.from(clone.querySelectorAll('script[src]'));
-    for (const script of scriptsJs) {
-      const src = script.getAttribute('src');
-      // Ignora links externos (como PDF.js e Cropper.js CDNs)
+    for (const sc of scriptsJs) {
+      const src = sc.getAttribute('src');
       if (src && !src.startsWith('http')) {
         try {
-          const resposta = await fetch(src);
-          const jsTexto = await resposta.text();
-          const tagScript = document.createElement('script');
-          tagScript.textContent = jsTexto;
-          script.replaceWith(tagScript);
-        } catch (erro) {
-          console.warn(`⚠️ Não foi possível embutir o JS: ${src}`, erro);
-        }
+          const resp = await fetch(src);
+          const js = await resp.text();
+          const inlineSc = document.createElement('script');
+          inlineSc.textContent = js;
+          sc.replaceWith(inlineSc);
+        } catch (e) { console.warn(`Falha no JS: ${src}`, e); }
       }
     }
   };
@@ -62,11 +53,11 @@ const HTMLGenerator = (() => {
   const generate = async (data) => {
     const clone = document.documentElement.cloneNode(true);
     
-    // Transforma a ficha em um arquivo único (Monolito)
+    // Transforma em arquivo único pegando os arquivos do GitHub
     await embutirRecursosLocais(clone);
-
     limparEsqueleto(clone);
 
+    // Cria o cofre de dados JSON
     const jsonState = JSON.stringify(data || {})
       .replace(/</g, '\\u003c')
       .replace(/>/g, '\\u003e');
@@ -75,7 +66,6 @@ const HTMLGenerator = (() => {
     dataScript.id = '__dados_exportados__';
     dataScript.type = 'application/json';
     dataScript.textContent = jsonState;
-    
     clone.querySelector('head')?.appendChild(dataScript);
 
     return '<!DOCTYPE html>\n' + clone.outerHTML;
@@ -83,14 +73,13 @@ const HTMLGenerator = (() => {
 
   const download = async () => {
     try {
-      if (typeof Toast !== 'undefined' && Toast.show) Toast.show('⏳ Empacotando ficha completa...');
+      if (typeof Toast !== 'undefined' && Toast.show) Toast.show('⏳ Gerando ficha monolítica...');
 
       const data = (typeof window.CharacterDataHelper !== 'undefined' && window.CharacterDataHelper.collectData)
         ? window.CharacterDataHelper.collectData()
         : (typeof collectData === 'function' ? collectData() : {});
 
       const htmlContent = await generate(data);
-
       const rawName = data['char-name'] || document.getElementById('char-name')?.value || 'personagem';
       const safeName = rawName.trim().replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '') || 'ficha';
 
@@ -99,14 +88,12 @@ const HTMLGenerator = (() => {
       const a = document.createElement('a');
       a.href = url;
       a.download = `Ficha_${safeName}.html`;
-      
       a.click();
       URL.revokeObjectURL(url);
 
       if (typeof Toast !== 'undefined' && Toast.show) Toast.show('📄 Ficha exportada com sucesso!');
     } catch (err) {
-      console.error('Erro ao gerar/baixar HTML:', err);
-      if (typeof Toast !== 'undefined' && Toast.show) Toast.show('❌ Erro ao exportar.');
+      console.error('Erro:', err);
     }
   };
 
