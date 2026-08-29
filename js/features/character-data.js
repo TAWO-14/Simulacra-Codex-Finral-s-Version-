@@ -311,4 +311,4 @@ window.addEventListener('DOMContentLoaded', () => {
             if (check) check.className = 'save-check' + (saveProfs[a.id] ? ' active' : '');
         });
     });
-});s
+});
