@@ -182,6 +182,7 @@ function collectData() {
         _feats: typeof feats !== 'undefined' ? feats : [],
         _initiativeOverride: initiativeOverride,
         _spellDCOverride: typeof spellDCOverride !== 'undefined' ? spellDCOverride : false,
+        _secondarySpellSlots: typeof secondarySpellSlots !== 'undefined' ? secondarySpellSlots : {},
         _passivePercOverride: passivePercOverride,
         _bgImage: window.imagemFundoCustomizada || '',
     };
@@ -220,6 +221,8 @@ window.addEventListener('DOMContentLoaded', () => {
     initiativeOverride = window.SHEET_DATA._initiativeOverride || false;
     passivePercOverride = window.SHEET_DATA._passivePercOverride || false;
     window.imagemFundoCustomizada = window.SHEET_DATA._bgImage || '';
+    secondarySpellSlots = window.SHEET_DATA._secondarySpellSlots || {};
+    secondarySpellSlots = data._secondarySpellSlots || {};
 
     // Montagem das estruturas HTML base
     if (typeof aplicarFundoCustomizado === 'function') safeStep('fundo customizado', aplicarFundoCustomizado);
@@ -311,4 +314,4 @@ window.addEventListener('DOMContentLoaded', () => {
             if (check) check.className = 'save-check' + (saveProfs[a.id] ? ' active' : '');
         });
     });
-});
+});s
