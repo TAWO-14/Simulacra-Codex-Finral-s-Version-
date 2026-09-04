@@ -61,26 +61,26 @@
 </head>
 
 <style>
-        /* Garante que a paleta flutuante abra na frente de tudo */
-        #clr-picker {
-            z-index: 100000 !important;
-            border-radius: 8px !important;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important;
-        }
+    /* Garante que a paleta flutuante abra na frente de tudo */
+    #clr-picker {
+        z-index: 100000 !important;
+        border-radius: 8px !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8) !important;
+    }
 
-        /* Deixa as bolinhas de cores prontas redondas e bonitas */
-        #clr-picker .clr-swatches button {
-            border-radius: 50% !important;
-            border: 1px solid rgba(255,255,255,0.2) !important;
-        }
+    /* Deixa as bolinhas de cores prontas redondas e bonitas */
+    #clr-picker .clr-swatches button {
+        border-radius: 50% !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
 
-        /* Ajusta o campo de texto dentro do pop-up */
-        #clr-picker input {
-            background: var(--input-bg) !important;
-            color: var(--text) !important;
-            border: 1px solid var(--border) !important;
-        }
-    </style>
+    /* Ajusta o campo de texto dentro do pop-up */
+    #clr-picker input {
+        background: var(--input-bg) !important;
+        color: var(--text) !important;
+        border: 1px solid var(--border) !important;
+    }
+</style>
 
 <body>
 
@@ -998,7 +998,27 @@
                 </div>
 
                 <div class="panel">
-                    <div class="section-title mb10">Espaços de Magia</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <div class="section-title" style="margin-bottom:0; border:none; padding:0;">Espaços de Magia
+                        </div>
+                        <!-- Seletor de Modo/Grade -->
+                        <div style="display: flex; gap: 4px;">
+                            <button type="button" class="h-btn active" id="btn-slot-primary"
+                                onclick="switchSlotSet('primary')"
+                                style="width: auto; height: 24px; padding: 0 10px; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px;"
+                                title="Espaços Primarios">Classe</button>
+                            <button type="button" class="h-btn" id="btn-slot-secondary"
+                                onclick="switchSlotSet('secondary')"
+                                style="width: auto; height: 24px; padding: 0 10px; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px;"
+                                title="Espaços Secundários">Multi</button>
+                        </div>
+                    </div>
+
+                    <!-- Subtítulo dinâmico indicando o conjunto ativo -->
+                    <div id="slot-set-indicator"
+                        style="font-size:11px; color:var(--text3); margin-bottom:8px; font-family:'Cinzel', serif;">
+                        Grade: Principal (Conjurador Padrão)</div>
+
                     <div id="slots-grid"></div>
                 </div>
             </div>
