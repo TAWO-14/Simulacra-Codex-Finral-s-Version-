@@ -13,18 +13,18 @@ function buildSpells() {
   if (!leftEl || !rightEl) return;
   leftEl.innerHTML = '';
   rightEl.innerHTML = '';
-  
+
   [0, 1, 2, 3, 4].forEach(l => buildLevelBlock(l, leftEl));
   [5, 6, 7, 8, 9].forEach(l => buildLevelBlock(l, rightEl));
 
   function buildLevelBlock(level, container) {
     if (!spells[level] || spells[level].length === 0) spells[level] = [{ name: '', prepped: false }];
-    
+
     const panel = document.createElement('div');
     panel.className = 'panel mb12';
     const levelLabel = level === 0 ? 'Truques' : `Nível ${level}`;
     let slotsHTML = '';
-    
+
     if (level > 0) {
       if (!spellSlots[level]) spellSlots[level] = { total: 0, used: 0 };
       slotsHTML = `
@@ -34,7 +34,7 @@ function buildSpells() {
           <span id="slot-pips-${level}" style="display:flex; gap:3px;"></span>
         </div>`;
     }
-    
+
     panel.innerHTML = `
       <div class="spell-level-header">
         <div class="spell-level-badge">${level}</div>
@@ -44,7 +44,7 @@ function buildSpells() {
       <div class="spell-list" id="spell-list-${level}"></div>
       <button class="add-btn" onclick="addSpellRow(${level})">+ Adicionar</button>
     `;
-    
+
     container.appendChild(panel);
     renderSpellList(level);
     if (level > 0) updateSlotPips(level);
@@ -59,10 +59,10 @@ function renderSpellList(level) {
 }
 
 function spellRowHTML(level, i, sp) {
-  const prepCheck = level > 0 
-    ? `<div class="spell-prep ${sp.prepped ? 'prepped' : ''}" onclick="toggleSpellPrep(${level},${i})" title="Preparado">✔</div>` 
+  const prepCheck = level > 0
+    ? `<div class="spell-prep ${sp.prepped ? 'prepped' : ''}" onclick="toggleSpellPrep(${level},${i})" title="Preparado">✔</div>`
     : '<div style="width:13px; flex-shrink:0;"></div>';
-    
+
   return `
     <div class="spell-row" id="spell-row-${level}-${i}">
       ${prepCheck}
@@ -101,7 +101,7 @@ function buildSlotOverview() {
   const grid = document.getElementById('slots-grid');
   if (!grid) return;
   grid.innerHTML = '';
-  
+
   for (let l = 1; l <= 9; l++) {
     if (!spellSlots[l]) spellSlots[l] = { total: 0, used: 0 };
     const block = document.createElement('div');
@@ -121,7 +121,7 @@ function setSlotTotal(level, val) {
   spellSlots[level] = spellSlots[level] || { total: 0, used: 0 };
   spellSlots[level].total = n;
   if (spellSlots[level].used > n) spellSlots[level].used = n;
-  
+
   if (document.getElementById('slot-ov-' + level)) document.getElementById('slot-ov-' + level).value = n;
   if (document.getElementById('slot-total-' + level)) document.getElementById('slot-total-' + level).value = n;
   updateSlotPips(level);
@@ -153,12 +153,12 @@ function updateSpellDC() {
 
   if (!ability) {
     if (!window.spellDCOverride && dcEl) dcEl.value = '';
-    if (!window.spellAtkOverride && atkEl) atkEl.value = ''; 
+    if (!window.spellAtkOverride && atkEl) atkEl.value = '';
     return;
   }
 
   const mod = getMod(getAttrVal(ability)),
-        pb = getProfBonus();
+    pb = getProfBonus();
 
   if (!window.spellDCOverride && dcEl) {
     dcEl.value = 8 + mod + pb;
@@ -171,6 +171,101 @@ function updateSpellDC() {
 
 // Expõe explicitamente como um módulo para a inicialização no character-data.js
 window.SpellsModule = {
-    buildSpells,
-    buildSlotOverview
+  buildSpells,
+  buildSlotOverview
 };
+
+let activeSlotSet = 'primary'; // 'primary' ou 'secondary'
+let secondarySpellSlots = {};
+
+function switchSlotSet(setName) {
+  activeSlotSet = setName;
+
+  const btnP = document.getElementById('btn-slot-primary');
+  const btnS = document.getElementById('btn-slot-secondary');
+  const lbl = document.getElementById('slot-set-indicator');
+
+  if (btnP) btnP.classList.toggle('active', setName === 'primary');
+  if (btnS) btnS.classList.toggle('active', setName === 'secondary');
+  if (lbl) {
+    lbl.textContent = setName === 'primary'
+      ? 'Grade: Principal (Conjurador Padrão)'
+      : 'Grade: Secundária (Pacto / Bruxo / Multiclasse)';
+  }
+
+  buildSlotOverview();
+}
+
+function getActiveSlotData(level) {
+  const store = activeSlotSet === 'primary' ? spellSlots : secondarySpellSlots;
+  if (!store[level]) store[level] = { total: 0, used: 0 };
+  return store[level];
+}
+
+function buildSlotOverview() {
+  const grid = document.getElementById('slots-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  for (let l = 1; l <= 9; l++) {
+    const s = getActiveSlotData(l);
+    const block = document.createElement('div');
+    block.className = 'slot-block';
+    block.innerHTML = `
+      <input type="number" value="${s.total}" min="0" max="9" class="sl-num-input" onchange="setSlotTotal(${l}, this.value)" id="slot-ov-${l}">
+      <div class="sl-num">Nível ${l}</div>
+      <div class="sl-pips" id="sl-pips-${l}"></div>
+    `;
+    grid.appendChild(block);
+    updateSlotPips(l);
+  }
+}
+
+function setSlotTotal(level, val) {
+  const n = Math.max(0, Math.min(9, parseInt(val) || 0));
+  const s = getActiveSlotData(level);
+  s.total = n;
+  if (s.used > n) s.used = n;
+
+  if (document.getElementById('slot-ov-' + level)) document.getElementById('slot-ov-' + level).value = n;
+  if (activeSlotSet === 'primary' && document.getElementById('slot-total-' + level)) {
+    document.getElementById('slot-total-' + level).value = n;
+  }
+  updateSlotPips(level);
+}
+
+function updateSlotPips(level) {
+  const s = getActiveSlotData(level);
+  const el = document.getElementById('sl-pips-' + level);
+  if (el) {
+    el.innerHTML = '';
+    for (let i = 0; i < s.total; i++) {
+      const pip = document.createElement('div');
+      pip.className = 'sl-pip' + (i < s.used ? ' used' : ' avail');
+      pip.onclick = () => {
+        if (i < s.used) s.used--;
+        else s.used++;
+        updateSlotPips(level);
+      };
+      el.appendChild(pip);
+    }
+  }
+
+  // Sincroniza pips da lista do códex se for a grade primária
+  if (activeSlotSet === 'primary') {
+    const listPip = document.getElementById('slot-pips-' + level);
+    if (listPip) {
+      listPip.innerHTML = '';
+      for (let i = 0; i < s.total; i++) {
+        const p = document.createElement('div');
+        p.className = 'slot-pip' + (i < s.used ? ' used' : ' avail');
+        p.onclick = () => {
+          if (i < s.used) s.used--;
+          else s.used++;
+          updateSlotPips(level);
+        };
+        listPip.appendChild(p);
+      }
+    }
+  }
+}
