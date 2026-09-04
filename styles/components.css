@@ -27,14 +27,15 @@
 .h-btn:hover {
   border-color: var(--border2);
   color: var(--accent2);
-  background: rgba(200, 146, 42, 0.08);
+  background: var(--glow);
   box-shadow: 0 0 10px var(--glow);
 }
 
 .h-btn.active {
-  border-color: var(--accent);
+  border-color: var(--accent2);
   color: var(--accent2);
-  background: rgba(200, 146, 42, 0.12);
+  background: var(--glow);
+  box-shadow: 0 0 8px var(--glow);
 }
 
 .h-btn[title]:hover::after {
