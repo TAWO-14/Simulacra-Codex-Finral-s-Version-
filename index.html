@@ -362,8 +362,21 @@
                 <div><label>Nome</label><input type="text" id="char-name" oninput="updateHeader()"
                         placeholder="Aragorn...">
                 </div>
-                <div><label>Classe &amp; Nível</label><input type="text" id="char-class" oninput="updateHeader()"
-                        placeholder="Guerreiro 5"></div>
+
+                <div style="display: flex; gap: 8px;">
+                    <div style="flex: 1;">
+                        <label>Classe</label>
+                        <input type="text" id="char-class" placeholder="Guerreiro" oninput="updateHeader()"
+                            style="width: 200px;">
+                    </div>
+
+                    <div>
+                        <label>Nível</label>
+                        <input type="number" id="char-level" min="1" max="20" value="1" oninput="updateProfBonus()"
+                            style="width: 33px; text-align: center;" title="Nível do Personagem">
+                    </div>
+                </div>
+
                 <div><label>Raça</label><input type="text" id="char-race" oninput="updateHeader()" placeholder="Humano">
                 </div>
                 <div><label>Antecedente</label><input type="text" id="char-bg" placeholder="Soldado"></div>
@@ -386,6 +399,8 @@
         </div>
 
         <div class="page1-layout">
+
+            <!-- COLUNA 1 (Apenas Atributos e Percepção Passiva) -->
             <div>
                 <div class="panel mb12">
                     <div class="section-title mb12">Atributos</div>
@@ -428,87 +443,113 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="panel mb12">
-                    <div class="grid-2" style="align-items:start;">
-                        <div>
-                            <div class="section-title mb8">Prof.</div>
-                            <div class="prof-badge">
-                                <div class="pb-num" id="prof-bonus">+2</div>
-                                <div class="pb-label">Bônus</div>
-                            </div>
-                            <div style="text-align:center; margin-top:6px;">
-                                <label>Nível</label>
-                                <input type="number" id="char-level" min="1" max="20" value="1"
-                                    oninput="updateProfBonus()"
-                                    style="width:60px; text-align:center; margin:0 auto; display:block;">
-                            </div>
-                        </div>
-                        <div style="text-align:center;">
-                            <div class="section-title mb8">Inspiração</div>
-                            <div class="insp-box" id="insp-box" onclick="toggleInspiration()"
-                                title="Clique para alternar">✦
-                            </div>
-                            <div style="font-size: 11px; color: var(--text3); margin-top: 6px;">Clique p/ ativar
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="panel">
-                    <div class="section-title mb4">Percepção Passiva</div>
-                    <input type="number" id="passive-perc" value="10"
-                        style="font-family: &quot;Cinzel&quot;, serif; font-size: 28px; font-weight: 700; color: var(--accent2); text-align: center; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 4px; padding: 4px; width: 100%; box-sizing: border-box;"
-                        oninput="onPassivePercInput()" title="Calculado automaticamente; edite para sobrescrever">
-                    <div style="font-size: 11px; color: var(--text3); text-align: center;">10 + Mod Percepção</div>
-                </div>
             </div>
 
+            <!-- COLUNA 2 (Resistências + Prof/Inspiração, Perícias e Talentos) -->
             <div>
                 <div class="panel mb12">
-                    <div class="section-title mb8">Testes de Resistência</div>
-                    <div id="saves-list">
-                        <div class="save-row">
-                            <div class="save-check" id="save-check-str" onclick="toggleSaveProf('str')"></div>
-                            <div class="save-value" id="save-val-str">+0</div>
-                            <div class="save-label">Força <span style="font-size:10px; color:var(--text3);">(For)</span>
+                    <!-- Usamos 1.3fr e 1fr para dar um pouco mais de espaço ao título da esquerda e evitar quebra de linha -->
+                    <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 0;">
+
+                        <!-- Lado Esquerdo: Testes de Resistência (com borda e espaçamento) -->
+                        <div style="border-right: 1px solid var(--border); padding-right: 16px;">
+                            <div class="section-title mb8">Testes de Resistência</div>
+                            <div id="saves-list">
+                                <div class="save-row">
+                                    <div class="save-check" id="save-check-str" onclick="toggleSaveProf('str')"></div>
+                                    <div class="save-value" id="save-val-str">+0</div>
+                                    <div class="save-label">Força <span
+                                            style="font-size:10px; color:var(--text3);">(For)</span></div>
+                                </div>
+                                <div class="save-row">
+                                    <div class="save-check" id="save-check-dex" onclick="toggleSaveProf('dex')"></div>
+                                    <div class="save-value" id="save-val-dex">+0</div>
+                                    <div class="save-label">Destreza <span
+                                            style="font-size:10px; color:var(--text3);">(Des)</span></div>
+                                </div>
+                                <div class="save-row">
+                                    <div class="save-check" id="save-check-con" onclick="toggleSaveProf('con')"></div>
+                                    <div class="save-value" id="save-val-con">+0</div>
+                                    <div class="save-label">Constituição <span
+                                            style="font-size:10px; color:var(--text3);">(Con)</span></div>
+                                </div>
+                                <div class="save-row">
+                                    <div class="check" id="save-check-int" onclick="toggleSaveProf('int')"></div>
+                                    <div class="save-value" id="save-val-int">+0</div>
+                                    <div class="save-label">Inteligência <span
+                                            style="font-size:10px; color:var(--text3);">(Int)</span></div>
+                                </div>
+                                <div class="save-row">
+                                    <div class="save-check" id="save-check-wis" onclick="toggleSaveProf('wis')"></div>
+                                    <div class="save-value" id="save-val-wis">+0</div>
+                                    <div class="save-label">Sabedoria <span
+                                            style="font-size:10px; color:var(--text3);">(Sab)</span></div>
+                                </div>
+                                <div class="save-row">
+                                    <div class="save-check" id="save-check-cha" onclick="toggleSaveProf('cha')"></div>
+                                    <div class="save-value" id="save-val-cha">+0</div>
+                                    <div class="save-label">Carisma <span
+                                            style="font-size:10px; color:var(--text3);">(Car)</span></div>
+                                </div>
                             </div>
                         </div>
-                        <div class="save-row">
-                            <div class="save-check" id="save-check-dex" onclick="toggleSaveProf('dex')"></div>
-                            <div class="save-value" id="save-val-dex">+0</div>
-                            <div class="save-label">Destreza <span
-                                    style="font-size:10px; color:var(--text3);">(Des)</span>
+
+                        <!-- Lado Direito: Proficiência, Inspiração e Percepção -->
+                        <div
+                            style="padding-left: 16px; display: flex; flex-direction: column; justify-content: space-between;">
+
+                            <!-- TOPO: Proficiência e Inspiração -->
+                            <div class="grid-2" style="align-items:start;">
+                                <div style="display:flex; flex-direction:column; align-items:center;">
+                                    <div class="section-title mb8" style="width: 100%; text-align:center;">Prof.</div>
+                                    <div class="prof-badge">
+                                        <div class="pb-num" id="prof-bonus">+2</div>
+                                        <div class="pb-label">Bônus</div>
+                                    </div>
+                                    <!-- Nível escondido para manter a matemática do JS a funcionar -->
+                                    <input type="hidden" id="char-level" value="5" oninput="updateProfBonus()">
+                                </div>
+
+                                <div style="display:flex; flex-direction:column; align-items:center;">
+                                    <div class="section-title mb8" style="width: 100%; text-align:center;">Inspiração
+                                    </div>
+                                    <!-- Tamanho ajustado inline para igualar aos 52px da Proficiência -->
+                                    <div class="insp-box" id="insp-box" onclick="toggleInspiration()"
+                                        title="Clique para ativar" style="width: 52px; height: 52px; font-size: 24px;">✦
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="save-row">
-                            <div class="save-check" id="save-check-con" onclick="toggleSaveProf('con')"></div>
-                            <div class="save-value" id="save-val-con">+0</div>
-                            <div class="save-label">Constituição <span
-                                    style="font-size:10px; color:var(--text3);">(Con)</span></div>
-                        </div>
-                        <div class="save-row">
-                            <div class="save-check" id="save-check-int" onclick="toggleSaveProf('int')"></div>
-                            <div class="save-value" id="save-val-int">+0</div>
-                            <div class="save-label">Inteligência <span
-                                    style="font-size:10px; color:var(--text3);">(Int)</span></div>
-                        </div>
-                        <div class="save-row">
-                            <div class="save-check" id="save-check-wis" onclick="toggleSaveProf('wis')"></div>
-                            <div class="save-value" id="save-val-wis">+0</div>
-                            <div class="save-label">Sabedoria <span
-                                    style="font-size:10px; color:var(--text3);">(Sab)</span>
+
+                            <!-- BASE: Percepção Passiva -->
+                            <div style="margin-top: 16px;">
+                                <div class="section-title mb8" style="text-align:center; width: 100%;">Percepção Passiva
+                                </div>
+                                <div style="display: flex; gap: 8px; align-items: center; justify-content: center;">
+                                    <input type="text" id="passive-perc" class="hp-dynamic-input" value="10"
+                                        onfocus="this.dataset.old=this.value; this.value='';"
+                                        onblur="if(this.value==='') this.value=this.dataset.old;"
+                                        onchange="onPassivePercInput(this)"
+                                        onkeydown="if(event.key === 'Enter') { event.preventDefault(); this.blur(); }"
+                                        style="font-family: 'Cinzel', serif; font-size: 24px; font-weight: 700; color: var(--accent2); width: 50px; height: 42px; padding: 4px; box-sizing: border-box;"
+                                        title="Percepção Passiva">
+
+                                    <!-- Botão Observador (Talento) -->
+                                    <div
+                                        style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; flex-shrink: 0;">
+                                        <span
+                                            style="font-size: 10px; color: var(--text3); letter-spacing: 1px; text-align: center;">Observador</span>
+                                        <div class="save-check" id="obs-check" title="Talento: Observador (+5)"
+                                            onclick="this.classList.toggle('active'); let p = document.getElementById('passive-perc'); p.value = parseInt(p.value) + (this.classList.contains('active') ? 5 : -5);">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+
                         </div>
-                        <div class="save-row">
-                            <div class="save-check" id="save-check-cha" onclick="toggleSaveProf('cha')"></div>
-                            <div class="save-value" id="save-val-cha">+0</div>
-                            <div class="save-label">Carisma <span
-                                    style="font-size:10px; color:var(--text3);">(Car)</span>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
+
                 <div class="panel mb12">
                     <div class="section-title mb8">Perícias</div>
                     <div id="skills-list">
@@ -540,22 +581,19 @@
                             <div class="skill-attr">Car</div>
                         </div>
                         <div class="skill-row">
-                            <div class="skill-prof" id="skill-prof-stealth" onclick="cycleSkillProf('stealth')">
-                            </div>
+                            <div class="skill-prof" id="skill-prof-stealth" onclick="cycleSkillProf('stealth')"></div>
                             <div class="skill-val" id="skill-val-stealth">+0</div>
                             <div class="skill-name">Furtividade</div>
                             <div class="skill-attr">Des</div>
                         </div>
                         <div class="skill-row">
-                            <div class="skill-prof" id="skill-prof-history" onclick="cycleSkillProf('history')">
-                            </div>
+                            <div class="skill-prof" id="skill-prof-history" onclick="cycleSkillProf('history')"></div>
                             <div class="skill-val" id="skill-val-history">+0</div>
                             <div class="skill-name">História</div>
                             <div class="skill-attr">Int</div>
                         </div>
                         <div class="skill-row">
-                            <div class="skill-prof" id="skill-prof-insight" onclick="cycleSkillProf('insight')">
-                            </div>
+                            <div class="skill-prof" id="skill-prof-insight" onclick="cycleSkillProf('insight')"></div>
                             <div class="skill-val" id="skill-val-insight">+0</div>
                             <div class="skill-name">Intuição</div>
                             <div class="skill-attr">Sab</div>
@@ -583,8 +621,7 @@
                             <div class="skill-attr">Sab</div>
                         </div>
                         <div class="skill-row">
-                            <div class="skill-prof" id="skill-prof-medicine" onclick="cycleSkillProf('medicine')">
-                            </div>
+                            <div class="skill-prof" id="skill-prof-medicine" onclick="cycleSkillProf('medicine')"></div>
                             <div class="skill-val" id="skill-val-medicine">+0</div>
                             <div class="skill-name">Medicina</div>
                             <div class="skill-attr">Sab</div>
@@ -617,22 +654,19 @@
                             <div class="skill-attr">Car</div>
                         </div>
                         <div class="skill-row">
-                            <div class="skill-prof" id="skill-prof-sleight" onclick="cycleSkillProf('sleight')">
-                            </div>
+                            <div class="skill-prof" id="skill-prof-sleight" onclick="cycleSkillProf('sleight')"></div>
                             <div class="skill-val" id="skill-val-sleight">+0</div>
                             <div class="skill-name">Prestidigitação</div>
                             <div class="skill-attr">Des</div>
                         </div>
                         <div class="skill-row">
-                            <div class="skill-prof" id="skill-prof-religion" onclick="cycleSkillProf('religion')">
-                            </div>
+                            <div class="skill-prof" id="skill-prof-religion" onclick="cycleSkillProf('religion')"></div>
                             <div class="skill-val" id="skill-val-religion">+0</div>
                             <div class="skill-name">Religião</div>
                             <div class="skill-attr">Int</div>
                         </div>
                         <div class="skill-row">
-                            <div class="skill-prof" id="skill-prof-survival" onclick="cycleSkillProf('survival')">
-                            </div>
+                            <div class="skill-prof" id="skill-prof-survival" onclick="cycleSkillProf('survival')"></div>
                             <div class="skill-val" id="skill-val-survival">+0</div>
                             <div class="skill-name">Sobrevivência</div>
                             <div class="skill-attr">Sab</div>
@@ -651,70 +685,84 @@
                 </div>
             </div>
 
+            <!-- COLUNA 3 (Mantida intacta) -->
+            <!-- ... Resto do seu código (Pontos de Vida, Ataques, etc) ... -->
+
             <div>
                 <div class="panel mb12">
-                    <div class="section-title mb8">Combate</div>
-                    <div class="grid-3 mb12" style="gap:8px;">
-                        <div class="combat-stat">
-                            <label>CA</label>
-                            <input type="number" class="big-num" id="armor-class" min="0" value="10"
-                                style="width:100%;">
-                        </div>
-                        <div class="combat-stat">
-                            <label>Iniciativa</label>
-                            <input type="number" class="big-num" id="initiative" value="0" style="width:100%;"
-                                oninput="onInitiativeInput()"
-                                title="Calculado automaticamente por Des; edite para sobrescrever">
-                        </div>
-                        <div class="combat-stat">
-                            <label>Deslocamento</label>
-                            <div style="position: relative; width: 100%;">
-                                <input type="number" class="big-num" id="speed" min="0" value="9"
-                                    style="width: 100%; padding-right: 15px;">
+                    <div class="section-title mb8">Pontos de Vida</div>
+
+                    <div style="display: flex; gap: 10px; margin-bottom: 12px; align-items: stretch;">
+                        <!-- Box Principal: Atual / Máximo -->
+                        <div
+                            style="flex: 2; background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: inset 0 2px 4px var(--glow);">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+
+                                <!-- HP Atual: Fonte 26px, Largura 70px -->
+                                <input type="text" id="hp-current" class="hp-dynamic-input" value="10"
+                                    title="Atual: Digite um valor absoluto ou use + e -"
+                                    style="width: 70px; font-size: 26px; font-weight: 700; color: var(--accent2); font-family: 'Cinzel', serif;"
+                                    onfocus="this.dataset.old=this.value; this.value='';"
+                                    onblur="if(this.value==='') this.value=this.dataset.old;"
+                                    onchange="handleDynamicHP(this)"
+                                    onkeydown="if(event.key === 'Enter') { event.preventDefault(); this.blur(); }">
+
                                 <span
-                                    style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 16px; color: var(--text3); pointer-events: none;">m</span>
+                                    style="font-size: 22px; color: var(--text3); font-family: 'Cinzel', serif; opacity: 0.6;">/</span>
+
+                                <!-- HP Máximo: Fonte 26px, Largura 70px (Igualado ao Atual) -->
+                                <input type="number" id="hp-max" class="hp-dynamic-input" value="10" min="1"
+                                    title="Máximo"
+                                    style="width: 70px; font-size: 26px; font-weight: 600; color: var(--text2); font-family: 'Cinzel', serif;"
+                                    onchange="updateHPBar()">
                             </div>
+                            <div
+                                style="font-size: 10px; color: var(--text3); text-align: center; letter-spacing: 1.5px; line-height: 1.3;">
+                                VIDA<br>ATUAL
+                            </div>
+                        </div>
+
+                        <!-- Box Secundário: PV Temporário -->
+                        <div
+                            style="flex: 1; background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px; display: flex; align-items: center; justify-content: center; flex-direction: column; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);">
+                            <div style="font-size: 9px; color: var(--text3); letter-spacing: 1px; margin-bottom: 4px;">
+                                TEMPORÁRIO</div>
+                            <input type="text" id="hp-temp" class="hp-dynamic-input" value="0"
+                                title="Temporário: Digite um valor absoluto ou use + e -"
+                                style="width: 60px; height: 60px; border-radius: 50%; font-size: 22px; font-weight: 700; color: var(--green); font-family: 'Cinzel', serif; margin: 0 auto;"
+                                onfocus="this.dataset.old=this.value; this.value='';"
+                                onblur="if(this.value==='') this.value=this.dataset.old;"
+                                onchange="handleDynamicHP(this)"
+                                onkeydown="if(event.key === 'Enter') { event.preventDefault(); this.blur(); }">
                         </div>
                     </div>
 
-                    <div class="section-title mb8">Pontos de Vida</div>
-                    <div class="grid-2 mb8" style="gap:8px;">
-                        <div><label>PV Máximos</label><input type="number" id="hp-max" min="0" value="10"
-                                oninput="updateHPBar()" style="text-align:center;"></div>
-                        <div><label>PV Temporários</label><input type="number" id="hp-temp" min="0" value="0"
-                                oninput="updateHPBar()" style="text-align:center;"></div>
-                    </div>
-                    <div class="hp-bar mb4">
+                    <div class="hp-bar mb8">
                         <div class="hp-bar-fill" id="hp-bar-fill" style="width: 100%;"></div>
                         <div class="hp-bar-temp" id="hp-bar-temp" style="width:0%;"></div>
                     </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                        <span style="font-size: 10px; color: var(--text3); letter-spacing: 1px;">VIDA ATUAL</span>
-                        <span id="hp-temp-badge" class="hp-temp-badge" style="display:none;">✦ <span
-                                id="hp-temp-label">0</span>
-                            temp</span>
-                    </div>
-                    <div class="hp-section">
-                        <div class="hp-row">
-                            <button class="hp-btn dmg" onclick="changeHP(-1)" title="Sofrer 1 dano">−</button>
-                            <input type="number" class="hp-current" id="hp-current" value="10" oninput="updateHPBar()"
-                                min="0">
-                            <button class="hp-btn" onclick="changeHP(1)" title="Curar 1">+</button>
-                        </div>
-                        <div style="display:flex; gap:6px;">
-                            <input type="number" id="hp-delta" value="1" min="1" style="width:60px; text-align:center;"
-                                placeholder="Qtd">
-                            <button class="hp-btn dmg" onclick="changeHPBy(-1)"
-                                style="flex:1; width:auto;">Dano</button>
-                            <button class="hp-btn" onclick="changeHPBy(1)" style="flex:1; width:auto;">Cura</button>
-                        </div>
-                    </div>
 
                     <div class="mt12 mb8">
-                        <div class="grid-3" style="gap:6px;">
-                            <div><label>Dados de Vida</label><input type="text" id="hd-die" placeholder="d8"></div>
-                            <div><label>Total</label><input type="number" id="hd-total" min="0" value="0"></div>
-                            <div><label>Restantes</label><input type="number" id="hd-left" min="0" value="0"></div>
+                        <div style="display: flex; gap: 10px; align-items: stretch;">
+                            <!-- Box: Total (Texto Livre para Multiclasse) -->
+                            <div
+                                style="flex: 1; background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px; display: flex; align-items: center; justify-content: center; flex-direction: column; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);">
+                                <div
+                                    style="font-size: 9px; color: var(--text3); letter-spacing: 1px; margin-bottom: 4px;">
+                                    DADOS TOTAIS</div>
+                                <input type="text" id="hd-total" class="hp-dynamic-input" placeholder="Ex: 5d10 + 2d6"
+                                    style="width: 100%; font-size: 16px; font-weight: 600; color: var(--text2); font-family: 'Times New Roman', serif;">
+                            </div>
+
+                            <!-- Box: Restantes (Texto Livre) -->
+                            <div
+                                style="flex: 1; background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px; display: flex; align-items: center; justify-content: center; flex-direction: column; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);">
+                                <div
+                                    style="font-size: 9px; color: var(--text3); letter-spacing: 1px; margin-bottom: 4px;">
+                                    RESTANTES</div>
+                                <input type="text" id="hd-left" class="hp-dynamic-input" placeholder="Ex: 2d10 + 1d6"
+                                    style="width: 100%; font-size: 18px; font-weight: 700; color: var(--accent2); font-family: 'Times New Roman', serif;">
+                            </div>
                         </div>
                     </div>
 
@@ -789,15 +837,34 @@
             <!-- COLUNA 1 -->
             <div>
                 <div class="panel mb12">
-                    <div class="section-title mb8">Traços &amp; Personalidade</div>
-                    <div class="mb8"><label>Traços da Personalidade</label><input type="text" id="trait-personality"
-                            placeholder="Como você age, fala ou pensa..."></div>
-                    <div class="mb8"><label>Ideais</label><input type="text" id="trait-ideals"
-                            placeholder="O que guia suas ações..."></div>
-                    <div class="mb8"><label>Laços</label><input type="text" id="trait-bonds"
-                            placeholder="O que o conecta ao mundo..."></div>
-                    <div><label>Manias</label><input type="text" id="trait-quirks"
-                            placeholder="Comportamentos incomuns...">
+                    <div class="section-title mb8">Traços & Personalidade</div>
+
+                    <!-- Abas / Navegação -->
+                    <div class="trait-tabs-header">
+                        <button type="button" class="trait-tab active" onclick="switchTraitTab(0)">Traços</button>
+                        <button type="button" class="trait-tab" onclick="switchTraitTab(1)">Ideais</button>
+                        <button type="button" class="trait-tab" onclick="switchTraitTab(2)">Laços</button>
+                        <button type="button" class="trait-tab" onclick="switchTraitTab(3)">Manias</button>
+                    </div>
+
+                    <!-- Conteúdos das Abas (Textareas) -->
+                    <div class="trait-tabs-content">
+                        <div class="trait-tab-pane active" id="trait-pane-0">
+                            <textarea id="trait-personality" rows="5" placeholder="Como você age, fala ou pensa..."
+                                style="resize: vertical; width: 100%;"></textarea>
+                        </div>
+                        <div class="trait-tab-pane" id="trait-pane-1">
+                            <textarea id="trait-ideals" rows="5" placeholder="O que guia suas ações..."
+                                style="resize: vertical; width: 100%;"></textarea>
+                        </div>
+                        <div class="trait-tab-pane" id="trait-pane-2">
+                            <textarea id="trait-bonds" rows="5" placeholder="O que o conecta ao mundo..."
+                                style="resize: vertical; width: 100%;"></textarea>
+                        </div>
+                        <div class="trait-tab-pane" id="trait-pane-3">
+                            <textarea id="trait-quirks" rows="5" placeholder="Comportamentos incomuns..."
+                                style="resize: vertical; width: 100%;"></textarea>
+                        </div>
                     </div>
                 </div>
 
@@ -1006,11 +1073,11 @@
                             <button type="button" class="h-btn active" id="btn-slot-primary"
                                 onclick="switchSlotSet('primary')"
                                 style="width: auto; height: 24px; padding: 0 10px; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px;"
-                                title="Espaços Primarios">Classe</button>
+                                title="Espaços Primarios">Classe I</button>
                             <button type="button" class="h-btn" id="btn-slot-secondary"
                                 onclick="switchSlotSet('secondary')"
                                 style="width: auto; height: 24px; padding: 0 10px; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px;"
-                                title="Espaços Secundários">Multi</button>
+                                title="Espaços Secundários">Classe II</button>
                         </div>
                     </div>
 
@@ -1022,9 +1089,7 @@
                     <div id="slots-grid"></div>
                 </div>
             </div>
-
         </div>
-    </div>
     </div>
 
     <div class="toast" id="toast">📄 Ficha salva no PC!</div>
