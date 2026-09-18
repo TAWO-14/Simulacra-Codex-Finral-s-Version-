@@ -408,45 +408,35 @@ body.theme-cyberpunk {
   --header-bot: #0B0E14;
 }
 
-:root {
-  --c-beige: #DCC9A9;
-  --c-red: #B83A2D;
-  --c-green: #4E6851;
-
-  --c-poster-red: #7B2E21;
-  --c-poster-green: #2A4543;
-}
-
 body.theme-retro {
   --bg: #141414;
   --bg2: #1d1d1d;
   --bg3: #252525;
   --panel: #0a0a0a;
 
-  --text: var(--c-beige);
+  --border: #4E6851;
+  --border2: #B83A2D;
+
+  --accent: #B83A2D;
+  --accent2: #DCC9A9;
+
+  --text: #DCC9A9;
   --text2: #C0B192;
   --text3: #DCC9A9;
 
-  --border: var(--c-green);
-  --border2: var(--c-red);
-  --accent: var(--c-red);
-  --accent2: var(--c-beige);
-
-  --input-bg: var(--panel);
-  --input-border: var(--c-green);
+  --input-bg: #0a0a0a;
+  --input-border: #4E6851;
 
   --shadow: rgba(0, 0, 0, 0.6);
   --glow: rgba(184, 58, 45, 0.1);
 
-  --red: var(--c-red);
-  --red2: var(--c-poster-red);
-  --green: var(--c-green);
-  --green2: var(--c-poster-green);
+  --red: #B83A2D;
+  --red2: #7B2E21;
+  --green: #4E6851;
+  --green2: #2A4543;
 
   --header-top: #050505;
-  --header-bot: var(--panel);
-
-  --text-on-accent: #ffffff;
+  --header-bot: #0a0a0a;
 }
 
 body.theme-neon {
