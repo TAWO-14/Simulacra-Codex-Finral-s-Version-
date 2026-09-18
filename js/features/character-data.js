@@ -74,7 +74,22 @@ function buildSkills() {
 }
 
 // ── Atualizadores (Updaters) ──
-function onPassivePercInput() { passivePercOverride = true; }
+function onPassivePercInput(el) { 
+    if (!el) return;
+    
+    // Tenta converter o que o usuário digitou num número inteiro
+    let parsed = parseInt(el.value);
+    
+    // Se o resultado não for um número válido (ex: digitou "a")
+    if (isNaN(parsed)) {
+        passivePercOverride = false;
+        // O updateSkills vai recalcular a percepção sozinho e preencher o campo com o valor certo, apagando o "a"
+        updateSkills(); 
+    } else {
+        passivePercOverride = true; 
+        el.value = parsed; // Garante que o campo fica apenas com o número limpo
+    }
+}
 
 function onAttrChange() {
     ATTRS.forEach(a => {
@@ -108,12 +123,19 @@ function updateSkills() {
         const pd = document.getElementById('skill-prof-' + s.id);
         if (pd) pd.className = 'skill-prof' + (prof === 1 ? ' prof' : prof === 2 ? ' expert' : '');
     });
+    
+    // Tratamento Robusto da Percepção Passiva
     const ppEl = document.getElementById('passive-perc');
     if (ppEl) {
+        // Verifica se o checkbox Observador está ativo no HTML (se existir)
+        const obsCheck = document.getElementById('obs-check');
+        const obsBonus = (obsCheck && obsCheck.classList.contains('active')) ? 5 : 0;
+
         if (!passivePercOverride || ppEl.value === '') {
-            passivePercOverride = false;
+            // Cálculo Base + Proficiência de Percepção + Bônus do Observador (se ativo)
             const percProf = profStates['perception'] || 0;
-            ppEl.value = 10 + getMod(getAttrVal('wis')) + (percProf === 2 ? pb * 2 : percProf === 1 ? pb : 0);
+            const percBonus = percProf === 2 ? pb * 2 : percProf === 1 ? pb : 0;
+            ppEl.value = 10 + getMod(getAttrVal('wis')) + percBonus + obsBonus;
         }
     }
 }
@@ -222,7 +244,6 @@ window.addEventListener('DOMContentLoaded', () => {
     passivePercOverride = window.SHEET_DATA._passivePercOverride || false;
     window.imagemFundoCustomizada = window.SHEET_DATA._bgImage || '';
     secondarySpellSlots = window.SHEET_DATA._secondarySpellSlots || {};
-    secondarySpellSlots = data._secondarySpellSlots || {};
 
     // Montagem das estruturas HTML base
     if (typeof aplicarFundoCustomizado === 'function') safeStep('fundo customizado', aplicarFundoCustomizado);
@@ -314,4 +335,17 @@ window.addEventListener('DOMContentLoaded', () => {
             if (check) check.className = 'save-check' + (saveProfs[a.id] ? ' active' : '');
         });
     });
-});s
+});
+
+function switchTraitTab(index) {
+    const tabs = document.querySelectorAll('.trait-tab');
+    const panes = document.querySelectorAll('.trait-tab-pane');
+
+    tabs.forEach((tab, i) => {
+        tab.classList.toggle('active', i === index);
+    });
+
+    panes.forEach((pane, i) => {
+        pane.classList.toggle('active', i === index);
+    });
+}

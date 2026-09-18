@@ -70,8 +70,18 @@ function removeFeat(i) {
 }
 
 function toggleFeat(i) {
+    // Inverte o estado lógico na matriz
     feats[i].open = !feats[i].open;
-    renderFeats();
+    
+    // Busca o elemento diretamente na DOM pelo índice
+    const list = document.getElementById('feats-list');
+    if (!list) return;
+    const block = list.children[i];
+    
+    if (block) {
+        // Adiciona ou remove a classe 'open' sem recriar a lista inteira
+        block.classList.toggle('open', feats[i].open);
+    }
 }
 
 let fichaAlterada = false;
