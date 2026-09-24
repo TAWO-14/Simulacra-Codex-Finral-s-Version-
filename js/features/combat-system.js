@@ -158,7 +158,7 @@ function renderLimitedResources() {
     let barHTML = '';
 
     // Se o total for 20 ou mais, renderiza a barra sólida e o input
-    if (safeTotal >= 20) {
+    if (safeTotal >= 11) {
       const pct = Math.max(0, Math.min(100, (current / safeTotal) * 100));
 
       // Input da esquerda agora usa lresSetCurrent e limpa o valor ao focar

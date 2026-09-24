@@ -154,12 +154,28 @@ function inlineFormat(s) {
     });
 
     let out = escaped
-        .replace(/!\[([^\]]*)\]\((https?:\/\/[\w\.\/\-\?%&=]+|data:image\/[^;]+;base64,[\w\+\/=]+)\)/g, '<img class="rn-img" src="$2" alt="$1">')
-        .replace(/\[([^\]]+)\]\((https?:\/\/[^\)\s]+|mailto:[^\)\s]+)\)/g, '<a class="rn-link" href="$2" target="_blank" rel="noopener" onclick="event.stopPropagation()">$1</a>').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/!\[([^\]]*)\]\((https?:\/\/[\w\.\/\-\?\%&=]+\vert{}data:image\/[^;]+;base64,[\w\+\/=]+)\)/g, '<img class="rn-img" src="$2" alt="$1">')
+        .replace(/\[([^\]]+)\]\((https?:\/\/[^\)\s]+|mailto:[^\)\s]+)\)/g, '<a class="rn-link" href="$2" target="_blank" rel="noopener" onclick="event.stopPropagation()">$1</a>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
         .replace(/__(.+?)__/g, '<strong>$1</strong>')
         .replace(/\*(.+?)\*/g, '<em>$1</em>')
         .replace(/(?<![a-zA-Z0-9])_(.+?)_(?![a-zA-Z0-9])/g, '<em>$1</em>')
-        .replace(/~~(.+?)~~/g, '<del>$1</del>');
+        .replace(/~~(.+?)~~/g, '<del>$1</del>')
+        
+// ── 1. COLCHETES [ ] (Quadrado Dourado / Equipado) ──
+        .replace(/\[ \]/g, '<input type="checkbox" class="rn-custom-toggle rn-toggle-square" onclick="event.stopPropagation()" onchange="const t = this.closest(\'.rn-heading\') ? this.closest(\'.rn-section\') : this.parentElement; t?.classList.toggle(\'is-equipped\', this.checked)">')
+        .replace(/\[[xX]\]/g, '<input type="checkbox" class="rn-custom-toggle rn-toggle-square" checked onclick="event.stopPropagation()" onchange="const t = this.closest(\'.rn-heading\') ? this.closest(\'.rn-section\') : this.parentElement; t?.classList.toggle(\'is-equipped\', this.checked)">')
+        
+        // ── 2. CHAVES { } (Círculo Verde / Ativo-Concentração) ──
+        .replace(/\{ \}/g, '<input type="checkbox" class="rn-custom-toggle rn-toggle-circle" onclick="event.stopPropagation()" onchange="const t = this.closest(\'.rn-heading\') ? this.closest(\'.rn-section\') : this.parentElement; t?.classList.toggle(\'is-active\', this.checked)">')
+        .replace(/\{[xX]\}/g, '<input type="checkbox" class="rn-custom-toggle rn-toggle-circle" checked onclick="event.stopPropagation()" onchange="const t = this.closest(\'.rn-heading\') ? this.closest(\'.rn-section\') : this.parentElement; t?.classList.toggle(\'is-active\', this.checked)">')
+        
+        // ── 3. PARÊNTESES ( ) (Losango Vermelho / Gasto) ──
+        .replace(/\( \)/g, '<input type="checkbox" class="rn-custom-toggle rn-toggle-diamond" onclick="event.stopPropagation()" onchange="const t = this.closest(\'.rn-heading\') ? this.closest(\'.rn-section\') : this.parentElement; t?.classList.toggle(\'is-expended\', this.checked)">')
+        .replace(/\([xX]\)/g, '<input type="checkbox" class="rn-custom-toggle rn-toggle-diamond" checked onclick="event.stopPropagation()" onchange="const t = this.closest(\'.rn-heading\') ? this.closest(\'.rn-section\') : this.parentElement; t?.classList.toggle(\'is-expended\', this.checked)">')
+        
+        // ── PÍLULAS DE CATEGORIA :: ──
+        .replace(/::\s*([^<\n]+)/g, '<span class="src">$1</span>');
 
     out = out.replace(/\u0000CODE(\d+)\u0000/g, (_, i) => `<code class="rn-code">${codeSpans[+i]}</code>`);
     return out;

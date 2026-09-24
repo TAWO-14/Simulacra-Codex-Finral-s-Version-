@@ -9,13 +9,14 @@ let saveProfs = {};
 let inspiration = false;
 let deathSaves = { s: [false, false, false], f: [false, false, false] };
 let attacks = [];
-let spellSlots = {};
-let spells = {};
+window.spellSlots = {};
+window.spells = {};
+window.secondarySpellSlots = {};
 let sanity = 10;
 let limitedResources = [];
 let initiativeOverride = false;
 let passivePercOverride = false;
-let spellDCOverride = false; 
+let spellDCOverride = false;
 window.imagemFundoCustomizada = window.imagemFundoCustomizada || '';
 
 // ── Utilitários Base ──
@@ -74,19 +75,19 @@ function buildSkills() {
 }
 
 // ── Atualizadores (Updaters) ──
-function onPassivePercInput(el) { 
+function onPassivePercInput(el) {
     if (!el) return;
-    
+
     // Tenta converter o que o usuário digitou num número inteiro
     let parsed = parseInt(el.value);
-    
+
     // Se o resultado não for um número válido (ex: digitou "a")
     if (isNaN(parsed)) {
         passivePercOverride = false;
         // O updateSkills vai recalcular a percepção sozinho e preencher o campo com o valor certo, apagando o "a"
-        updateSkills(); 
+        updateSkills();
     } else {
-        passivePercOverride = true; 
+        passivePercOverride = true;
         el.value = parsed; // Garante que o campo fica apenas com o número limpo
     }
 }
@@ -99,7 +100,7 @@ function onAttrChange() {
     updateSaves();
     updateSkills();
     updateInitiative();
-    
+
     // Delega a atualização do CD Mágico para o módulo de magias
     if (typeof updateSpellDC === 'function') updateSpellDC();
 }
@@ -123,7 +124,7 @@ function updateSkills() {
         const pd = document.getElementById('skill-prof-' + s.id);
         if (pd) pd.className = 'skill-prof' + (prof === 1 ? ' prof' : prof === 2 ? ' expert' : '');
     });
-    
+
     // Tratamento Robusto da Percepção Passiva
     const ppEl = document.getElementById('passive-perc');
     if (ppEl) {
@@ -183,7 +184,9 @@ function collectData() {
     const data = {};
     document.querySelectorAll('[id]').forEach(el => {
         if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
-            if (el.type !== 'file') data[el.id] = el.value;
+            if (el.type !== 'file' && !el.id.startsWith('spell-') && !el.id.startsWith('slot-')) {
+                data[el.id] = el.value;
+            }
         }
     });
     const avatarImg = document.getElementById('char-avatar');
@@ -222,7 +225,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const dataEl = document.getElementById('__dados_exportados__');
     if (dataEl && dataEl.textContent) {
-        try { window.SHEET_DATA = JSON.parse(dataEl.textContent); } 
+        try { window.SHEET_DATA = JSON.parse(dataEl.textContent); }
         catch (e) { console.error("Erro ao carregar dados", e); window.SHEET_DATA = {}; }
     } else {
         window.SHEET_DATA = {};
@@ -232,8 +235,8 @@ window.addEventListener('DOMContentLoaded', () => {
     profStates = window.SHEET_DATA._profStates || {};
     saveProfs = window.SHEET_DATA._saveProfs || {};
     attacks = window.SHEET_DATA._attacks || [];
-    spellSlots = window.SHEET_DATA._spellSlots || {};
-    spells = window.SHEET_DATA._spells || {};
+    window.spellSlots = window.SHEET_DATA._spellSlots || {};
+    window.spells = window.SHEET_DATA._spells || {};
     sanity = window.SHEET_DATA._sanity !== undefined ? window.SHEET_DATA._sanity : 10;
     spellDCOverride = window.SHEET_DATA._spellDCOverride || false;
     inspiration = window.SHEET_DATA._inspiration || false;
@@ -243,7 +246,7 @@ window.addEventListener('DOMContentLoaded', () => {
     initiativeOverride = window.SHEET_DATA._initiativeOverride || false;
     passivePercOverride = window.SHEET_DATA._passivePercOverride || false;
     window.imagemFundoCustomizada = window.SHEET_DATA._bgImage || '';
-    secondarySpellSlots = window.SHEET_DATA._secondarySpellSlots || {};
+    window.secondarySpellSlots = window.SHEET_DATA._secondarySpellSlots || {};
 
     // Montagem das estruturas HTML base
     if (typeof aplicarFundoCustomizado === 'function') safeStep('fundo customizado', aplicarFundoCustomizado);
@@ -251,24 +254,21 @@ window.addEventListener('DOMContentLoaded', () => {
     safeStep('resistências', buildSaves);
     safeStep('perícias', buildSkills);
     if (typeof renderFeats === 'function') safeStep('talentos', renderFeats);
-    
+
     // Render de módulos isolados (Combate/Magia)
     safeStep('ataques', () => { if (typeof renderAttacks === 'function') { if (attacks.length === 0) addAttack(); else renderAttacks(); } });
-    
-    if (typeof SpellsModule !== 'undefined') {
-        safeStep('magias', () => SpellsModule.buildSpells());
-        safeStep('espaços de magia', () => SpellsModule.buildSlotOverview());
-    } else if (typeof buildSpells === 'function') {
-        safeStep('magias (legado)', buildSpells);
-        if (typeof buildSlotOverview === 'function') safeStep('espaços de magia (legado)', buildSlotOverview);
+
+    // Avisa o novo sistema de magias para se redesenhar com os dados carregados da memória
+    if (typeof refreshSpellSystem === 'function') {
+        safeStep('sistema de magias atualizado', () => refreshSpellSystem());
     }
-    
+
     if (typeof renderLimitedResources === 'function') safeStep('recursos limitados', renderLimitedResources);
 
     // Preenchimento dos inputs
     safeStep('campos salvos', () => {
         Object.entries(window.SHEET_DATA).forEach(([k, v]) => {
-            if (k.startsWith('_')) return;
+            if (k.startsWith('_') || k.startsWith('spell-') || k.startsWith('slot-')) return;
             const el = document.getElementById(k);
             if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT')) {
                 el.value = v;
@@ -349,3 +349,20 @@ function switchTraitTab(index) {
         pane.classList.toggle('active', i === index);
     });
 }
+
+// Função para alternar as abas do inventário
+function switchInvTab(idx, tabEl) {
+    // 1. Remove a classe 'active' de todas as abas (botões)
+    document.querySelectorAll('.inv-tab').forEach(t => t.classList.remove('active'));
+
+    // 2. Adiciona a classe 'active' na aba que foi clicada
+    if (tabEl) tabEl.classList.add('active');
+
+    // 3. Mostra o painel correspondente ao índice (0 a 4) e esconde os demais
+    document.querySelectorAll('.inv-tab-pane').forEach((pane, i) => {
+        const isActive = (i === idx);
+        pane.style.display = isActive ? 'block' : 'none';
+        pane.classList.toggle('active', isActive);
+    });
+}
+
