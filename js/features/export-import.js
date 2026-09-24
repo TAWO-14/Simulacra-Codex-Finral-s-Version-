@@ -11,31 +11,27 @@ const ExportImportSystem = (() => {
     console.group('💾 INICIANDO EXPORTAÇÃO DA FICHA...');
     console.log('1. Sincronizando interface e forçando atualização de variáveis...');
 
-    // 🪄 GATILHO DE SEGURANÇA REFINADO: Em vez de disparar eventos gerais que quebram o código, 
-    // lemos o valor que está na tela (se existir) e guardamos diretamente no array de magias.
+    // Sincroniza magias da interface para o objeto global em memória
     try {
-      if (typeof window.spells !== 'undefined' && typeof window.updateSpell === 'function') {
+      if (typeof window.spells !== 'undefined' && typeof window.updateActiveSpell === 'function') {
         for (let level = 0; level <= 9; level++) {
-          const idx = window.activeSpellIndex && window.activeSpellIndex[level] !== undefined ? window.activeSpellIndex[level] : 0;
+          const titleEl = document.getElementById(`spell-title-${level}`);
+          const prepEl = document.getElementById(`spell-prep-${level}`);
+          const concEl = document.getElementById(`spell-conc-${level}`);
+          const descEl = document.getElementById(`spell-desc-${level}`);
 
-          const titleEl = document.getElementById(`spell-title-${level}-${idx}`);
-          const prepEl = document.getElementById(`spell-prep-${level}-${idx}`);
-          const concEl = document.getElementById(`spell-conc-${level}-${idx}`);
-          const descEl = document.getElementById(`spell-desc-${level}-${idx}`);
-
-          if (titleEl) window.updateSpell(level, idx, 'name', titleEl.value);
-          if (prepEl) window.updateSpell(level, idx, 'prepped', prepEl.checked);
-          if (concEl) window.updateSpell(level, idx, 'concentration', concEl.checked);
-          if (descEl) window.updateSpell(level, idx, 'desc', descEl.value);
+          if (titleEl) window.updateActiveSpell(level, 'name', titleEl.value);
+          if (prepEl) window.updateActiveSpell(level, 'prepped', prepEl.checked);
+          if (concEl) window.updateActiveSpell(level, 'concentration', concEl.checked);
+          if (descEl) window.updateActiveSpell(level, 'desc', descEl.value);
         }
       }
 
-      // Sincroniza os slots diretamente do valor da tela sem reiniciar o painel
+      // Sincroniza os slots diretamente da tela
       if (typeof window.spellSlots !== 'undefined' && typeof window.setSlotTotal === 'function') {
         for (let l = 1; l <= 9; l++) {
           const slotInput = document.getElementById(`slot-ov-${l}`);
           if (slotInput) {
-            // keepInput = true para não destruir o foco nem a interface
             window.setSlotTotal(l, slotInput.value, true);
           }
         }
@@ -46,9 +42,14 @@ const ExportImportSystem = (() => {
 
     const data = {};
     const inputs = document.querySelectorAll('input[id], textarea[id], select[id]');
+
+    // IDs das magias/painéis individuais que não entram no loop comum de campos simples
+    const isDetailSpellField = (id) => /^spell-(title|prep|conc|desc|toggle|detail|pane|list|empty)-\d+$/.test(id);
+
     inputs.forEach(el => {
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
-        if (el.type !== 'file' && !el.id.startsWith('spell-') && !el.id.startsWith('slot-')) {
+        // Ignora inputs de arquivo e os campos dinâmicos da sub-aba de magias (para evitar colisão com _spells e _spellSlots)
+        if (el.type !== 'file' && !isDetailSpellField(el.id) && !el.id.startsWith('slot-')) {
           data[el.id] = el.value;
         }
       }
@@ -71,14 +72,14 @@ const ExportImportSystem = (() => {
       _spellSlots: window.spellSlots || {},
       _secondarySpellSlots: window.secondarySpellSlots || {},
       _spells: window.spells || {},
+      _spellDCOverride: typeof spellDCOverride !== 'undefined' ? spellDCOverride : false,
+      _spellAtkOverride: typeof spellAtkOverride !== 'undefined' ? spellAtkOverride : false,
 
-      _sanity: typeof sanity !== 'undefined' ? sanity : 10,
       _theme: document.body.getAttribute('data-theme') || 'default',
       _avatar: avatarSrc,
       _limitedResources: typeof limitedResources !== 'undefined' ? limitedResources : [],
       _feats: typeof feats !== 'undefined' ? feats : [],
       _initiativeOverride: typeof initiativeOverride !== 'undefined' ? initiativeOverride : false,
-      _spellDCOverride: typeof spellDCOverride !== 'undefined' ? spellDCOverride : false,
       _passivePercOverride: typeof passivePercOverride !== 'undefined' ? passivePercOverride : false,
       _bgImage: window.imagemFundoCustomizada || '',
     };
@@ -90,6 +91,7 @@ const ExportImportSystem = (() => {
 
     return finalData;
   }
+
   // Sobrescreve a função global para garantir que o html-generator use ESTA versão
   window.CharacterDataHelper = {
     collectData: collectData
@@ -158,7 +160,7 @@ const ExportImportSystem = (() => {
     try {
       if (typeof window !== 'undefined') window.SHEET_DATA = data;
 
-      // 🪄 MUTAÇÃO DE REFERÊNCIA (O Segredo para não quebrar a UI)
+      // MUTAÇÃO DE REFERÊNCIA
       const mutarObjeto = (alvo, fonte) => {
         if (typeof alvo !== 'undefined' && alvo !== null && fonte) {
           Object.keys(alvo).forEach(k => delete alvo[k]);
@@ -185,11 +187,10 @@ const ExportImportSystem = (() => {
       mutarArray(typeof limitedResources !== 'undefined' ? limitedResources : null, data._limitedResources);
       mutarArray(typeof feats !== 'undefined' ? feats : null, data._feats);
 
-      if (typeof initiativeOverride !== 'undefined') initiativeOverride = data._initiativeOverride || false;
       if (typeof passivePercOverride !== 'undefined') passivePercOverride = data._passivePercOverride || false;
       if (typeof inspiration !== 'undefined') inspiration = data._inspiration || false;
 
-      // 2️⃣ Reconstrói estruturas HTML
+      // Reconstrói estruturas HTML
       const funcoes = [
         'buildAttrs', 'buildSaves', 'buildSkills', 'renderFeats',
         'buildSpells', 'buildSlotOverview', 'renderLimitedResources', 'renderAttacks'
@@ -200,9 +201,9 @@ const ExportImportSystem = (() => {
         }
       }
 
-      // 3️⃣ Preenche valores
+      // Preenche valores em todos os inputs/selects cadastrados
       Object.entries(data).forEach(([key, value]) => {
-        if (key.startsWith('_') || key.startsWith('spell-') || key.startsWith('slot-')) return;
+        if (key.startsWith('_') || key.startsWith('slot-')) return;
         const el = document.getElementById(key);
         if (el) {
           try {
@@ -217,7 +218,7 @@ const ExportImportSystem = (() => {
 
       restaurarEstadosVisuais(data);
 
-      const callbacks = ['onAttrChange', 'updateProfBonus', 'updateHeader', 'updateHPBar', 'updateSaves', 'updateSkills'];
+      const callbacks = ['onAttrChange', 'updateProfBonus', 'updateHeader', 'updateHPBar', 'updateSaves', 'updateSkills', 'updateSpellDC'];
       for (const cb of callbacks) {
         if (typeof window[cb] === 'function') {
           try { window[cb](); } catch (err) { }
@@ -241,7 +242,6 @@ const ExportImportSystem = (() => {
         }
       }
 
-      // Força a atualização da aba de magias se o sistema estiver presente
       if (typeof refreshSpellSystem === 'function') {
         refreshSpellSystem();
       }
@@ -372,3 +372,24 @@ const ExportImportSystem = (() => {
     collectData,
   };
 })();
+
+/**
+ * Mapeia e migra campos legados (como antecedentes e alinhamento)
+ */
+const associarCamposAntigos = (data) => {
+  // Mapeamento de Antecedente
+  const bgVal = data['char-bg'] || data['char-background'] || data['background'] || data['antecedente'] || '';
+  if (bgVal) {
+    data['char-background'] = bgVal;
+    data['char-bg'] = bgVal;
+    data['background'] = bgVal;
+  }
+
+  // Mapeamento de Alinhamento
+  const alignVal = data['char-align'] || data['char-alignment'] || data['align'] || data['alignment'] || data['alinhamento'] || '';
+  if (alignVal) {
+    data['char-align'] = alignVal;
+    data['char-alignment'] = alignVal;
+    data['align'] = alignVal;
+  }
+};
