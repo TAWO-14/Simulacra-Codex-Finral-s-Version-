@@ -2265,3 +2265,63 @@
     flex-shrink: 0; /* Impede a pílula de ser esmagada se o nome da magia for muito longo */
     box-shadow: 0 2px 4px var(--shadow);
 }
+
+.spell-sort-select {
+    background: var(--bg);
+    color: var(--accent3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 11px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.spell-sort-select:hover {
+    border-color: var(--border);
+    color: var(--accent2);
+}
+
+.spell-sort-select option {
+    background: var(--bg);
+    color: var(--accent)
+}
+
+/* Container do cabeçalho */
+.codex-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+/* Estilo compacto do botão de ordenação integrado às variáveis do tema */
+select.spell-sort-select {
+    width: auto !important;
+    max-width: 130px !important;
+    height: 28px !important;
+    background: var(--input-bg) !important;
+    color: var(--text2) !important;
+    border: 1px solid var(--input-border) !important;
+    border-radius: 6px !important;
+    padding: 0 8px !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    outline: none !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+select.spell-sort-select:hover,
+select.spell-sort-select:focus {
+    border-color: var(--accent) !important;
+    color: var(--text) !important;
+    background: var(--bg3) !important;
+    box-shadow: 0 0 8px var(--glow2) !important;
+}
+
+select.spell-sort-select option {
+    background: var(--bg2) !important;
+    color: var(--text) !important;
+}
