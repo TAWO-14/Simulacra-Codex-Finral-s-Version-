@@ -12,11 +12,10 @@ let attacks = [];
 window.spellSlots = {};
 window.spells = {};
 window.secondarySpellSlots = {};
-let sanity = 10;
 let limitedResources = [];
-let initiativeOverride = false;
 let passivePercOverride = false;
 let spellDCOverride = false;
+let spellAtkOverride = false;
 window.imagemFundoCustomizada = window.imagemFundoCustomizada || '';
 
 // ── Utilitários Base ──
@@ -24,6 +23,8 @@ function getMod(score) { return Math.floor((score - 10) / 2); }
 function fmtMod(n) { return (n >= 0 ? '+' : '') + n; }
 function getProfBonus() { return Math.ceil((parseInt(document.getElementById('char-level')?.value) || 1) / 4) + 1; }
 function getAttrVal(id) { return parseInt(document.getElementById('attr-score-' + id)?.value) || 10; }
+function onSpellDCOnput() { spellDCOverride = true; }
+function onSpellAtkInput() { spellAtkOverride = true; }
 
 function escapeHTML(str) {
     return String(str || '')
@@ -99,7 +100,6 @@ function onAttrChange() {
     });
     updateSaves();
     updateSkills();
-    updateInitiative();
 
     // Delega a atualização do CD Mágico para o módulo de magias
     if (typeof updateSpellDC === 'function') updateSpellDC();
@@ -137,16 +137,6 @@ function updateSkills() {
             const percProf = profStates['perception'] || 0;
             const percBonus = percProf === 2 ? pb * 2 : percProf === 1 ? pb : 0;
             ppEl.value = 10 + getMod(getAttrVal('wis')) + percBonus + obsBonus;
-        }
-    }
-}
-
-function updateInitiative() {
-    const el = document.getElementById('initiative');
-    if (el) {
-        if (!initiativeOverride || el.value === '') {
-            initiativeOverride = false;
-            el.value = getMod(getAttrVal('dex'));
         }
     }
 }
@@ -199,16 +189,16 @@ function collectData() {
         _deathSaves: typeof deathSaves !== 'undefined' ? deathSaves : { s: [false, false, false], f: [false, false, false] },
         _attacks: typeof attacks !== 'undefined' ? attacks : [],
         _spellSlots: typeof spellSlots !== 'undefined' ? spellSlots : {},
+        _secondarySpellSlots: typeof secondarySpellSlots !== 'undefined' ? secondarySpellSlots : {},
         _spells: typeof spells !== 'undefined' ? spells : {},
-        _sanity: typeof sanity !== 'undefined' ? sanity : 10,
         _theme: document.body.getAttribute('data-theme') || 'default',
         _avatar: avatarSrc,
         _limitedResources: typeof limitedResources !== 'undefined' ? limitedResources : [],
         _feats: typeof feats !== 'undefined' ? feats : [],
-        _initiativeOverride: initiativeOverride,
+        _initiativeOverride: typeof initiativeOverride !== 'undefined' ? initiativeOverride : false,
+        _passivePercOverride: typeof passivePercOverride !== 'undefined' ? passivePercOverride : false,
         _spellDCOverride: typeof spellDCOverride !== 'undefined' ? spellDCOverride : false,
-        _secondarySpellSlots: typeof secondarySpellSlots !== 'undefined' ? secondarySpellSlots : {},
-        _passivePercOverride: passivePercOverride,
+        _spellAtkOverride: typeof spellAtkOverride !== 'undefined' ? spellAtkOverride : false,
         _bgImage: window.imagemFundoCustomizada || '',
     };
 }
@@ -237,13 +227,11 @@ window.addEventListener('DOMContentLoaded', () => {
     attacks = window.SHEET_DATA._attacks || [];
     window.spellSlots = window.SHEET_DATA._spellSlots || {};
     window.spells = window.SHEET_DATA._spells || {};
-    sanity = window.SHEET_DATA._sanity !== undefined ? window.SHEET_DATA._sanity : 10;
     spellDCOverride = window.SHEET_DATA._spellDCOverride || false;
     inspiration = window.SHEET_DATA._inspiration || false;
     deathSaves = window.SHEET_DATA._deathSaves || { s: [false, false, false], f: [false, false, false] };
     limitedResources = window.SHEET_DATA._limitedResources || [];
     feats = window.SHEET_DATA._feats || [];
-    initiativeOverride = window.SHEET_DATA._initiativeOverride || false;
     passivePercOverride = window.SHEET_DATA._passivePercOverride || false;
     window.imagemFundoCustomizada = window.SHEET_DATA._bgImage || '';
     window.secondarySpellSlots = window.SHEET_DATA._secondarySpellSlots || {};
@@ -318,11 +306,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (typeof updateHPBar === 'function') updateHPBar();
     });
 
-    safeStep('sobrescrita de iniciativa/percepção', () => {
-        if (initiativeOverride && window.SHEET_DATA['initiative'] !== undefined) {
-            const initEl = document.getElementById('initiative');
-            if (initEl) initEl.value = window.SHEET_DATA['initiative'];
-        }
+    safeStep('sobrescrita de percepção', () => {
         if (passivePercOverride && window.SHEET_DATA['passive-perc'] !== undefined) {
             const ppEl = document.getElementById('passive-perc');
             if (ppEl) ppEl.value = window.SHEET_DATA['passive-perc'];
@@ -364,5 +348,106 @@ function switchInvTab(idx, tabEl) {
         pane.style.display = isActive ? 'block' : 'none';
         pane.classList.toggle('active', isActive);
     });
+}
+
+function updateSpellDC() {
+    const pb = getProfBonus();
+
+    // Identifica o atributo conjurador selecionado no select (ex: 'wis', 'int', 'cha')
+    const spellAttrSelect = document.getElementById('spell-ability');
+    const attrKey = spellAttrSelect ? spellAttrSelect.value.toLowerCase() : 'int';
+    const mod = getMod(getAttrVal(attrKey));
+
+    // 1. Atualiza CD de Resistência (8 + PB + Modificador)
+    const dcEl = document.getElementById('spell-dc');
+    if (dcEl) {
+        if (!spellDCOverride || dcEl.value === '') {
+            spellDCOverride = false;
+            dcEl.value = 8 + pb + mod;
+        }
+    }
+
+    // 2. Atualiza Bônus de Ataque de Magia (PB + Modificador)
+    const atkEl = document.getElementById('spell-atk');
+    if (atkEl) {
+        if (!spellAtkOverride || atkEl.value === '') {
+            spellAtkOverride = false;
+            atkEl.value = fmtMod(pb + mod); // ou pb + mod se o input for do tipo number
+        }
+    }
+}
+
+// Handlers de Input (ativa override se houver digitação explícita)
+window.onSpellDCInput = function (el) {
+    if (!el) return;
+    let parsed = parseInt(el.value);
+
+    // Se o usuário digitou letras ou caracteres inválidos
+    if (isNaN(parsed)) {
+        spellDCOverride = false;
+        updateSpellDC(); // Recalcula automaticamente e corrige o campo
+    } else {
+        spellDCOverride = true;
+        el.value = parsed; // Mantém apenas o valor numérico limpo
+    }
+};
+
+window.onSpellAtkInput = function (el) {
+    if (!el) return;
+    // Remove o sinal '+' para conseguir validar o número digitado
+    let rawValue = el.value.replace('+', '').trim();
+    let parsed = parseInt(rawValue);
+
+    if (isNaN(parsed)) {
+        spellAtkOverride = false;
+        updateSpellDC();
+    } else {
+        spellAtkOverride = true;
+        // Mantém a formatação bonita com o sinal '+' para números positivos/nulos
+        el.value = parsed >= 0 ? `+${parsed}` : `${parsed}`;
+    }
+};
+
+// Handlers de Blur (se o usuário limpou o campo ou deixou vazio, reseta para o automático)
+window.handleSpellDCBlur = function (el) {
+    if (el.value.trim() === '' || isNaN(parseInt(el.value))) {
+        el.value = '';
+        spellDCOverride = false;
+        updateSpellDC();
+    }
+};
+
+window.handleSpellAtkBlur = function (el) {
+    if (el.value.trim() === '') {
+        el.value = '';
+        spellAtkOverride = false;
+        updateSpellDC();
+    }
+};
+
+// Cálculo Automático no Placeholder
+function updateSpellDC() {
+    const pb = typeof getProfBonus === 'function' ? getProfBonus() : 2;
+    const spellAttrSelect = document.getElementById('spell-ability');
+    const attrKey = spellAttrSelect ? spellAttrSelect.value.toLowerCase() : '';
+
+    const mod = (attrKey && typeof getMod === 'function' && typeof getAttrVal === 'function')
+        ? getMod(getAttrVal(attrKey))
+        : 0;
+
+    const calculatedDC = 8 + pb + mod;
+    const calculatedAtk = (pb + mod) >= 0 ? `+${pb + mod}` : `${pb + mod}`;
+
+    const dcEl = document.getElementById('spell-dc');
+    if (dcEl) {
+        dcEl.placeholder = calculatedDC;
+        if (!spellDCOverride) dcEl.value = '';
+    }
+
+    const atkEl = document.getElementById('spell-atk');
+    if (atkEl) {
+        atkEl.placeholder = calculatedAtk;
+        if (!spellAtkOverride) atkEl.value = '';
+    }
 }
 
