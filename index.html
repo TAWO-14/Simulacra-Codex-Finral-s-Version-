@@ -1139,7 +1139,7 @@
                         <option value="preparadas">Preparadas Primeiro</option>
                     </select>
                 </div>
-                
+
                 <!-- Abas dos Círculos de Magia -->
                 <div class="spell-tabs-header">
                     <button type="button" class="spell-tab active" onclick="switchSpellTab(0)">TRUQUES</button>
@@ -1231,14 +1231,25 @@
                     </div>
                     <div class="grid-2">
                         <div class="combat-stat">
-                            <label>CD de Resistência</label>
-                            <input type="text" id="spell-dc" readonly title="8 + Proficiência + Modificador"
-                                style="font-family: 'Cinzel', serif; font-size: 24px; font-weight: 700; color: var(--accent2); text-align: center;">
+                            <label>CD DE RESISTÊNCIA</label>
+                            <input type="text" id="spell-dc" class="hp-dynamic-input" value="10"
+                                onfocus="this.dataset.old=this.value; this.value='';"
+                                onblur="if(this.value==='') this.value=this.dataset.old;"
+                                onchange="onSpellDCInput(this)"
+                                onkeydown="if(event.key === 'Enter') { event.preventDefault(); this.blur(); }"
+                                style="font-family: 'Cinzel', serif; font-size: 24px; font-weight: 700; color: var(--accent2); width: 100%; height: 42px; padding: 4px; box-sizing: border-box; text-align: center;"
+                                title="CD de Resistência">
                         </div>
+
                         <div class="combat-stat">
-                            <label>Bônus de Ataque</label>
-                            <input type="text" id="spell-atk" readonly title="Proficiência + Modificador"
-                                style="font-family: 'Cinzel', serif; font-size: 24px; font-weight: 700; color: var(--accent2); text-align: center;">
+                            <label>BÔNUS DE ATAQUE</label>
+                            <input type="text" id="spell-atk" class="hp-dynamic-input" value="+2"
+                                onfocus="this.dataset.old=this.value; this.value='';"
+                                onblur="if(this.value==='') this.value=this.dataset.old;"
+                                onchange="onSpellAtkInput(this)"
+                                onkeydown="if(event.key === 'Enter') { event.preventDefault(); this.blur(); }"
+                                style="font-family: 'Cinzel', serif; font-size: 24px; font-weight: 700; color: var(--accent2); width: 100%; height: 42px; padding: 4px; box-sizing: border-box; text-align: center;"
+                                title="Bônus de Ataque">
                         </div>
                     </div>
                 </div>
