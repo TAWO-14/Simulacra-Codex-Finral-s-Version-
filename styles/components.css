@@ -1258,8 +1258,8 @@
 
 .rn-preview {
   background: var(--input-bg);
-  border: 1px solid var(--border2);
-  border-radius: 3px;
+  border: 1px solid var(--input-border);
+  border-radius: var(--field-radius);
   padding: 6px 10px;
   min-height: 60px;
   cursor: text;
@@ -1714,8 +1714,8 @@
 .trait-tab {
   flex: 1;
   background: var(--input-bg);
-  border: 1px solid var(--border);
-  border-radius: 6px 6px 0 0;
+  border: 1px solid var(--input-border);
+  border-radius: var(--field-radius) var(--field-radius) 0 0;
   color: var(--text3);
   font-family: 'Cinzel', serif;
   font-size: 10px;
@@ -1745,13 +1745,14 @@
   box-shadow: 0 -2px 8px var(--glow);
 }
 
-/* Caixa de conteúdo que abriga os textareas */
+/* Caixa que abriga os campos das abas: sem contorno nem espaçamento próprios.
+   O contorno vem do próprio textarea/preview (mesmo estilo de todos os inputs). */
 .trait-tabs-content {
-  background: var(--input-bg);
-  border: 1px solid var(--border);
-  border-radius: 0 0 6px 6px; /* Cantos superiores 100% retos, arredonda apenas embaixo */
-  padding: 8px;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
   position: relative;
   z-index: 1;
 }
@@ -1763,20 +1764,6 @@
 
 .trait-tab-pane.active {
   display: block;
-}
-
-/* Deixa o textarea interno limpo */
-.trait-tab-pane textarea {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 4px;
-  color: var(--text);
-}
-
-.trait-tab-pane textarea:focus {
-  outline: none;
-  box-shadow: none !important;
 }
 
 /* ── CORES DISTINTAS POR ABA (ESTILO GRUVBOX) ── */
@@ -1823,4 +1810,458 @@
   color: var(--red2);
   border-color: var(--red2);
   box-shadow: 0 -2px 10px color-mix(in srgb, var(--red2) 30%, transparent);
+}
+
+.inv-tab-pane textarea,
+.inv-tab-pane .rn-preview {
+    min-height: 200px;
+}
+
+/* ── CORES DISTINTAS DAS 5 ABAS (HOVER & ACTIVE) ── */
+/* 1. Armas: Vermelho / Combate */
+.inv-tab:nth-child(1):hover { color: var(--red2); border-color: var(--red2); }
+.inv-tab:nth-child(1).active { color: var(--red2); border-color: var(--red2); box-shadow: 0 -2px 10px color-mix(in srgb, var(--red2) 30%, transparent); }
+
+/* 2. Armaduras: Dourado Âmbar */
+.inv-tab:nth-child(2):hover { color: var(--accent); border-color: var(--accent); }
+.inv-tab:nth-child(2).active { color: var(--accent); border-color: var(--accent); box-shadow: 0 -2px 10px color-mix(in srgb, var(--accent) 30%, transparent); }
+
+/* 3. Consumíveis: Verde Herbal */
+.inv-tab:nth-child(3):hover { color: var(--green); border-color: var(--green); }
+.inv-tab:nth-child(3).active { color: var(--green); border-color: var(--green); box-shadow: 0 -2px 10px color-mix(in srgb, var(--green) 30%, transparent); }
+
+/* 4. Ferramentas: Ciano / Destaque Secundário */
+.inv-tab:nth-child(4):hover { color: var(--accent2); border-color: var(--accent2); }
+.inv-tab:nth-child(4).active { color: var(--accent2); border-color: var(--accent2); box-shadow: 0 -2px 10px color-mix(in srgb, var(--accent2) 30%, transparent); }
+
+/* 5. Geral / Magia: Roxo ou Dourado Claro */
+.inv-tab:nth-child(5):hover { color: var(--text); border-color: var(--text2); }
+.inv-tab:nth-child(5).active { color: var(--text); border-color: var(--text2); box-shadow: 0 -2px 10px color-mix(in srgb, var(--text) 20%, transparent); }
+
+/* ── TAG DE SINTONIA / CHECKBOX INTERATIVA NO TÍTULO ── */
+.rn-heading .rn-head-check {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 15px;
+    height: 15px;
+    background: var(--input-bg);
+    border: 1px solid var(--border2);
+    border-radius: 3px;
+    cursor: pointer;
+    vertical-align: middle;
+    margin-right: 8px;
+    margin-left: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.rn-heading .rn-head-check:hover {
+    border-color: var(--accent2);
+    box-shadow: 0 0 6px var(--glow);
+}
+
+.rn-heading .rn-head-check:checked {
+    background: var(--accent);
+    border-color: var(--accent2);
+}
+
+.rn-heading .rn-head-check:checked::after {
+    content: '✦';
+    font-size: 11px;
+    color: var(--bg);
+    line-height: 1;
+}
+
+/* Efeito quando equipado: dá um tom dourado/brilho no título */
+.rn-section.is-equipped > .rn-heading {
+    color: var(--accent2) !important;
+}
+
+/* =========================================
+   CORES TEMÁTICAS DO INVENTÁRIO
+   ========================================= */
+
+/* 1. ARMAS (Vermelho) */
+.inv-tab:nth-child(1).active { border-color: var(--red2) !important; color: var(--red2) !important; text-shadow: 0 0 8px color-mix(in srgb, var(--red2) 40%, transparent); }
+
+/* 2. ARMADURAS (Azul Claro / Aço) */
+.inv-tab:nth-child(2).active { border-color: var(--text3) !important; color: var(--text3) !important; text-shadow: 0 0 8px color-mix(in srgb, var(--text3) 40%, transparent); }
+
+/* 3. CONSUMÍVEIS (Verde) */
+.inv-tab:nth-child(3).active { border-color: var(--green) !important; color: var(--green) !important; text-shadow: 0 0 8px color-mix(in srgb, var(--green) 40%, transparent); }
+
+/* 4. FERRAMENTAS (Laranja/Dourado) */
+.inv-tab:nth-child(4).active { border-color: var(--accent) !important; color: var(--accent) !important; text-shadow: 0 0 8px color-mix(in srgb, var(--accent) 40%, transparent); }
+
+/* 5. GERAL (Neutro) */
+.inv-tab:nth-child(5).active { border-color: var(--text2) !important; color: var(--text2) !important; text-shadow: 0 0 8px color-mix(in srgb, var(--text2) 40%, transparent); }
+
+/* ============================================================
+   CAMPOS DAS ABAS + RESPIRO INTERNO DOS PAINÉIS
+   ============================================================ */
+
+/* Contorno dos campos: vem do estilo base (base.css) —
+   1px solid var(--input-border), raio var(--field-radius), foco com var(--border2) + glow.
+   Traços, Aparência, Descrição, Classe/Raça, Moedas e Inventário ficam idênticos. */
+.trait-tab-pane,
+.inv-tab-pane {
+  padding: 0;
+  margin: 0;
+}
+
+.trait-tab-pane textarea,
+.inv-tab-pane textarea,
+.inv-tab-pane .rn-preview {
+  width: 100%;
+  margin: 0;
+}
+
+/* O último elemento de um painel não tem margem própria:
+   o espaço entre o último campo e a borda de baixo é sempre o padding do painel. */
+.panel > :last-child {
+  margin-bottom: 0;
+}
+
+/* Reduzir o tamanho da fonte e o espaçamento dos marcadores do inventário */
+.inv-tab {
+  font-size: 8.5px !important;       /* Diminui a altura dos caracteres */
+  letter-spacing: 0px !important;     /* Remove o espaçamento extra entre letras */
+  padding: 6px 2px !important;       /* Reduz o padding lateral para dar mais espaço */
+}
+
+/* Container das Abas de Magia */
+.spell-tabs-header {
+  display: flex;
+  gap: 4px;
+  margin-bottom: -1px;
+  width: 100%;
+  position: relative;
+  z-index: 3;
+}
+
+/* Marcador individual */
+.spell-tab {
+  flex: 1;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--field-radius) var(--field-radius) 0 0;
+  color: var(--text3);
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  padding: 6px 2px;
+  text-align: center;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.spell-tab:hover {
+  color: var(--accent2);
+  background: var(--bg3);
+  border-color: var(--border2);
+}
+
+/* Aba Selecionada */
+.spell-tab.active {
+  background: var(--input-bg);
+  color: var(--accent2);
+  border-color: var(--border2);
+  border-bottom-color: var(--input-bg);
+  font-weight: bold;
+  box-shadow: 0 -2px 8px var(--glow);
+}
+
+/* Painéis de Conteúdo e Altura */
+.spell-tabs-content {
+  position: relative;
+  z-index: 1;
+}
+
+.spell-tab-pane {
+  display: none;
+}
+
+.spell-tab-pane.active {
+  display: block;
+}
+
+.spell-tab-pane textarea,
+.spell-tab-pane .rn-preview {
+  min-height: 480px;
+  width: 100%;
+}
+
+/* Layout da Aba de Magias */
+.page2-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 850px) {
+  .page2-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Abas de Círculo */
+.spell-tabs-header {
+  display: flex;
+  gap: 6px; /* Aumentei um pouco o espaço entre os botões para respirarem melhor */
+  margin-bottom: 16px; /* AQUI ESTÁ A MAGIA: Adiciona o espaço para desgrudar do conteúdo! */
+  position: relative;
+  z-index: 2;
+}
+
+.spell-tab {
+  flex: 1;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 4px; /* Agora arredonda os 4 cantos, já que estão soltos */
+  color: var(--text3);
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  padding: 6px 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.spell-tab:hover {
+  color: var(--text);
+  border-color: var(--border2);
+}
+
+.spell-tab.active {
+  background: var(--bg2);
+  color: var(--accent2);
+  border-color: var(--accent); /* Borda inteira com a cor de destaque */
+  font-weight: bold;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.spell-tab-pane {
+  display: none;
+}
+
+.spell-tab-pane.active {
+  display: block;
+}
+
+.spell-tab-pane textarea {
+  min-height: 520px;
+  width: 100%;
+}
+
+/* Linha de Cada Círculo nos Espaços de Magia */
+.spell-slot-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.spell-slot-row:last-child {
+  border-bottom: none;
+}
+
+.spell-slot-level-name {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  color: var(--text2);
+}
+
+.spell-slot-pips {
+  display: flex;
+  gap: 6px;
+}
+
+/* 1. QUADRADO [ ] -> Dourado (Equipado / Preparado) */
+.rn-toggle-square {
+    width: 14px !important;
+    height: 14px !important;
+    border-radius: 3px !important;
+}
+.rn-toggle-square:checked {
+    background: var(--accent) !important;
+    border-color: var(--accent2) !important;
+}
+.rn-toggle-square:checked::after {
+    display: none !important; /* Esconde qualquer símbolo interno */
+}
+
+/* 2. CÍRCULO { } -> Verde (Ativo / Concentração) */
+.rn-toggle-circle {
+    width: 15px !important;
+    height: 15px !important;
+    border-radius: 50% !important;
+}
+.rn-toggle-circle:checked {
+    background: var(--green) !important;
+    border-color: #a8d5ba !important;
+    box-shadow: 0 0 8px color-mix(in srgb, var(--green) 40%, transparent) !important;
+}
+.rn-toggle-circle:checked::after {
+    display: none !important; /* Esconde qualquer símbolo interno */
+}
+
+/* 3. LOSANGO ( ) -> Vermelho (Gasto / Exausto) */
+.rn-toggle-diamond {
+    width: 12px !important;
+    height: 12px !important;
+    transform: rotate(45deg) !important;
+    margin-left: 1px !important; /* Empurra a ponta esquerda para alinhar com os outros */
+    margin-right: 10px !important; 
+}
+.rn-toggle-diamond:checked {
+    background: var(--red2) !important;
+    border-color: var(--red) !important;
+}
+.rn-toggle-diamond:checked::after {
+    display: none !important;
+}
+
+/* =======================================================
+   DESIGN MASTER-DETAIL PARA MAGIAS
+   ======================================================= */
+.spell-master-detail {
+    display: grid;
+    grid-template-columns: 220px 1fr; 
+    gap: 16px;
+    min-height: 480px;
+    align-items: stretch;
+}
+
+.spell-list-col {
+    border-right: 1px solid var(--border); 
+    padding-right: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.spell-list-container {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.spell-item-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: var(--text2);
+    text-align: left;
+    padding: 8px 12px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.spell-item-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.spell-item-btn.active {
+    background: var(--bg3);
+    border-color: var(--border2);
+    color: var(--accent2);
+    font-weight: bold;
+}
+
+.spell-title-input {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--accent2);
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed transparent;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.spell-title-input:focus {
+    border-bottom-color: var(--accent);
+}
+
+/* =======================================================
+   TOGGLES DA INTERFACE (MASTER-DETAIL)
+   Garante que o navegador não sobreponha o estilo padrão
+   ======================================================= */
+.ui-toggle {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid var(--border2) !important;
+    cursor: pointer;
+    margin: 0 !important;
+    margin-right: 8px !important;
+    transition: all 0.2s ease !important;
+    position: relative;
+}
+
+.ui-toggle:focus { outline: none; }
+
+.ui-toggle:hover {
+    border-color: var(--text) !important;
+}
+
+/* Quadrado (Preparada) */
+.ui-toggle-square {
+    width: 14px !important;
+    height: 14px !important;
+    border-radius: 3px !important;
+}
+.ui-toggle-square:checked {
+    background: var(--accent) !important;
+    border-color: var(--accent2) !important;
+    box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 40%, transparent) !important;
+}
+
+/* Círculo (Concentração) */
+.ui-toggle-circle {
+    width: 15px !important;
+    height: 15px !important;
+    border-radius: 50% !important;
+}
+.ui-toggle-circle:checked {
+    background: var(--green) !important;
+    border-color: #a8d5ba !important;
+    box-shadow: 0 0 8px color-mix(in srgb, var(--green) 40%, transparent) !important;
+}
+
+/* =======================================================
+   PÍLULAS DE TAG (LISTA DE MAGIAS)
+   ======================================================= */
+.spell-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--accent2);
+    font-size: 8px;
+    font-family: 'Inter', 'Cinzel', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    vertical-align: middle;
+    flex-shrink: 0; /* Impede a pílula de ser esmagada se o nome da magia for muito longo */
+    box-shadow: 0 2px 4px var(--shadow);
 }
