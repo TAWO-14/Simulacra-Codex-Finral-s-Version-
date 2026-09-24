@@ -1124,36 +1124,46 @@
             }
         </style>
 
-            <div class="page2-layout">
+        <div class="page2-layout">
 
-                <!-- COLUNA ESQUERDA: CODEX DE MAGIAS (MASTER-DETAIL) -->
-                <div class="panel">
-                    <div class="section-title">CODEX DE MAGIAS</div>
+            <!-- COLUNA ESQUERDA: CODEX DE MAGIAS (MASTER-DETAIL) -->
+            <div class="panel">
+                <!-- Cabeçalho do Codex com o menu de ordenação inline à direita -->
+                <div class="codex-header">
+                    <h3 class="codex-title">CODEX DE MAGIAS</h3>
 
-                    <!-- Abas dos Círculos de Magia -->
-                    <div class="spell-tabs-header">
-                        <button type="button" class="spell-tab active" onclick="switchSpellTab(0)">TRUQUES</button>
-                        <button type="button" class="spell-tab" onclick="switchSpellTab(1)">1º</button>
-                        <button type="button" class="spell-tab" onclick="switchSpellTab(2)">2º</button>
-                        <button type="button" class="spell-tab" onclick="switchSpellTab(3)">3º</button>
-                        <button type="button" class="spell-tab" onclick="switchSpellTab(4)">4º</button>
-                        <button type="button" class="spell-tab" onclick="switchSpellTab(5)">5º</button>
-                        <button type="button" class="spell-tab" onclick="switchSpellTab(6)">6º</button>
-                        <button type="button" class="spell-tab" onclick="switchSpellTab(7)">7º</button>
-                        <button type="button" class="spell-tab" onclick="switchSpellTab(8)">8º</button>
-                        <button type="button" class="spell-tab" onclick="switchSpellTab(9)">9º</button>
-                    </div>
+                    <select id="spellSortSelect" class="spell-sort-select" onchange="ordenarMagiasAtuais(this.value)">
+                        <option value="" disabled selected>Ordenar ▾</option>
+                        <option value="alfabetica-asc">Nome (A - Z)</option>
+                        <option value="alfabetica-desc">Nome (Z - A)</option>
+                        <option value="preparadas">Preparadas Primeiro</option>
+                    </select>
+                </div>
+                
+                <!-- Abas dos Círculos de Magia -->
+                <div class="spell-tabs-header">
+                    <button type="button" class="spell-tab active" onclick="switchSpellTab(0)">TRUQUES</button>
+                    <button type="button" class="spell-tab" onclick="switchSpellTab(1)">1º</button>
+                    <button type="button" class="spell-tab" onclick="switchSpellTab(2)">2º</button>
+                    <button type="button" class="spell-tab" onclick="switchSpellTab(3)">3º</button>
+                    <button type="button" class="spell-tab" onclick="switchSpellTab(4)">4º</button>
+                    <button type="button" class="spell-tab" onclick="switchSpellTab(5)">5º</button>
+                    <button type="button" class="spell-tab" onclick="switchSpellTab(6)">6º</button>
+                    <button type="button" class="spell-tab" onclick="switchSpellTab(7)">7º</button>
+                    <button type="button" class="spell-tab" onclick="switchSpellTab(8)">8º</button>
+                    <button type="button" class="spell-tab" onclick="switchSpellTab(9)">9º</button>
+                </div>
 
-                    <!-- Contentor onde as abas são geradas automaticamente -->
-                    <div class="spell-tabs-content" id="spell-tabs-container"></div>
+                <!-- Contentor onde as abas são geradas automaticamente -->
+                <div class="spell-tabs-content" id="spell-tabs-container"></div>
 
-                    <!-- SCRIPT GERADOR DAS ABAS (Mantém o HTML limpo e profissional) -->
-                    <script>
-                        const container = document.getElementById('spell-tabs-container');
-                        let html = '';
-                        for (let i = 0; i <= 9; i++) {
-                            let active = i === 0 ? 'active' : '';
-                            html += `
+                <!-- SCRIPT GERADOR DAS ABAS (Mantém o HTML limpo e profissional) -->
+                <script>
+                    const container = document.getElementById('spell-tabs-container');
+                    let html = '';
+                    for (let i = 0; i <= 9; i++) {
+                        let active = i === 0 ? 'active' : '';
+                        html += `
                         <div class="spell-tab-pane ${active}" id="spell-pane-${i}">
                             <div class="spell-master-detail">
                                 
@@ -1196,332 +1206,331 @@
                                 
                             </div>
                         </div>`;
-                        }
-                        container.innerHTML = html;
-                    </script>
+                    }
+                    container.innerHTML = html;
+                </script>
+            </div>
+
+            <!-- COLUNA DIREITA: CONJURAÇÃO + ESPAÇOS DE MAGIA -->
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div class="panel">
+                    <div class="section-title mb8">Conjuração</div>
+                    <div class="mb8">
+                        <label>Classe Mágica</label>
+                        <input type="text" id="spell-class" placeholder="Mago, Clérigo..."
+                            oninput="if(typeof autoConfigureSpellcasting === 'function') autoConfigureSpellcasting()">
+                    </div>
+                    <div class="mb8">
+                        <label>Habilidade de Conjuração</label>
+                        <select id="spell-ability" onchange="updateSpellDC()">
+                            <option value="">— Selecione —</option>
+                            <option value="int">Inteligência</option>
+                            <option value="wis">Sabedoria</option>
+                            <option value="cha">Carisma</option>
+                        </select>
+                    </div>
+                    <div class="grid-2">
+                        <div class="combat-stat">
+                            <label>CD de Resistência</label>
+                            <input type="text" id="spell-dc" readonly title="8 + Proficiência + Modificador"
+                                style="font-family: 'Cinzel', serif; font-size: 24px; font-weight: 700; color: var(--accent2); text-align: center;">
+                        </div>
+                        <div class="combat-stat">
+                            <label>Bônus de Ataque</label>
+                            <input type="text" id="spell-atk" readonly title="Proficiência + Modificador"
+                                style="font-family: 'Cinzel', serif; font-size: 24px; font-weight: 700; color: var(--accent2); text-align: center;">
+                        </div>
+                    </div>
                 </div>
 
-                <!-- COLUNA DIREITA: CONJURAÇÃO + ESPAÇOS DE MAGIA -->
-                <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <div class="panel">
-                        <div class="section-title mb8">Conjuração</div>
-                        <div class="mb8">
-                            <label>Classe Mágica</label>
-                            <input type="text" id="spell-class" placeholder="Mago, Clérigo..."
-                                oninput="if(typeof autoConfigureSpellcasting === 'function') autoConfigureSpellcasting()">
+                <div class="panel">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <div class="section-title" style="margin-bottom:0; border:none; padding:0;">Espaços de Magia
                         </div>
-                        <div class="mb8">
-                            <label>Habilidade de Conjuração</label>
-                            <select id="spell-ability" onchange="updateSpellDC()">
-                                <option value="">— Selecione —</option>
-                                <option value="int">Inteligência</option>
-                                <option value="wis">Sabedoria</option>
-                                <option value="cha">Carisma</option>
-                            </select>
-                        </div>
-                        <div class="grid-2">
-                            <div class="combat-stat">
-                                <label>CD de Resistência</label>
-                                <input type="text" id="spell-dc" readonly title="8 + Proficiência + Modificador"
-                                    style="font-family: 'Cinzel', serif; font-size: 24px; font-weight: 700; color: var(--accent2); text-align: center;">
-                            </div>
-                            <div class="combat-stat">
-                                <label>Bônus de Ataque</label>
-                                <input type="text" id="spell-atk" readonly title="Proficiência + Modificador"
-                                    style="font-family: 'Cinzel', serif; font-size: 24px; font-weight: 700; color: var(--accent2); text-align: center;">
-                            </div>
+                        <div style="display:flex; gap:6px;">
+                            <button type="button" class="h-btn active" id="btn-slot-primary"
+                                onclick="if(typeof switchSlotSet === 'function') switchSlotSet('primary')"
+                                style="width:auto; height:24px; padding:0 8px; font-size:10px;">Classe I</button>
+                            <button type="button" class="h-btn" id="btn-slot-secondary"
+                                onclick="if(typeof switchSlotSet === 'function') switchSlotSet('secondary')"
+                                style="width:auto; height:24px; padding:0 8px; font-size:10px;">Classe II</button>
                         </div>
                     </div>
 
-                    <div class="panel">
-                        <div
-                            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                            <div class="section-title" style="margin-bottom:0; border:none; padding:0;">Espaços de Magia
-                            </div>
-                            <div style="display:flex; gap:6px;">
-                                <button type="button" class="h-btn active" id="btn-slot-primary"
-                                    onclick="if(typeof switchSlotSet === 'function') switchSlotSet('primary')"
-                                    style="width:auto; height:24px; padding:0 8px; font-size:10px;">Classe I</button>
-                                <button type="button" class="h-btn" id="btn-slot-secondary"
-                                    onclick="if(typeof switchSlotSet === 'function') switchSlotSet('secondary')"
-                                    style="width:auto; height:24px; padding:0 8px; font-size:10px;">Classe II</button>
-                            </div>
-                        </div>
-
-                        <div id="slot-set-indicator"
-                            style="font-size:11px; color:var(--text3); margin-bottom:8px; font-family:'Cinzel', serif;">
-                            Grade: Conjurador Pleno
-                        </div>
-
-                        <div id="slots-grid"></div>
+                    <div id="slot-set-indicator"
+                        style="font-size:11px; color:var(--text3); margin-bottom:8px; font-family:'Cinzel', serif;">
+                        Grade: Conjurador Pleno
                     </div>
+
+                    <div id="slots-grid"></div>
                 </div>
             </div>
         </div>
+    </div>
 
 
-        <div class="toast" id="toast">📄 Ficha salva no PC!</div>
-        <!-- INÍCIO DO RODAPÉ -->
+    <div class="toast" id="toast">📄 Ficha salva no PC!</div>
+    <!-- INÍCIO DO RODAPÉ -->
+    <div
+        style="text-align: center; padding: 20px; margin-top: 20px; border-top: 1px solid var(--border); color: var(--text3); font-family: 'Cinzel', serif; font-size: 11px;">
+        <p>Desenvolvido por <strong>TAWO</strong> (Licença MIT).</p>
+        <p style="margin-top: 8px; font-family: 'Crimson Text', serif; font-size: 10px; opacity: 0.8;">
+            Este projeto não é oficial e é permitido pela Política de Conteúdo de Fãs da Wizards of the Coast. Não é
+            aprovado
+            ou endossado pela Wizards. Partes dos materiais utilizados são propriedade da Wizards of the Coast.
+            ©Wizards
+            of
+            the Coast LLC.
+        </p>
+    </div>
+    <!-- FIM DO RODAPÉ -->
+
+    <div id="crop-modal"
+        style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(5px); z-index:10000; align-items:center; justify-content:center;">
         <div
-            style="text-align: center; padding: 20px; margin-top: 20px; border-top: 1px solid var(--border); color: var(--text3); font-family: 'Cinzel', serif; font-size: 11px;">
-            <p>Desenvolvido por <strong>TAWO</strong> (Licença MIT).</p>
-            <p style="margin-top: 8px; font-family: 'Crimson Text', serif; font-size: 10px; opacity: 0.8;">
-                Este projeto não é oficial e é permitido pela Política de Conteúdo de Fãs da Wizards of the Coast. Não é
-                aprovado
-                ou endossado pela Wizards. Partes dos materiais utilizados são propriedade da Wizards of the Coast.
-                ©Wizards
-                of
-                the Coast LLC.
-            </p>
-        </div>
-        <!-- FIM DO RODAPÉ -->
-
-        <div id="crop-modal"
-            style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(5px); z-index:10000; align-items:center; justify-content:center;">
+            style="background:var(--bg2); padding:24px; border:2px solid var(--border2); border-radius:8px; width:90%; max-width:500px; box-shadow:0 10px 40px rgba(0,0,0,0.8);">
             <div
-                style="background:var(--bg2); padding:24px; border:2px solid var(--border2); border-radius:8px; width:90%; max-width:500px; box-shadow:0 10px 40px rgba(0,0,0,0.8);">
-                <div
-                    style="font-family:'Cinzel', serif; font-size:16px; font-weight:700; color:var(--accent2); text-align:center; margin-bottom:16px; letter-spacing:2px;">
-                    ✂️ AJUSTAR IMAGEM
-                </div>
+                style="font-family:'Cinzel', serif; font-size:16px; font-weight:700; color:var(--accent2); text-align:center; margin-bottom:16px; letter-spacing:2px;">
+                ✂️ AJUSTAR IMAGEM
+            </div>
 
-                <div
-                    style="width:100%; height:400px; background:var(--bg); border:1px solid var(--border); border-radius:4px; overflow:hidden;">
-                    <img id="crop-image" style="display:block; max-width:100%;">
-                </div>
+            <div
+                style="width:100%; height:400px; background:var(--bg); border:1px solid var(--border); border-radius:4px; overflow:hidden;">
+                <img id="crop-image" style="display:block; max-width:100%;">
+            </div>
 
-                <div style="margin-top:20px; display:flex; justify-content:center; gap:16px;">
-                    <button class="h-btn" onclick="fecharCropper()"
-                        style="width:140px; border-color:var(--red); color:var(--red2); font-family:'Cinzel', serif;">✕
-                        Cancelar</button>
-                    <button class="h-btn active" onclick="aplicarCrop()"
-                        style="width:140px; border-color:var(--green); color:var(--green); font-family:'Cinzel', serif; font-weight:bold;">✔
-                        Cortar</button>
-                </div>
+            <div style="margin-top:20px; display:flex; justify-content:center; gap:16px;">
+                <button class="h-btn" onclick="fecharCropper()"
+                    style="width:140px; border-color:var(--red); color:var(--red2); font-family:'Cinzel', serif;">✕
+                    Cancelar</button>
+                <button class="h-btn active" onclick="aplicarCrop()"
+                    style="width:140px; border-color:var(--green); color:var(--green); font-family:'Cinzel', serif; font-weight:bold;">✔
+                    Cortar</button>
             </div>
         </div>
+    </div>
 
-        <script>
-            (function () {
-                var THEMES = [
-                    { v: 'default', label: 'Clássico', emoji: '📜', cat: 'fantasia' },
-                    { v: 'barbarian', label: 'Bárbaro', emoji: '🪓', cat: 'fantasia' },
-                    { v: 'moon-druid', label: 'Druida da Lua', emoji: '🌙', cat: 'fantasia' },
-                    { v: 'dark-elf', label: 'Elfo Negro', emoji: '🌌', cat: 'fantasia' },
-                    { v: 'fighter', label: 'Guerreiro', emoji: '🐆', cat: 'fantasia' },
-                    { v: 'mage', label: 'Mago', emoji: '🔮', cat: 'fantasia' },
-                    { v: 'mystic', label: 'Místico', emoji: '👁️', cat: 'fantasia' },
-                    { v: 'necromancer', label: 'Necromante', emoji: '💀', cat: 'fantasia' },
-                    { v: 'nord', label: 'Nórdico', emoji: '❄️', cat: 'fantasia' },
-                    { v: 'paladin', label: 'Paladino', emoji: '⚔️', cat: 'fantasia' },
-                    { v: 'samurai', label: 'Samurai', emoji: '🌸', cat: 'fantasia' },
-                    { v: 'owl', label: 'Sábio', emoji: '🦉', cat: 'fantasia' },
-                    { v: 'royal', label: 'Realeza', emoji: '👑', cat: 'fantasia' },
+    <script>
+        (function () {
+            var THEMES = [
+                { v: 'default', label: 'Clássico', emoji: '📜', cat: 'fantasia' },
+                { v: 'barbarian', label: 'Bárbaro', emoji: '🪓', cat: 'fantasia' },
+                { v: 'moon-druid', label: 'Druida da Lua', emoji: '🌙', cat: 'fantasia' },
+                { v: 'dark-elf', label: 'Elfo Negro', emoji: '🌌', cat: 'fantasia' },
+                { v: 'fighter', label: 'Guerreiro', emoji: '🐆', cat: 'fantasia' },
+                { v: 'mage', label: 'Mago', emoji: '🔮', cat: 'fantasia' },
+                { v: 'mystic', label: 'Místico', emoji: '👁️', cat: 'fantasia' },
+                { v: 'necromancer', label: 'Necromante', emoji: '💀', cat: 'fantasia' },
+                { v: 'nord', label: 'Nórdico', emoji: '❄️', cat: 'fantasia' },
+                { v: 'paladin', label: 'Paladino', emoji: '⚔️', cat: 'fantasia' },
+                { v: 'samurai', label: 'Samurai', emoji: '🌸', cat: 'fantasia' },
+                { v: 'owl', label: 'Sábio', emoji: '🦉', cat: 'fantasia' },
+                { v: 'royal', label: 'Realeza', emoji: '👑', cat: 'fantasia' },
 
-                    { v: 'chocolate-sand', label: 'Chocolate', emoji: '🍫', cat: 'cores' },
-                    { v: 'Ébano', label: 'Ébano', emoji: '🐦‍⬛', cat: 'cores' },
-                    { v: 'deserto', label: 'Deserto', emoji: '🏜️', cat: 'cores' },
-                    { v: 'Midnights', label: 'Midnight', emoji: '🌌', cat: 'cores' },
-                    { v: 'primavera', label: 'Primavera', emoji: '🌱', cat: 'cores' },
-                    { v: 'verao', label: 'Verão', emoji: '☀️', cat: 'cores' },
-                    { v: 'redtv', label: 'Outono', emoji: '🧣', cat: 'cores' },
-                    { v: 'frost', label: 'Inverno', emoji: '❄️', cat: 'cores' },
-                    { v: 'sunset', label: 'Sunset', emoji: '⛅', cat: 'cores' },
-                    { v: 'Monocromático', label: 'Xeque-Mate', emoji: '♟️', cat: 'cores' },
-                    { v: 'lava', label: 'Lava', emoji: '🌋', cat: 'cores' },
-                    { v: 'melodrama', label: 'Melodrama', emoji: '🌌', cat: 'cores' },
-                    { v: '1989', label: '1989', emoji: '🕊️', cat: 'cores' },
-                    { v: 'tvgirl', label: 'TV Girl', emoji: '📼', cat: 'cores' },
-                    { v: 'blackout', label: 'Blackout', emoji: '🪩', cat: 'cores' },
+                { v: 'chocolate-sand', label: 'Chocolate', emoji: '🍫', cat: 'cores' },
+                { v: 'Ébano', label: 'Ébano', emoji: '🐦‍⬛', cat: 'cores' },
+                { v: 'deserto', label: 'Deserto', emoji: '🏜️', cat: 'cores' },
+                { v: 'Midnights', label: 'Midnight', emoji: '🌌', cat: 'cores' },
+                { v: 'primavera', label: 'Primavera', emoji: '🌱', cat: 'cores' },
+                { v: 'verao', label: 'Verão', emoji: '☀️', cat: 'cores' },
+                { v: 'redtv', label: 'Outono', emoji: '🧣', cat: 'cores' },
+                { v: 'frost', label: 'Inverno', emoji: '❄️', cat: 'cores' },
+                { v: 'sunset', label: 'Sunset', emoji: '⛅', cat: 'cores' },
+                { v: 'Monocromático', label: 'Xeque-Mate', emoji: '♟️', cat: 'cores' },
+                { v: 'lava', label: 'Lava', emoji: '🌋', cat: 'cores' },
+                { v: 'melodrama', label: 'Melodrama', emoji: '🌌', cat: 'cores' },
+                { v: '1989', label: '1989', emoji: '🕊️', cat: 'cores' },
+                { v: 'tvgirl', label: 'TV Girl', emoji: '📼', cat: 'cores' },
+                { v: 'blackout', label: 'Blackout', emoji: '🪩', cat: 'cores' },
 
-                    { v: 'americana', label: 'Americana', emoji: '🇺🇸', cat: 'retro' },
-                    { v: 'cinema-retro', label: 'Cinema', emoji: '🎥', cat: 'retro' },
-                    { v: 'cyberpunk', label: 'Cyberpunk', emoji: '🤖', cat: 'retro' },
-                    { v: 'fliper', label: 'Fliperama', emoji: '🕹️', cat: 'retro' },
-                    { v: 'neon', label: 'Neon', emoji: '📔', cat: 'retro' },
-                    { v: 'retro', label: 'Retrô', emoji: '📻', cat: 'retro' },
-                    { v: 'monster', label: 'Monster', emoji: 'X', cat: 'retro' },
-                    { v: 'cyber-amarelo', label: 'Cyber Yellow', emoji: '⚡', cat: 'retro' },
+                { v: 'americana', label: 'Americana', emoji: '🇺🇸', cat: 'retro' },
+                { v: 'cinema-retro', label: 'Cinema', emoji: '🎥', cat: 'retro' },
+                { v: 'cyberpunk', label: 'Cyberpunk', emoji: '🤖', cat: 'retro' },
+                { v: 'fliper', label: 'Fliperama', emoji: '🕹️', cat: 'retro' },
+                { v: 'neon', label: 'Neon', emoji: '📔', cat: 'retro' },
+                { v: 'retro', label: 'Retrô', emoji: '📻', cat: 'retro' },
+                { v: 'monster', label: 'Monster', emoji: 'X', cat: 'retro' },
+                { v: 'cyber-amarelo', label: 'Cyber Yellow', emoji: '⚡', cat: 'retro' },
 
-                    { v: 'lavanda', label: 'Lavanda', emoji: '🪻', cat: 'jardim' },
-                    { v: 'girassol', label: 'Girassol', emoji: '🌻', cat: 'jardim' },
-                    { v: 'roseiral', label: 'Roseiral', emoji: '🌹', cat: 'jardim' },
-                    { v: 'hortensia', label: 'Hortensia', emoji: '🪻', cat: 'jardim' },
-                    { v: 'lótus', label: 'Lótus', emoji: '🪷', cat: 'jardim' },
-                    { v: 'jasmim', label: 'Jasmim', emoji: '🌼', cat: 'jardim' },
-                    { v: 'cerejeira', label: 'Cerejeira', emoji: '🌸', cat: 'jardim' },
-                    { v: 'orquidea', label: 'Orquidea', emoji: '🪻', cat: 'jardim' },
-                    { v: 'apotecario', label: 'Apotecário', emoji: '⚗️', cat: 'jardim' },
-                    { v: 'cottagecore', label: 'Cottagecore', emoji: '🍄', cat: 'jardim' },
-                    { v: 'bruxa-verde', label: 'Bruxa Verde', emoji: '🐸', cat: 'jardim' },
-                    { v: 'colmeia', label: 'Colmeia', emoji: '🍯', cat: 'jardim' },
-                ];
+                { v: 'lavanda', label: 'Lavanda', emoji: '🪻', cat: 'jardim' },
+                { v: 'girassol', label: 'Girassol', emoji: '🌻', cat: 'jardim' },
+                { v: 'roseiral', label: 'Roseiral', emoji: '🌹', cat: 'jardim' },
+                { v: 'hortensia', label: 'Hortensia', emoji: '🪻', cat: 'jardim' },
+                { v: 'lótus', label: 'Lótus', emoji: '🪷', cat: 'jardim' },
+                { v: 'jasmim', label: 'Jasmim', emoji: '🌼', cat: 'jardim' },
+                { v: 'cerejeira', label: 'Cerejeira', emoji: '🌸', cat: 'jardim' },
+                { v: 'orquidea', label: 'Orquidea', emoji: '🪻', cat: 'jardim' },
+                { v: 'apotecario', label: 'Apotecário', emoji: '⚗️', cat: 'jardim' },
+                { v: 'cottagecore', label: 'Cottagecore', emoji: '🍄', cat: 'jardim' },
+                { v: 'bruxa-verde', label: 'Bruxa Verde', emoji: '🐸', cat: 'jardim' },
+                { v: 'colmeia', label: 'Colmeia', emoji: '🍯', cat: 'jardim' },
+            ];
 
-                var CATS = [
-                    { key: 'todos', label: 'Todos' },
-                    { key: 'fantasia', label: 'Classes & Fantasia' },
-                    { key: 'cores', label: 'Cores & Climas' },
-                    { key: 'retro', label: 'Retrô & Moderno' },
-                    { key: 'jardim', label: 'Jardim do Ranger' }
-                ];
+            var CATS = [
+                { key: 'todos', label: 'Todos' },
+                { key: 'fantasia', label: 'Classes & Fantasia' },
+                { key: 'cores', label: 'Cores & Climas' },
+                { key: 'retro', label: 'Retrô & Moderno' },
+                { key: 'jardim', label: 'Jardim do Ranger' }
+            ];
 
-                var activeCat = 'todos';
-                var activeValue = 'default';
-                var recent = [];
-                try {
-                    var saved = localStorage.getItem('themeGalleryRecent');
-                    if (saved) recent = JSON.parse(saved);
-                } catch (e) { /* localStorage indisponível: segue sem histórico */ }
+            var activeCat = 'todos';
+            var activeValue = 'default';
+            var recent = [];
+            try {
+                var saved = localStorage.getItem('themeGalleryRecent');
+                if (saved) recent = JSON.parse(saved);
+            } catch (e) { /* localStorage indisponível: segue sem histórico */ }
 
-                var overlay = document.getElementById('themes-modal-overlay');
-                var grid = document.getElementById('theme-grid');
-                var tabsEl = document.getElementById('theme-tabs');
-                var recentEl = document.getElementById('theme-recent');
-                var searchInput = document.getElementById('theme-search');
-                var emptyEl = document.getElementById('theme-empty');
-                var triggerBtn = document.getElementById('theme-trigger-btn');
-                var triggerEmoji = document.getElementById('theme-trigger-emoji');
-                var triggerLabel = document.getElementById('theme-trigger-label');
+            var overlay = document.getElementById('themes-modal-overlay');
+            var grid = document.getElementById('theme-grid');
+            var tabsEl = document.getElementById('theme-tabs');
+            var recentEl = document.getElementById('theme-recent');
+            var searchInput = document.getElementById('theme-search');
+            var emptyEl = document.getElementById('theme-empty');
+            var triggerBtn = document.getElementById('theme-trigger-btn');
+            var triggerEmoji = document.getElementById('theme-trigger-emoji');
+            var triggerLabel = document.getElementById('theme-trigger-label');
 
-                function renderTabs() {
-                    tabsEl.innerHTML = '';
-                    CATS.forEach(function (c) {
-                        var b = document.createElement('button');
-                        b.type = 'button';
-                        b.className = 'theme-tab' + (c.key === activeCat ? ' active' : '');
-                        b.textContent = c.label;
-                        b.addEventListener('click', function () {
-                            activeCat = c.key;
-                            renderTabs();
-                            renderGrid();
-                        });
-                        tabsEl.appendChild(b);
+            function renderTabs() {
+                tabsEl.innerHTML = '';
+                CATS.forEach(function (c) {
+                    var b = document.createElement('button');
+                    b.type = 'button';
+                    b.className = 'theme-tab' + (c.key === activeCat ? ' active' : '');
+                    b.textContent = c.label;
+                    b.addEventListener('click', function () {
+                        activeCat = c.key;
+                        renderTabs();
+                        renderGrid();
                     });
-                }
+                    tabsEl.appendChild(b);
+                });
+            }
 
-                function renderRecent() {
-                    if (!recent.length || searchInput.value.trim()) {
-                        recentEl.innerHTML = '';
-                        return;
-                    }
-                    var items = recent
-                        .map(function (v) { return THEMES.filter(function (t) { return t.v === v; })[0]; })
-                        .filter(Boolean)
-                        .slice(0, 6);
-                    if (!items.length) {
-                        recentEl.innerHTML = '';
-                        return;
-                    }
+            function renderRecent() {
+                if (!recent.length || searchInput.value.trim()) {
                     recentEl.innerHTML = '';
-                    var label = document.createElement('div');
-                    label.className = 'theme-recent-label';
-                    label.textContent = 'Usados recentemente';
-                    var row = document.createElement('div');
-                    row.className = 'theme-recent-row';
-                    items.forEach(function (t) {
-                        var chip = document.createElement('button');
-                        chip.type = 'button';
-                        chip.className = 'theme-recent-chip';
-                        chip.innerHTML = '<span>' + t.emoji + '</span><span>' + t.label + '</span>';
-                        chip.addEventListener('click', function () { selectTheme(t); });
-                        row.appendChild(chip);
-                    });
-                    recentEl.appendChild(label);
-                    recentEl.appendChild(row);
+                    return;
                 }
-
-                function renderGrid() {
-                    var q = searchInput.value.trim().toLowerCase();
-                    var filtered = THEMES.filter(function (t) {
-                        var matchesCat = activeCat === 'todos' || t.cat === activeCat;
-                        var matchesQ = !q || t.label.toLowerCase().indexOf(q) !== -1;
-                        return matchesCat && matchesQ;
-                    });
-                    grid.innerHTML = '';
-                    emptyEl.classList.toggle('hidden', filtered.length > 0);
-                    filtered.forEach(function (t) {
-                        var card = document.createElement('button');
-                        card.type = 'button';
-                        card.className = 'theme-card' + (t.v === activeValue ? ' active' : '');
-                        card.innerHTML = '<span class="theme-card-emoji">' + t.emoji + '</span>' +
-                            '<span class="theme-card-label">' + t.label + '</span>';
-                        card.addEventListener('click', function () { selectTheme(t); });
-                        grid.appendChild(card);
-                    });
+                var items = recent
+                    .map(function (v) { return THEMES.filter(function (t) { return t.v === v; })[0]; })
+                    .filter(Boolean)
+                    .slice(0, 6);
+                if (!items.length) {
+                    recentEl.innerHTML = '';
+                    return;
                 }
-
-                function selectTheme(t) {
-                    activeValue = t.v;
-                    triggerEmoji.textContent = t.emoji;
-                    triggerLabel.textContent = t.label;
-
-                    recent = [t.v].concat(recent.filter(function (v) { return v !== t.v; })).slice(0, 6);
-                    try { localStorage.setItem('themeGalleryRecent', JSON.stringify(recent)); } catch (e) { }
-
-                    if (typeof changeTheme === 'function') changeTheme(t.v);
-                    closeModal();
-                }
-
-                function openModal() {
-                    overlay.classList.remove('hidden');
-                    renderTabs();
-                    renderRecent();
-                    renderGrid();
-                    searchInput.value = '';
-                    setTimeout(function () { searchInput.focus(); }, 50);
-                }
-
-                function closeModal() {
-                    overlay.classList.add('hidden');
-                }
-
-                triggerBtn.addEventListener('click', openModal);
-                document.getElementById('themes-modal-close').addEventListener('click', closeModal);
-                overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
-                document.addEventListener('keydown', function (e) {
-                    if (e.key === 'Escape' && !overlay.classList.contains('hidden')) closeModal();
+                recentEl.innerHTML = '';
+                var label = document.createElement('div');
+                label.className = 'theme-recent-label';
+                label.textContent = 'Usados recentemente';
+                var row = document.createElement('div');
+                row.className = 'theme-recent-row';
+                items.forEach(function (t) {
+                    var chip = document.createElement('button');
+                    chip.type = 'button';
+                    chip.className = 'theme-recent-chip';
+                    chip.innerHTML = '<span>' + t.emoji + '</span><span>' + t.label + '</span>';
+                    chip.addEventListener('click', function () { selectTheme(t); });
+                    row.appendChild(chip);
                 });
-                searchInput.addEventListener('input', function () { renderRecent(); renderGrid(); });
-                document.getElementById('theme-custom-open').addEventListener('click', function () {
-                    closeModal();
-                    if (typeof changeTheme === 'function') changeTheme('custom');
-                    if (typeof openThemeModal === 'function') openThemeModal();
+                recentEl.appendChild(label);
+                recentEl.appendChild(row);
+            }
+
+            function renderGrid() {
+                var q = searchInput.value.trim().toLowerCase();
+                var filtered = THEMES.filter(function (t) {
+                    var matchesCat = activeCat === 'todos' || t.cat === activeCat;
+                    var matchesQ = !q || t.label.toLowerCase().indexOf(q) !== -1;
+                    return matchesCat && matchesQ;
                 });
-
-                // Se o theme-manager.js expuser o tema atualmente salvo (ex: leitura de
-                // localStorage/cookie), sincronize aqui para o botão já abrir mostrando
-                // o tema certo em vez de sempre "Clássico". Exemplo:
-                // var saved = localStorage.getItem('dnd-theme');
-                // var found = THEMES.filter(function(t){ return t.v === saved; })[0];
-                // if (found) selectThemeSilently(found); // função a criar, sem chamar changeTheme de novo
-
-                // ... resto do seu código ...
-                document.getElementById('theme-custom-open').addEventListener('click', function () {
-                    closeModal();
-                    if (typeof changeTheme === 'function') changeTheme('custom');
-                    if (typeof openThemeModal === 'function') openThemeModal();
+                grid.innerHTML = '';
+                emptyEl.classList.toggle('hidden', filtered.length > 0);
+                filtered.forEach(function (t) {
+                    var card = document.createElement('button');
+                    card.type = 'button';
+                    card.className = 'theme-card' + (t.v === activeValue ? ' active' : '');
+                    card.innerHTML = '<span class="theme-card-emoji">' + t.emoji + '</span>' +
+                        '<span class="theme-card-label">' + t.label + '</span>';
+                    card.addEventListener('click', function () { selectTheme(t); });
+                    grid.appendChild(card);
                 });
+            }
 
-                // NOVA FUNÇÃO (Adicione aqui, dentro da IIFE):
-                window.updateThemeButtonUI = function (themeClass) {
-                    var themeValue = themeClass.replace('theme-', '');
+            function selectTheme(t) {
+                activeValue = t.v;
+                triggerEmoji.textContent = t.emoji;
+                triggerLabel.textContent = t.label;
 
-                    if (themeValue === 'custom') {
-                        triggerEmoji.textContent = '🎨';
-                        triggerLabel.textContent = 'Personalizado';
-                        return;
-                    }
+                recent = [t.v].concat(recent.filter(function (v) { return v !== t.v; })).slice(0, 6);
+                try { localStorage.setItem('themeGalleryRecent', JSON.stringify(recent)); } catch (e) { }
 
-                    // Busca o tema na sua array THEMES que já existe
-                    var found = THEMES.filter(function (t) { return t.v === themeValue; })[0];
-                    if (found) {
-                        triggerEmoji.textContent = found.emoji;
-                        triggerLabel.textContent = found.label;
-                    }
-                };
+                if (typeof changeTheme === 'function') changeTheme(t.v);
+                closeModal();
+            }
 
-            })(); // Fim da sua IIFE
-        </script>
+            function openModal() {
+                overlay.classList.remove('hidden');
+                renderTabs();
+                renderRecent();
+                renderGrid();
+                searchInput.value = '';
+                setTimeout(function () { searchInput.focus(); }, 50);
+            }
+
+            function closeModal() {
+                overlay.classList.add('hidden');
+            }
+
+            triggerBtn.addEventListener('click', openModal);
+            document.getElementById('themes-modal-close').addEventListener('click', closeModal);
+            overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && !overlay.classList.contains('hidden')) closeModal();
+            });
+            searchInput.addEventListener('input', function () { renderRecent(); renderGrid(); });
+            document.getElementById('theme-custom-open').addEventListener('click', function () {
+                closeModal();
+                if (typeof changeTheme === 'function') changeTheme('custom');
+                if (typeof openThemeModal === 'function') openThemeModal();
+            });
+
+            // Se o theme-manager.js expuser o tema atualmente salvo (ex: leitura de
+            // localStorage/cookie), sincronize aqui para o botão já abrir mostrando
+            // o tema certo em vez de sempre "Clássico". Exemplo:
+            // var saved = localStorage.getItem('dnd-theme');
+            // var found = THEMES.filter(function(t){ return t.v === saved; })[0];
+            // if (found) selectThemeSilently(found); // função a criar, sem chamar changeTheme de novo
+
+            // ... resto do seu código ...
+            document.getElementById('theme-custom-open').addEventListener('click', function () {
+                closeModal();
+                if (typeof changeTheme === 'function') changeTheme('custom');
+                if (typeof openThemeModal === 'function') openThemeModal();
+            });
+
+            // NOVA FUNÇÃO (Adicione aqui, dentro da IIFE):
+            window.updateThemeButtonUI = function (themeClass) {
+                var themeValue = themeClass.replace('theme-', '');
+
+                if (themeValue === 'custom') {
+                    triggerEmoji.textContent = '🎨';
+                    triggerLabel.textContent = 'Personalizado';
+                    return;
+                }
+
+                // Busca o tema na sua array THEMES que já existe
+                var found = THEMES.filter(function (t) { return t.v === themeValue; })[0];
+                if (found) {
+                    triggerEmoji.textContent = found.emoji;
+                    triggerLabel.textContent = found.label;
+                }
+            };
+
+        })(); // Fim da sua IIFE
+    </script>
 </body>
 
 </html>
