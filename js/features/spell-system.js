@@ -2,17 +2,6 @@
    SPELL SYSTEM (MASTER-DETAIL)
    Abas de círculo, lista de magias + painel de detalhes, espaços de magia
    (slots) em duas grades e cálculo de CD / Ataque Mágico.
-
-   Estado global (mesmos nomes de antes, para não quebrar salvar/importar):
-     window.spells             { [círculo 0-9]: [{ name, prepped, concentration, desc }] }
-     window.activeSpellIndex   { [círculo]: índice da magia aberta }
-     window.spellSlots         { [nível 1-9]: { total, used } }   -> Classe I
-     window.secondarySpellSlots                                    -> Classe II
-     window.activeSlotSet      'primary' | 'secondary'
-
-   Dependências opcionais (usadas só se existirem):
-     parseRichText()  (rich-notes.js)         -> preview das descrições
-     getMod / getAttrVal / getProfBonus / fmtMod -> cálculo de CD e ataque
    ========================================================================== */
 (function () {
   'use strict';
@@ -23,6 +12,8 @@
   /* ----------------------------------------------------------------------
      ESTADO
      ---------------------------------------------------------------------- */
+
+  let magiaArrastadaIndex = null;
   window.spellDCOverride = window.spellDCOverride || false;
   window.spellAtkOverride = window.spellAtkOverride || false;
 
@@ -45,7 +36,6 @@
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 
-  // rich-notes.js também usa escapeHTML; garante que exista.
   window.escapeHTML = window.escapeHTML || esc;
 
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
@@ -57,7 +47,6 @@
     return window.spells[level];
   }
 
-  // Aceita (level) ou (level, index); sem índice usa a magia aberta.
   function resolveIndex(level, index) {
     return index === undefined ? window.activeSpellIndex[level] : index;
   }
@@ -68,13 +57,11 @@
       : esc(text).replace(/\n/g, '<br>');
   }
 
-  // Separa "Nome :: Tag 1 :: Tag 2" em { name, tags }.
   function parseSpellTitle(raw) {
     const parts = String(raw || '').split('::').map(s => s.trim());
     return { name: parts.shift() || '', tags: parts.filter(Boolean) };
   }
 
-  // Garante que os dados (novos, importados ou antigos) tenham o formato esperado.
   function normalizeSpells() {
     if (!window.spells || typeof window.spells !== 'object') window.spells = {};
     for (let l = 0; l <= MAX_SPELL_LEVEL; l++) {
@@ -92,7 +79,6 @@
     }
   }
 
-  // CSS mínimo que o JS precisa (idempotente). Pode ser movido para components.css.
   function ensureSpellStyles() {
     if ($('spell-system-styles')) return;
     const style = document.createElement('style');
@@ -100,17 +86,17 @@
     style.textContent = `
 .spell-item-btn { width: 100%; min-width: 0; }
 .spell-item-icons { display: flex; gap: 4px; width: 26px; flex-shrink: 0; justify-content: flex-start; font-size: 11px; line-height: 1; }
-.spell-item-icons .sp-prep { color: var(--accent2); }
-.spell-item-icons .sp-conc { color: var(--green); }
+.spell-item-icons .sp-prep { color: var(--accent2, #e2b714); }
+.spell-item-icons .sp-conc { color: var(--green, #22c55e); }
 .spell-item-body { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 6px; flex: 1; min-width: 0; }
 .spell-item-name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .spell-item-name.is-untitled { opacity: .55; font-style: italic; }
-.spell-detail-head { display: flex; gap: 8px; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
-.spell-tags-row { display: flex; align-items: center; gap: 20px; height: 20px; margin-bottom: 12px; font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--text2); }
+.spell-detail-head { display: flex; gap: 8px; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--border, #334155); }
+.spell-tags-row { display: flex; align-items: center; gap: 20px; height: 20px; margin-bottom: 12px; font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--text2, #94a3b8); }
 .spell-flag { display: flex; align-items: center; cursor: pointer; text-transform: uppercase; transition: color .2s; }
-.spell-flag-prep:hover { color: var(--accent2); }
-.spell-flag-conc:hover { color: var(--green); }
-.h-btn.spell-del-btn { border-color: var(--red2); color: var(--red2); }
+.spell-flag-prep:hover { color: var(--accent2, #e2b714); }
+.spell-flag-conc:hover { color: var(--green, #22c55e); }
+.h-btn.spell-del-btn { border-color: var(--red2, #ef4444); color: var(--red2, #ef4444); }
 .spell-detail-col .rn-bar { top: -32px; height: 20px; display: flex; align-items: center; }`;
     document.head.appendChild(style);
   }
@@ -118,15 +104,9 @@
   /* ==========================================================================
      1. ABAS DE CÍRCULO
      ========================================================================== */
-
-  // Constrói (uma única vez) os painéis de cada círculo dentro de #spell-tabs-container.
-  // Se o HTML não tiver as abas .spell-tab, a barra de abas também é gerada.
   window.buildSpellTabs = function (force) {
     const container = $('spell-tabs-container');
-    if (!container) {
-      console.warn('[SpellSystem] Elemento #spell-tabs-container não encontrado no HTML.');
-      return false;
-    }
+    if (!container) return false;
     const built = container.querySelectorAll('[id^="spell-pane-"]').length === MAX_SPELL_LEVEL + 1;
     if (built && !force) return true;
 
@@ -146,16 +126,13 @@
       html += `
         <div class="spell-tab-pane${i === 0 ? ' active' : ''}" id="spell-pane-${i}">
             <div class="spell-master-detail">
-                <!-- Esquerda: lista de magias -->
                 <div class="spell-list-col">
                     <div class="spell-list-container" id="spell-list-${i}"></div>
                     <button type="button" class="add-btn mt8" onclick="addNewSpell(${i})">+ Nova Magia</button>
                 </div>
-                <!-- Direita: detalhes da magia selecionada (injetado por selectSpell) -->
                 <div class="spell-detail-col" id="spell-detail-${i}" style="display: none;"></div>
-                <!-- Direita: estado vazio -->
                 <div class="spell-empty-state" id="spell-empty-${i}"
-                    style="display: flex; align-items: center; justify-content: center; flex-direction: column; color: var(--text3); height: 100%;">
+                    style="display: flex; align-items: center; justify-content: center; flex-direction: column; color: var(--text3, #64748b); height: 100%;">
                     <span style="font-size: 24px; margin-bottom: 8px; opacity: 0.5;">🔮</span>
                     <span style="font-size: 11px; font-family: 'Cinzel', serif; letter-spacing: 1px; text-transform: uppercase;">Selecione ou crie uma magia</span>
                 </div>
@@ -183,13 +160,12 @@
   };
 
   /* ==========================================================================
-     2. LISTA (ESQUERDA) — pílulas "::" e ícones de status
+     2. LISTA E DRAG & DROP
      ========================================================================== */
   function spellButtonHTML(level, sp, i, isActive) {
     const { name, tags } = parseSpellTitle(sp.name);
     const label = name || 'Nova Magia';
 
-    // Status independentes: os dois podem aparecer ao mesmo tempo.
     const icons =
       (sp.prepped ? '<span class="sp-prep" title="Preparada">✦</span>' : '') +
       (sp.concentration ? '<span class="sp-conc" title="Concentração">◈</span>' : '');
@@ -197,7 +173,14 @@
     const pills = tags.map(t => `<span class="spell-pill">${esc(t)}</span>`).join('');
 
     return `
-        <button type="button" class="spell-item-btn${isActive ? ' active' : ''}" onclick="selectSpell(${level}, ${i})" title="${esc(sp.name || 'Nova Magia')}">
+        <button type="button" 
+            class="spell-item-btn${isActive ? ' active' : ''}" 
+            draggable="true"
+            ondragstart="window.onSpellDragStart(event, ${level}, ${i})"
+            ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'move';"
+            ondrop="window.onSpellDrop(event, ${level}, ${i})"
+            onclick="selectSpell(${level}, ${i})" 
+            title="${esc(sp.name || 'Nova Magia')}">
             <span class="spell-item-icons">${icons}</span>
             <span class="spell-item-body">
                 <span class="spell-item-name${name ? '' : ' is-untitled'}">${esc(label)}</span>${pills}
@@ -205,7 +188,67 @@
         </button>`;
   }
 
-  // Mostra o painel de detalhes ou o estado vazio, conforme haja magia selecionada.
+  window.onSpellDragStart = function (e, level, index) {
+    magiaArrastadaIndex = index;
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  window.onSpellDrop = function (e, level, targetIndex) {
+    e.preventDefault();
+    if (magiaArrastadaIndex === null || magiaArrastadaIndex === targetIndex) return;
+
+    const list = getSpellList(level);
+    const [movedSpell] = list.splice(magiaArrastadaIndex, 1);
+    list.splice(targetIndex, 0, movedSpell);
+
+    if (window.activeSpellIndex[level] === magiaArrastadaIndex) {
+      window.activeSpellIndex[level] = targetIndex;
+    } else if (
+      window.activeSpellIndex[level] > magiaArrastadaIndex &&
+      window.activeSpellIndex[level] <= targetIndex
+    ) {
+      window.activeSpellIndex[level]--;
+    } else if (
+      window.activeSpellIndex[level] < magiaArrastadaIndex &&
+      window.activeSpellIndex[level] >= targetIndex
+    ) {
+      window.activeSpellIndex[level]++;
+    }
+
+    magiaArrastadaIndex = null;
+    renderSpellList(level);
+    if (typeof salvarDadosFicha === 'function') salvarDadosFicha();
+  };
+
+  /* ==========================================================================
+     3. FUNÇÃO DE ORDENAÇÃO (CORRIGIDA E INTEGRADA)
+     ========================================================================== */
+  window.ordenarMagiasAtuais = function (criterio) {
+    const level = toLevel(window.activeSpellTab);
+    const list = getSpellList(level);
+
+    if (!list || !Array.isArray(list) || list.length === 0) return;
+
+    const getName = (sp) => {
+      if (!sp || !sp.name) return '';
+      return parseSpellTitle(sp.name).name.toLowerCase();
+    };
+
+    if (criterio === 'alfabetica-asc') {
+      list.sort((a, b) => getName(a).localeCompare(getName(b)));
+    } else if (criterio === 'alfabetica-desc') {
+      list.sort((a, b) => getName(b).localeCompare(getName(a)));
+    } else if (criterio === 'preparadas') {
+      list.sort((a, b) => (b.prepped ? 1 : 0) - (a.prepped ? 1 : 0));
+    }
+
+    const selectElem = $('spellSortSelect');
+    if (selectElem) selectElem.value = '';
+
+    renderSpellList(level);
+    if (typeof window.salvarDadosFicha === 'function') window.salvarDadosFicha();
+  };
+
   function syncSpellPanels(level) {
     const detail = $('spell-detail-' + level);
     const empty = $('spell-empty-' + level);
@@ -235,11 +278,8 @@
   };
 
   /* ==========================================================================
-     3. DETALHES (DIREITA) — IDs dinâmicos por círculo + índice
+     4. DETALHES E CRUD
      ========================================================================== */
-
-  // Injeta o painel da magia (level, index). Tudo o que é editável usa
-  // IDs "spell-*-{level}-{index}", então nada vaza entre magias.
   function renderSpellDetail(level, index, opts) {
     const detail = $('spell-detail-' + level);
     const spell = getSpellList(level)[index];
@@ -277,7 +317,6 @@
                 ondblclick="editSpellRN(${level}, ${index})"></div>
         </div>`;
 
-    // Valores via propriedade (e não via HTML) para preservar quebras de linha e aspas.
     $('spell-title-' + key).value = spell.name;
     $('spell-prep-' + key).checked = spell.prepped;
     $('spell-conc-' + key).checked = spell.concentration;
@@ -285,12 +324,10 @@
 
     detail.dataset.spellIndex = String(index);
 
-    // Com descrição: abre no preview. Vazia (ex.: magia nova): abre direto para editar.
     const mode = opts.edit === undefined ? (spell.desc.trim() ? 'preview' : 'edit') : (opts.edit ? 'edit' : 'preview');
     setSpellMode(level, index, mode);
   }
 
-  // Alterna o campo de descrição entre edição (textarea) e preview (Rich Notes).
   function setSpellMode(level, index, mode, focus) {
     const key = `${level}-${index}`;
     const ta = $('spell-desc-' + key);
@@ -313,18 +350,17 @@
     }
   }
 
-// Se o círculo tem magias mas nenhuma aberta, abre a primeira (ou a última ativa).
   function ensureSpellDetail(level) {
     const list = getSpellList(level);
     if (!list || list.length === 0) { syncSpellPanels(level); return; }
 
     let idx = window.activeSpellIndex[level] !== undefined ? window.activeSpellIndex[level] : 0;
-    if (!list[idx]) idx = 0; // Proteção extra se o índice for inválido
+    if (!list[idx]) idx = 0;
 
     const detail = $('spell-detail-' + level);
     const alreadyShown = detail && detail.dataset.spellIndex === String(idx)
       && window.activeSpellIndex[level] === idx;
-    
+
     if (!alreadyShown) selectSpell(level, idx, { edit: false });
   }
 
@@ -333,11 +369,11 @@
     index = toInt(index);
 
     const list = getSpellList(level);
-    if (!list || !list[index]) return; // Proteção contra arrays vazios
+    if (!list || !list[index]) return;
 
     window.activeSpellIndex[level] = index;
-    renderSpellList(level);                       // marca o botão ativo + mostra o painel
-    renderSpellDetail(level, index, opts || {});  // injeta o HTML da magia exata
+    renderSpellList(level);
+    renderSpellDetail(level, index, opts || {});
   };
 
   window.toggleSpellRN = function (level, index) {
@@ -353,9 +389,6 @@
     setSpellMode(level, resolveIndex(level, index), 'edit', true);
   };
 
-  /* ==========================================================================
-     CRUD
-     ========================================================================== */
   window.addNewSpell = function (level) {
     level = toLevel(level);
     const list = getSpellList(level);
@@ -370,8 +403,6 @@
     if (listEl) listEl.scrollTop = listEl.scrollHeight;
   };
 
-  // Grava um campo da magia. Só a lista é redesenhada (o painel de detalhes
-  // não é tocado, então o foco e o cursor não se perdem enquanto digita).
   window.updateSpell = function (level, index, field, value) {
     level = toLevel(level);
     const spell = getSpellList(level)[index];
@@ -390,21 +421,17 @@
     delete window.activeSpellIndex[level];
 
     if (list.length) {
-      // Como os índices mudam, o painel é reconstruído com IDs novos.
       selectSpell(level, Math.min(index, list.length - 1));
     } else {
-      renderSpellList(level);   // mostra o estado vazio
+      renderSpellList(level);
     }
   };
 
-  // Compatibilidade com chamadas antigas.
   window.updateActiveSpell = (level, field, value) =>
     window.updateSpell(level, resolveIndex(toLevel(level)), field, value);
   window.deleteActiveSpell = level =>
     window.removeSpell(level, resolveIndex(toLevel(level)));
 
-  // Redesenha tudo a partir de window.spells / window.spellSlots
-  // (chame depois de importar ou carregar uma ficha).
   window.refreshSpellSystem = function () {
     normalizeSpells();
     for (let l = 0; l <= MAX_SPELL_LEVEL; l++) {
@@ -417,7 +444,7 @@
   };
 
   /* ==========================================================================
-     CÁLCULOS DE MAGIA (CD E ATAQUE)
+     5. CÁLCULOS DE MAGIA E ESPAÇOS (SLOTS)
      ========================================================================== */
   window.updateSpellDC = function () {
     const ability = $('spell-ability')?.value;
@@ -443,16 +470,12 @@
     if (!window.spellAtkOverride && atkEl) atkEl.value = fmtMod(mod + pb);
   };
 
-  /* ==========================================================================
-     4. ESPAÇOS DE MAGIA (SLOTS) — Classe I / Classe II
-     ========================================================================== */
   function slotStore(setName) {
     const key = setName === 'secondary' ? 'secondarySpellSlots' : 'spellSlots';
     if (!window[key] || typeof window[key] !== 'object') window[key] = {};
     return window[key];
   }
 
-  // Sempre lê do store atual (funciona mesmo se um import trocar o objeto inteiro).
   function getSlotData(level) {
     const store = slotStore(window.activeSlotSet);
     let s = store[level];
@@ -466,8 +489,7 @@
     window.activeSlotSet = setName === 'secondary' ? 'secondary' : 'primary';
     const isPrimary = window.activeSlotSet === 'primary';
 
-    $('btn-slot-primary')?.classList.toggle('active', isPrimary);
-    $('btn-slot-secondary')?.classList.toggle('active', !isPrimary);
+    $('btn-slot-primary')?.classList.toggle('active', isPrimary);$('btn-slot-secondary')?.classList.toggle('active', !isPrimary);
 
     const label = $('slot-set-indicator');
     if (label) label.textContent = isPrimary ? 'Grade: Principal' : 'Grade: Secundária';
@@ -496,7 +518,6 @@
     for (let l = 1; l <= MAX_SPELL_LEVEL; l++) updateSlotPips(l);
   };
 
-  // keepInput = true enquanto o usuário digita (não reescreve o campo).
   window.setSlotTotal = function (level, val, keepInput) {
     level = clamp(toInt(level), 1, MAX_SPELL_LEVEL);
     const n = clamp(toInt(val), 0, MAX_SLOTS);
@@ -510,7 +531,6 @@
     updateSlotPips(level);
   };
 
-  // Clicar em um pip disponível gasta um espaço; em um pip gasto, recupera um.
   window.toggleSlotPip = function (level, i) {
     const s = getSlotData(level);
     if (i < s.used) s.used--;
@@ -524,9 +544,6 @@
 
     const s = getSlotData(level);
 
-    // Os pips são reaproveitados (só se acrescenta/remove no fim). Recriar tudo
-    // trocaria o elemento sob o mouse entre o mousedown e o mouseup e o clique
-    // se perderia (ex.: digitar o total e clicar direto num pip).
     while (el.children.length > s.total) el.lastElementChild.remove();
     while (el.children.length < s.total) {
       const i = el.children.length;
@@ -554,11 +571,9 @@
     normalizeSpells();
     buildSpellTabs();
     switchSpellTab(window.activeSpellTab);
-    switchSlotSet(window.activeSlotSet);   // desenha os slots assim que a página carrega
+    switchSlotSet(window.activeSlotSet);
   }
 
-  // Scripts com `defer` rodam antes do DOMContentLoaded, então o listener dispara.
-  // O `load` cobre scripts injetados depois, e a flag impede a execução dupla.
   if (document.readyState === 'complete') {
     initSpellSystem();
   } else {
