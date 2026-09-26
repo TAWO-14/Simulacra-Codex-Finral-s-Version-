@@ -451,3 +451,22 @@ function updateSpellDC() {
     }
 }
 
+window.onArmorClassInput = function(el) {
+    if (!el) return;
+    let parsed = parseInt(el.value);
+
+    // Se o usuário digitou letras/inválido ou deixou em branco
+    if (isNaN(parsed)) {
+        window.acOverride = false;
+        // Recalcula a CA padrão com base na Destreza + 10 (ou sua função de cálculo)
+        if (typeof updateArmorClass === 'function') {
+            updateArmorClass();
+        } else {
+            const dexMod = typeof getMod === 'function' && typeof getAttrVal === 'function' ? getMod(getAttrVal('dex')) : 0;
+            el.value = 10 + dexMod;
+        }
+    } else {
+        window.acOverride = true;
+        el.value = parsed; // Mantém apenas o número digitado
+    }
+};
