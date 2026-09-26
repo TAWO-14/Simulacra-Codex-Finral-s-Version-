@@ -711,15 +711,14 @@
                     <div class="section-title mb8">Pontos de Vida</div>
 
                     <div style="display: flex; gap: 10px; margin-bottom: 12px; align-items: stretch;">
-                        <!-- Box Principal: Atual / Máximo -->
+                        <!-- Box Principal: Vida Atual / Máximo -->
                         <div
-                            style="flex: 2; background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: inset 0 2px 4px var(--glow);">
+                            style="flex: 2; background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);">
                             <div style="display: flex; align-items: center; gap: 6px;">
-
-                                <!-- HP Atual: Fonte 26px, Largura 70px -->
+                                <!-- HP Atual -->
                                 <input type="text" id="hp-current" class="hp-dynamic-input" value="10"
                                     title="Atual: Digite um valor absoluto ou use + e -"
-                                    style="width: 70px; font-size: 26px; font-weight: 700; color: var(--accent2); font-family: 'Cinzel', serif;"
+                                    style="width: 55px; font-size: 26px; font-weight: 700; color: var(--accent2); font-family: 'Cinzel', serif;"
                                     onfocus="this.dataset.old=this.value; this.value='';"
                                     onblur="if(this.value==='') this.value=this.dataset.old;"
                                     onchange="handleDynamicHP(this)"
@@ -728,10 +727,10 @@
                                 <span
                                     style="font-size: 22px; color: var(--text3); font-family: 'Cinzel', serif; opacity: 0.6;">/</span>
 
-                                <!-- HP Máximo: Fonte 26px, Largura 70px (Igualado ao Atual) -->
+                                <!-- HP Máximo -->
                                 <input type="number" id="hp-max" class="hp-dynamic-input" value="10" min="1"
                                     title="Máximo"
-                                    style="width: 70px; font-size: 26px; font-weight: 600; color: var(--text2); font-family: 'Cinzel', serif;"
+                                    style="width: 55px; font-size: 26px; font-weight: 600; color: var(--text2); font-family: 'Cinzel', serif;"
                                     onchange="updateHPBar()">
                             </div>
                             <div
@@ -747,10 +746,24 @@
                                 TEMPORÁRIO</div>
                             <input type="text" id="hp-temp" class="hp-dynamic-input" value="0"
                                 title="Temporário: Digite um valor absoluto ou use + e -"
-                                style="width: 60px; height: 60px; border-radius: 50%; font-size: 22px; font-weight: 700; color: var(--green); font-family: 'Cinzel', serif; margin: 0 auto;"
+                                style="width: 100%; font-size: 22px; font-weight: 700; color: var(--green); font-family: 'Cinzel', serif; text-align: center;"
                                 onfocus="this.dataset.old=this.value; this.value='';"
                                 onblur="if(this.value==='') this.value=this.dataset.old;"
                                 onchange="handleDynamicHP(this)"
+                                onkeydown="if(event.key === 'Enter') { event.preventDefault(); this.blur(); }">
+                        </div>
+
+                        <!-- Novo Box: Classe de Armadura (CA) -->
+                        <div
+                            style="flex: 1; background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px; display: flex; align-items: center; justify-content: center; flex-direction: column; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);">
+                            <div style="font-size: 9px; color: var(--text3); letter-spacing: 1px; margin-bottom: 4px;">
+                                ARMADURA</div>
+                            <input type="text" id="armor-class" class="hp-dynamic-input" value="10"
+                                title="Classe de Armadura (CA)"
+                                style="width: 100%; font-size: 22px; font-weight: 700; color: var(--accent2); font-family: 'Cinzel', serif; text-align: center;"
+                                onfocus="this.dataset.old=this.value; this.value='';"
+                                onblur="if(this.value==='') this.value=this.dataset.old;"
+                                onchange="onArmorClassInput(this)"
                                 onkeydown="if(event.key === 'Enter') { event.preventDefault(); this.blur(); }">
                         </div>
                     </div>
