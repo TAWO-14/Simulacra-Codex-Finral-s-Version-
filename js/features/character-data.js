@@ -21,10 +21,8 @@ window.imagemFundoCustomizada = window.imagemFundoCustomizada || '';
 // ── Utilitários Base ──
 function getMod(score) { return Math.floor((score - 10) / 2); }
 function fmtMod(n) { return (n >= 0 ? '+' : '') + n; }
-function getProfBonus() { return Math.ceil((parseInt(document.getElementById('char-level')?.value) || 1) / 4) + 1; }
+
 function getAttrVal(id) { return parseInt(document.getElementById('attr-score-' + id)?.value) || 10; }
-function onSpellDCOnput() { spellDCOverride = true; }
-function onSpellAtkInput() { spellAtkOverride = true; }
 
 function escapeHTML(str) {
     return String(str || '')
@@ -78,18 +76,13 @@ function buildSkills() {
 // ── Atualizadores (Updaters) ──
 function onPassivePercInput(el) {
     if (!el) return;
-
-    // Tenta converter o que o usuário digitou num número inteiro
     let parsed = parseInt(el.value);
-
-    // Se o resultado não for um número válido (ex: digitou "a")
     if (isNaN(parsed)) {
         passivePercOverride = false;
-        // O updateSkills vai recalcular a percepção sozinho e preencher o campo com o valor certo, apagando o "a"
         updateSkills();
     } else {
         passivePercOverride = true;
-        el.value = parsed; // Garante que o campo fica apenas com o número limpo
+        el.value = parsed;
     }
 }
 
@@ -100,8 +93,6 @@ function onAttrChange() {
     });
     updateSaves();
     updateSkills();
-
-    // Delega a atualização do CD Mágico para o módulo de magias
     if (typeof updateSpellDC === 'function') updateSpellDC();
 }
 
@@ -125,15 +116,12 @@ function updateSkills() {
         if (pd) pd.className = 'skill-prof' + (prof === 1 ? ' prof' : prof === 2 ? ' expert' : '');
     });
 
-    // Tratamento Robusto da Percepção Passiva
     const ppEl = document.getElementById('passive-perc');
     if (ppEl) {
-        // Verifica se o checkbox Observador está ativo no HTML (se existir)
         const obsCheck = document.getElementById('obs-check');
         const obsBonus = (obsCheck && obsCheck.classList.contains('active')) ? 5 : 0;
 
         if (!passivePercOverride || ppEl.value === '') {
-            // Cálculo Base + Proficiência de Percepção + Bônus do Observador (se ativo)
             const percProf = profStates['perception'] || 0;
             const percBonus = percProf === 2 ? pb * 2 : percProf === 1 ? pb : 0;
             ppEl.value = 10 + getMod(getAttrVal('wis')) + percBonus + obsBonus;
@@ -141,12 +129,51 @@ function updateSkills() {
     }
 }
 
+function onLevelChange() {
+    updateProfBonus();
+}
+
+// Handler seguro para digitação no campo de Nível
+function onLevelInput(el) {
+    if (!el) return;
+    let val = parseInt(el.value, 10);
+
+    // Evita valores fora do intervalo (1 a 20) durante a digitação.
+    // Só corrige quando o valor já é um número completo e fora da faixa;
+    // nunca mexe no campo enquanto ele está vazio (usuário apagando para redigitar).
+    if (!isNaN(val)) {
+        if (val > 20) el.value = 20;
+        if (val < 1) el.value = 1;
+    }
+
+    // Atualiza o Bônus de Proficiência e recálculos dependentes
+    updateProfBonus();
+}
+
+// Garante leitura segura do Nível (funciona mesmo se o elemento ainda
+// não existir no DOM no momento da chamada)
+function getProfBonus() {
+    const lvlInput = document.getElementById('char-level');
+    const parsed = lvlInput ? parseInt(lvlInput.value, 10) : 1;
+    const level = isNaN(parsed) || parsed < 1 ? 1 : (parsed > 20 ? 20 : parsed);
+    return Math.ceil(level / 4) + 1;
+}
+
+// Ponto único de atualização do bônus de proficiência e de tudo que
+// depende dele. Cada etapa roda isolada em try/catch: se qualquer
+// cálculo dependente falhar (perícias, magia, etc.), o número do
+// bônus em si NUNCA fica desatualizado por causa disso.
 function updateProfBonus() {
+    const pbValue = fmtMod(getProfBonus());
+
     const el = document.getElementById('prof-bonus');
-    if (el) el.textContent = fmtMod(getProfBonus());
-    updateSaves();
-    updateSkills();
-    if (typeof updateSpellDC === 'function') updateSpellDC();
+    if (el) el.textContent = pbValue;
+
+    try { updateSaves(); } catch (e) { console.error('Erro ao atualizar resistências:', e); }
+    try { updateSkills(); } catch (e) { console.error('Erro ao atualizar perícias:', e); }
+    try {
+        if (typeof updateSpellDC === 'function') updateSpellDC();
+    } catch (e) { console.error('Erro ao atualizar CD de magia:', e); }
 }
 
 function toggleSaveProf(id) {
@@ -179,6 +206,13 @@ function collectData() {
             }
         }
     });
+
+    // Força explicitamente a coleta correta do nível do personagem
+    const lvlEl = document.getElementById('char-level');
+    if (lvlEl) {
+        data['char-level'] = lvlEl.value || '1';
+    }
+
     const avatarImg = document.getElementById('char-avatar');
     const avatarSrc = (avatarImg && avatarImg.src && avatarImg.src.startsWith('data:image')) ? avatarImg.src : '';
     return {
@@ -246,7 +280,6 @@ window.addEventListener('DOMContentLoaded', () => {
     // Render de módulos isolados (Combate/Magia)
     safeStep('ataques', () => { if (typeof renderAttacks === 'function') { if (attacks.length === 0) addAttack(); else renderAttacks(); } });
 
-    // Avisa o novo sistema de magias para se redesenhar com os dados carregados da memória
     if (typeof refreshSpellSystem === 'function') {
         safeStep('sistema de magias atualizado', () => refreshSpellSystem());
     }
@@ -262,6 +295,12 @@ window.addEventListener('DOMContentLoaded', () => {
                 el.value = v;
             }
         });
+
+        // Restauração garantida do nível salvo
+        const lvlEl = document.getElementById('char-level');
+        if (lvlEl && window.SHEET_DATA['char-level'] !== undefined) {
+            lvlEl.value = window.SHEET_DATA['char-level'];
+        }
     });
 
     // Restauração de UI e Visual
@@ -324,25 +363,13 @@ window.addEventListener('DOMContentLoaded', () => {
 function switchTraitTab(index) {
     const tabs = document.querySelectorAll('.trait-tab');
     const panes = document.querySelectorAll('.trait-tab-pane');
-
-    tabs.forEach((tab, i) => {
-        tab.classList.toggle('active', i === index);
-    });
-
-    panes.forEach((pane, i) => {
-        pane.classList.toggle('active', i === index);
-    });
+    tabs.forEach((tab, i) => { tab.classList.toggle('active', i === index); });
+    panes.forEach((pane, i) => { pane.classList.toggle('active', i === index); });
 }
 
-// Função para alternar as abas do inventário
 function switchInvTab(idx, tabEl) {
-    // 1. Remove a classe 'active' de todas as abas (botões)
     document.querySelectorAll('.inv-tab').forEach(t => t.classList.remove('active'));
-
-    // 2. Adiciona a classe 'active' na aba que foi clicada
     if (tabEl) tabEl.classList.add('active');
-
-    // 3. Mostra o painel correspondente ao índice (0 a 4) e esconde os demais
     document.querySelectorAll('.inv-tab-pane').forEach((pane, i) => {
         const isActive = (i === idx);
         pane.style.display = isActive ? 'block' : 'none';
@@ -352,88 +379,9 @@ function switchInvTab(idx, tabEl) {
 
 function updateSpellDC() {
     const pb = getProfBonus();
-
-    // Identifica o atributo conjurador selecionado no select (ex: 'wis', 'int', 'cha')
     const spellAttrSelect = document.getElementById('spell-ability');
     const attrKey = spellAttrSelect ? spellAttrSelect.value.toLowerCase() : 'int';
     const mod = getMod(getAttrVal(attrKey));
-
-    // 1. Atualiza CD de Resistência (8 + PB + Modificador)
-    const dcEl = document.getElementById('spell-dc');
-    if (dcEl) {
-        if (!spellDCOverride || dcEl.value === '') {
-            spellDCOverride = false;
-            dcEl.value = 8 + pb + mod;
-        }
-    }
-
-    // 2. Atualiza Bônus de Ataque de Magia (PB + Modificador)
-    const atkEl = document.getElementById('spell-atk');
-    if (atkEl) {
-        if (!spellAtkOverride || atkEl.value === '') {
-            spellAtkOverride = false;
-            atkEl.value = fmtMod(pb + mod); // ou pb + mod se o input for do tipo number
-        }
-    }
-}
-
-// Handlers de Input (ativa override se houver digitação explícita)
-window.onSpellDCInput = function (el) {
-    if (!el) return;
-    let parsed = parseInt(el.value);
-
-    // Se o usuário digitou letras ou caracteres inválidos
-    if (isNaN(parsed)) {
-        spellDCOverride = false;
-        updateSpellDC(); // Recalcula automaticamente e corrige o campo
-    } else {
-        spellDCOverride = true;
-        el.value = parsed; // Mantém apenas o valor numérico limpo
-    }
-};
-
-window.onSpellAtkInput = function (el) {
-    if (!el) return;
-    // Remove o sinal '+' para conseguir validar o número digitado
-    let rawValue = el.value.replace('+', '').trim();
-    let parsed = parseInt(rawValue);
-
-    if (isNaN(parsed)) {
-        spellAtkOverride = false;
-        updateSpellDC();
-    } else {
-        spellAtkOverride = true;
-        // Mantém a formatação bonita com o sinal '+' para números positivos/nulos
-        el.value = parsed >= 0 ? `+${parsed}` : `${parsed}`;
-    }
-};
-
-// Handlers de Blur (se o usuário limpou o campo ou deixou vazio, reseta para o automático)
-window.handleSpellDCBlur = function (el) {
-    if (el.value.trim() === '' || isNaN(parseInt(el.value))) {
-        el.value = '';
-        spellDCOverride = false;
-        updateSpellDC();
-    }
-};
-
-window.handleSpellAtkBlur = function (el) {
-    if (el.value.trim() === '') {
-        el.value = '';
-        spellAtkOverride = false;
-        updateSpellDC();
-    }
-};
-
-// Cálculo Automático no Placeholder
-function updateSpellDC() {
-    const pb = typeof getProfBonus === 'function' ? getProfBonus() : 2;
-    const spellAttrSelect = document.getElementById('spell-ability');
-    const attrKey = spellAttrSelect ? spellAttrSelect.value.toLowerCase() : '';
-
-    const mod = (attrKey && typeof getMod === 'function' && typeof getAttrVal === 'function')
-        ? getMod(getAttrVal(attrKey))
-        : 0;
 
     const calculatedDC = 8 + pb + mod;
     const calculatedAtk = (pb + mod) >= 0 ? `+${pb + mod}` : `${pb + mod}`;
@@ -451,14 +399,53 @@ function updateSpellDC() {
     }
 }
 
-window.onArmorClassInput = function(el) {
+window.onSpellDCInput = function (el) {
+    if (!el) return;
+    let parsed = parseInt(el.value);
+    if (isNaN(parsed)) {
+        spellDCOverride = false;
+        updateSpellDC();
+    } else {
+        spellDCOverride = true;
+        el.value = parsed;
+    }
+};
+
+window.onSpellAtkInput = function (el) {
+    if (!el) return;
+    let rawValue = el.value.replace('+', '').trim();
+    let parsed = parseInt(rawValue);
+    if (isNaN(parsed)) {
+        spellAtkOverride = false;
+        updateSpellDC();
+    } else {
+        spellAtkOverride = true;
+        el.value = parsed >= 0 ? `+${parsed}` : `${parsed}`;
+    }
+};
+
+window.handleSpellDCBlur = function (el) {
+    if (el.value.trim() === '' || isNaN(parseInt(el.value))) {
+        el.value = '';
+        spellDCOverride = false;
+        updateSpellDC();
+    }
+};
+
+window.handleSpellAtkBlur = function (el) {
+    if (el.value.trim() === '') {
+        el.value = '';
+        spellAtkOverride = false;
+        updateSpellDC();
+    }
+};
+
+window.onArmorClassInput = function (el) {
     if (!el) return;
     let parsed = parseInt(el.value);
 
-    // Se o usuário digitou letras/inválido ou deixou em branco
     if (isNaN(parsed)) {
         window.acOverride = false;
-        // Recalcula a CA padrão com base na Destreza + 10 (ou sua função de cálculo)
         if (typeof updateArmorClass === 'function') {
             updateArmorClass();
         } else {
@@ -467,6 +454,6 @@ window.onArmorClassInput = function(el) {
         }
     } else {
         window.acOverride = true;
-        el.value = parsed; // Mantém apenas o número digitado
+        el.value = parsed;
     }
 };
