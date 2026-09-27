@@ -40,49 +40,37 @@ const ExportImportSystem = (() => {
       console.warn("Aviso: Sincronização forçada das magias falhou. Usando valores em memória.", e);
     }
 
-    const data = {};
-    const inputs = document.querySelectorAll('input[id], textarea[id], select[id]');
+    // ── Fonte única de verdade ──
+    // Em vez de reimplementar aqui o loop genérico de coleta de campos
+    // (o que no passado já causou dessincronia entre este arquivo e o
+    // character-data.js — ex.: o bug do bônus de proficiência/nível),
+    // reaproveitamos a função global `collectData()` definida em
+    // character-data.js. Ela já cuida de: campos simples de input/textarea/select,
+    // leitura defensiva do nível (char-level), estados de perícia/resistência,
+    // magias, slots, tema, avatar, talentos, etc.
+    let finalData;
+    if (typeof window.collectData === 'function') {
+      finalData = window.collectData();
+    } else {
+      // Fallback apenas para o caso (não esperado) do character-data.js
+      // não ter carregado. Mantém a ficha exportável mesmo assim.
+      console.warn('⚠️ window.collectData não encontrada; usando coleta mínima de emergência.');
+      finalData = {};
+      document.querySelectorAll('input[id], textarea[id], select[id]').forEach(el => {
+        if (el.type !== 'file') finalData[el.id] = el.value;
+      });
+    }
 
-    // IDs das magias/painéis individuais que não entram no loop comum de campos simples
-    const isDetailSpellField = (id) => /^spell-(title|prep|conc|desc|toggle|detail|pane|list|empty)-\d+$/.test(id);
+    // Reforço específico deste módulo: dados de magia recém-sincronizados
+    // acima (spells/spellSlots) e o próprio nível, lido direto do DOM,
+    // para nunca depender de qual coleta rodou por último.
+    const lvlEl = document.getElementById('char-level');
+    finalData._spellSlots = window.spellSlots || finalData._spellSlots || {};
+    finalData._secondarySpellSlots = window.secondarySpellSlots || finalData._secondarySpellSlots || {};
+    finalData._spells = window.spells || finalData._spells || {};
+    if (lvlEl) finalData['char-level'] = lvlEl.value || finalData['char-level'] || '1';
 
-    inputs.forEach(el => {
-      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
-        // Ignora inputs de arquivo e os campos dinâmicos da sub-aba de magias (para evitar colisão com _spells e _spellSlots)
-        if (el.type !== 'file' && !isDetailSpellField(el.id) && !el.id.startsWith('slot-')) {
-          data[el.id] = el.value;
-        }
-      }
-    });
-
-    console.log(`2. Coletados ${Object.keys(data).length} campos de texto e inputs básicos.`);
-
-    const avatarImg = document.getElementById('char-avatar');
-    const avatarSrc = (avatarImg && avatarImg.src && avatarImg.src.startsWith('data:image')) ? avatarImg.src : '';
-
-    const finalData = {
-      ...data,
-      _profStates: typeof profStates !== 'undefined' ? profStates : {},
-      _saveProfs: typeof saveProfs !== 'undefined' ? saveProfs : {},
-      _inspiration: typeof inspiration !== 'undefined' ? inspiration : false,
-      _deathSaves: typeof deathSaves !== 'undefined' ? deathSaves : { s: [false, false, false], f: [false, false, false] },
-      _attacks: typeof attacks !== 'undefined' ? attacks : [],
-
-      // DADOS MÁGICOS
-      _spellSlots: window.spellSlots || {},
-      _secondarySpellSlots: window.secondarySpellSlots || {},
-      _spells: window.spells || {},
-      _spellDCOverride: typeof spellDCOverride !== 'undefined' ? spellDCOverride : false,
-      _spellAtkOverride: typeof spellAtkOverride !== 'undefined' ? spellAtkOverride : false,
-
-      _theme: document.body.getAttribute('data-theme') || 'default',
-      _avatar: avatarSrc,
-      _limitedResources: typeof limitedResources !== 'undefined' ? limitedResources : [],
-      _feats: typeof feats !== 'undefined' ? feats : [],
-      _initiativeOverride: typeof initiativeOverride !== 'undefined' ? initiativeOverride : false,
-      _passivePercOverride: typeof passivePercOverride !== 'undefined' ? passivePercOverride : false,
-      _bgImage: window.imagemFundoCustomizada || '',
-    };
+    console.log(`2. Coletados ${Object.keys(finalData).length} campos ao todo.`);
 
     console.log('3. 🔮 STATUS DAS MAGIAS (Codex) A SALVAR:', JSON.parse(JSON.stringify(finalData._spells)));
     console.log('4. 💠 STATUS DOS SLOTS A SALVAR:', JSON.parse(JSON.stringify(finalData._spellSlots)));
@@ -92,7 +80,8 @@ const ExportImportSystem = (() => {
     return finalData;
   }
 
-  // Sobrescreve a função global para garantir que o html-generator use ESTA versão
+  // Expõe esta versão (que sincroniza magias/slots e depois delega para
+  // window.collectData) como a coleta usada pelo html-generator na exportação.
   window.CharacterDataHelper = {
     collectData: collectData
   };
@@ -243,7 +232,16 @@ const ExportImportSystem = (() => {
       }
 
       if (typeof refreshSpellSystem === 'function') {
-        refreshSpellSystem();
+        try { refreshSpellSystem(); } catch (err) { console.error('Erro ao atualizar sistema de magias', err); }
+      }
+
+      // Passo final garantido: roda por último, depois de qualquer
+      // reconstrução de painel (como o de magias acima), para que o
+      // badge de Bônus de Proficiência e tudo que depende dele
+      // (resistências, perícias, CD/ataque de magia) sempre reflitam
+      // o nível que acabou de ser importado.
+      if (typeof window.updateProfBonus === 'function') {
+        try { window.updateProfBonus(); } catch (err) { console.error('Erro no recálculo final do bônus de proficiência', err); }
       }
 
     } catch (err) {
