@@ -397,9 +397,8 @@
                         <input type="text" id="char-class" placeholder="Guerreiro"
                             style="flex: 1; border: none !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; padding: 6px 9px;">
                         <div style="width: 1px; background: var(--border); margin: 6px 0;"></div>
-                        <input type="number" id="char-level" min="1" max="20" value="1"
-                            oninput="if(parseInt(this.value) > 20) this.value = 20; if(parseInt(this.value) < 1 && this.value !== '') this.value = 1; updateProfBonus();"
-                            title="Nível"
+                        <input type="number" id="char-level" min="1" max="20" value="1" oninput="onLevelInput(this)"
+                            onchange="onLevelInput(this)" title="Nível"
                             style="width: 44px; border: none !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; text-align: center; font-weight: 700; color: var(--accent2); padding: 6px 0;">
                     </div>
                 </div>
@@ -524,8 +523,6 @@
                                         <div class="pb-num" id="prof-bonus">+2</div>
                                         <div class="pb-label">Bônus</div>
                                     </div>
-                                    <!-- Nível escondido para manter a matemática do JS a funcionar -->
-                                    <input type="hidden" id="char-level" value="5" oninput="updateProfBonus()">
                                 </div>
 
                                 <div style="display:flex; flex-direction:column; align-items:center;">
@@ -757,7 +754,7 @@
                         <div
                             style="flex: 1; background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px; display: flex; align-items: center; justify-content: center; flex-direction: column; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);">
                             <div style="font-size: 9px; color: var(--text3); letter-spacing: 1px; margin-bottom: 4px;">
-                                CA</div>
+                                ARMADURA</div>
                             <input type="text" id="armor-class" class="hp-dynamic-input" value="10"
                                 title="Classe de Armadura (CA)"
                                 style="width: 100%; font-size: 22px; font-weight: 700; color: var(--accent2); font-family: 'Cinzel', serif; text-align: center;"
@@ -1333,6 +1330,8 @@
             </div>
         </div>
     </div>
+</body>
+</html>
 
     <script>
         (function () {
