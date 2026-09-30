@@ -196,12 +196,19 @@ function updateHeader() {
     }
 }
 
+// IDs dinâmicos por nível da sub-aba de magias (spell-title-0, spell-desc-3, ...)
+// que não devem entrar no loop genérico de campos, pois já são salvos à parte
+// dentro de `_spells`/`_spellSlots`. NÃO inclui os campos fixos de conjuração
+// (spell-class, spell-ability, spell-dc, spell-atk), que são campos normais
+// e precisam ser salvos/restaurados como qualquer outro input.
+const isDetailSpellField = (id) => /^spell-(title|prep|conc|desc|toggle|detail|pane|list|empty)-\d+$/.test(id);
+
 // ── Coleta de Dados da Ficha Inteira ──
 function collectData() {
     const data = {};
     document.querySelectorAll('[id]').forEach(el => {
         if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
-            if (el.type !== 'file' && !el.id.startsWith('spell-') && !el.id.startsWith('slot-')) {
+            if (el.type !== 'file' && !isDetailSpellField(el.id) && !el.id.startsWith('slot-')) {
                 data[el.id] = el.value;
             }
         }
@@ -289,7 +296,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // Preenchimento dos inputs
     safeStep('campos salvos', () => {
         Object.entries(window.SHEET_DATA).forEach(([k, v]) => {
-            if (k.startsWith('_') || k.startsWith('spell-') || k.startsWith('slot-')) return;
+            if (k.startsWith('_') || isDetailSpellField(k) || k.startsWith('slot-')) return;
             const el = document.getElementById(k);
             if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT')) {
                 el.value = v;
