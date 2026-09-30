@@ -221,7 +221,7 @@
   };
 
   /* ==========================================================================
-     3. FUNÇÃO DE ORDENAÇÃO (CORRIGIDA E INTEGRADA)
+     3. FUNÇÃO DE ORDENAÇÃO
      ========================================================================== */
   window.ordenarMagiasAtuais = function (criterio) {
     const level = toLevel(window.activeSpellTab);
@@ -340,7 +340,7 @@
       preview.classList.add('rn-active');
       preview.style.display = 'block';
       ta.style.display = 'none';
-      if (btn) { btn.classList.add('active'); btn.textContent = '✏️'; }
+      if (btn) { btn.classList.add('active'); btn.textContent = '✏️️'; }
     } else {
       preview.classList.remove('rn-active');
       preview.style.display = 'none';
@@ -446,14 +446,82 @@
   /* ==========================================================================
      5. CÁLCULOS DE MAGIA E ESPAÇOS (SLOTS)
      ========================================================================== */
+
+  // Manipula e valida a CD da Magia
+  window.handleSpellDCInput = function (inputEl) {
+    if (!inputEl) return;
+    const val = inputEl.value.trim();
+
+    if (val === '') {
+      window.spellDCOverride = false;
+      window.updateSpellDC();
+    } else {
+      const num = parseInt(val, 10);
+      if (!isNaN(num) && num >= 0) {
+        window.spellDCOverride = true;
+        inputEl.value = num;
+      } else {
+        window.spellDCOverride = false;
+        window.updateSpellDC();
+      }
+    }
+    if (typeof window.salvarDadosFicha === 'function') window.salvarDadosFicha();
+  };
+  window.onSpellDCInput = window.handleSpellDCInput;
+
+  // Manipula e valida o Bônus de Ataque Mágico
+  window.handleSpellAtkInput = function (inputEl) {
+    if (!inputEl) return;
+    const val = inputEl.value.trim().replace('+', '');
+
+    if (val === '') {
+      window.spellAtkOverride = false;
+      window.updateSpellDC();
+    } else {
+      const num = parseInt(val, 10);
+      if (!isNaN(num)) {
+        window.spellAtkOverride = true;
+        if (typeof fmtMod === 'function') {
+          inputEl.value = fmtMod(num);
+        } else {
+          inputEl.value = num >= 0 ? `+${num}` : `${num}`;
+        }
+      } else {
+        window.spellAtkOverride = false;
+        window.updateSpellDC();
+      }
+    }
+    if (typeof window.salvarDadosFicha === 'function') window.salvarDadosFicha();
+  };
+  window.onSpellAtkInput = window.handleSpellAtkInput;
+
+  window.handleSpellDCBlur = function (el) {
+    if (!el) return;
+    if (el.value.trim() === '' || isNaN(parseInt(el.value, 10))) {
+      el.value = '';
+      window.spellDCOverride = false;
+      window.updateSpellDC();
+    }
+  };
+
+  window.handleSpellAtkBlur = function (el) {
+    if (!el) return;
+    if (el.value.trim() === '') {
+      el.value = '';
+      window.spellAtkOverride = false;
+      window.updateSpellDC();
+    }
+  };
+
+  // Função centralizadora de cálculo (CD e Ataque Mágico)
   window.updateSpellDC = function () {
-    const ability = $('spell-ability')?.value;
-    const dcEl = $('spell-dc');
-    const atkEl = $('spell-atk');
+    const ability = document.getElementById('spell-ability')?.value;
+    const dcEl = document.getElementById('spell-dc');
+    const atkEl = document.getElementById('spell-atk');
 
     const canCalc = ability
       && typeof getMod === 'function' && typeof getAttrVal === 'function'
-      && typeof getProfBonus === 'function' && typeof fmtMod === 'function';
+      && typeof getProfBonus === 'function';
 
     if (!canCalc) {
       if (!ability) {
@@ -463,11 +531,25 @@
       return;
     }
 
-    const mod = getMod(getAttrVal(ability));
+    const mod = getMod(getAttrVal(ability.toLowerCase()));
     const pb = getProfBonus();
 
-    if (!window.spellDCOverride && dcEl) dcEl.value = 8 + mod + pb;
-    if (!window.spellAtkOverride && atkEl) atkEl.value = fmtMod(mod + pb);
+    const calcDC = 8 + mod + pb;
+    const calcAtk = typeof fmtMod === 'function' ? fmtMod(mod + pb) : (mod + pb >= 0 ? `+${mod + pb}` : `${mod + pb}`);
+
+    if (dcEl) {
+      dcEl.placeholder = calcDC;
+      if (!window.spellDCOverride) {
+        dcEl.value = calcDC;
+      }
+    }
+
+    if (atkEl) {
+      atkEl.placeholder = calcAtk;
+      if (!window.spellAtkOverride) {
+        atkEl.value = calcAtk;
+      }
+    }
   };
 
   function slotStore(setName) {
@@ -581,3 +663,57 @@
     window.addEventListener('load', initSpellSystem, { once: true });
   }
 })();
+
+/* ==========================================================================
+   EXPORTAÇÃO E IMPORTAÇÃO DE ESTADO DO SISTEMA DE MAGIAS
+   ========================================================================== */
+
+// Retorna todo o objeto necessário para exportar/salvar
+window.getSpellSystemData = function () {
+  return {
+    spells: window.spells,
+    spellSlots: window.spellSlots,
+    secondarySpellSlots: window.secondarySpellSlots,
+    activeSlotSet: window.activeSlotSet,
+    spellAbility: document.getElementById('spell-ability')?.value || '',
+    spellDCOverride: !!window.spellDCOverride,
+    spellAtkOverride: !!window.spellAtkOverride,
+    spellDC: document.getElementById('spell-dc')?.value || '',
+    spellAtk: document.getElementById('spell-atk')?.value || ''
+  };
+};
+
+// Carrega os dados salvos/importados no sistema de magias
+window.loadSpellSystemData = function (data) {
+  if (!data || typeof data !== 'object') return;
+
+  if (data.spells) window.spells = data.spells;
+  if (data.spellSlots) window.spellSlots = data.spellSlots;
+  if (data.secondarySpellSlots) window.secondarySpellSlots = data.secondarySpellSlots;
+  if (data.activeSlotSet) window.activeSlotSet = data.activeSlotSet;
+
+  window.spellDCOverride = !!data.spellDCOverride;
+  window.spellAtkOverride = !!data.spellAtkOverride;
+
+  const abilityEl = document.getElementById('spell-ability');
+  if (abilityEl && data.spellAbility !== undefined) {
+    abilityEl.value = data.spellAbility;
+  }
+
+  const dcEl = document.getElementById('spell-dc');
+  if (dcEl && data.spellDC !== undefined) {
+    dcEl.value = data.spellDC;
+  }
+
+  const atkEl = document.getElementById('spell-atk');
+  if (atkEl && data.spellAtk !== undefined) {
+    atkEl.value = data.spellAtk;
+  }
+
+  if (typeof window.refreshSpellSystem === 'function') {
+    window.refreshSpellSystem();
+  }
+
+  // Recalcula ou aplica os valores importados
+  window.updateSpellDC();
+};

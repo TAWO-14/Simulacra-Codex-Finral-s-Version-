@@ -14,8 +14,8 @@ window.spells = {};
 window.secondarySpellSlots = {};
 let limitedResources = [];
 let passivePercOverride = false;
-let spellDCOverride = false;
-let spellAtkOverride = false;
+window.spellDCOverride = window.spellDCOverride || false;
+window.spellAtkOverride = window.spellAtkOverride || false;
 window.imagemFundoCustomizada = window.imagemFundoCustomizada || '';
 
 // ── Utilitários Base ──
@@ -93,7 +93,7 @@ function onAttrChange() {
     });
     updateSaves();
     updateSkills();
-    if (typeof updateSpellDC === 'function') updateSpellDC();
+    if (typeof window.updateSpellDC === 'function') window.updateSpellDC();
 }
 
 function updateSaves() {
@@ -133,25 +133,18 @@ function onLevelChange() {
     updateProfBonus();
 }
 
-// Handler seguro para digitação no campo de Nível
 function onLevelInput(el) {
     if (!el) return;
     let val = parseInt(el.value, 10);
 
-    // Evita valores fora do intervalo (1 a 20) durante a digitação.
-    // Só corrige quando o valor já é um número completo e fora da faixa;
-    // nunca mexe no campo enquanto ele está vazio (usuário apagando para redigitar).
     if (!isNaN(val)) {
         if (val > 20) el.value = 20;
         if (val < 1) el.value = 1;
     }
 
-    // Atualiza o Bônus de Proficiência e recálculos dependentes
     updateProfBonus();
 }
 
-// Garante leitura segura do Nível (funciona mesmo se o elemento ainda
-// não existir no DOM no momento da chamada)
 function getProfBonus() {
     const lvlInput = document.getElementById('char-level');
     const parsed = lvlInput ? parseInt(lvlInput.value, 10) : 1;
@@ -159,10 +152,6 @@ function getProfBonus() {
     return Math.ceil(level / 4) + 1;
 }
 
-// Ponto único de atualização do bônus de proficiência e de tudo que
-// depende dele. Cada etapa roda isolada em try/catch: se qualquer
-// cálculo dependente falhar (perícias, magia, etc.), o número do
-// bônus em si NUNCA fica desatualizado por causa disso.
 function updateProfBonus() {
     const pbValue = fmtMod(getProfBonus());
 
@@ -172,7 +161,7 @@ function updateProfBonus() {
     try { updateSaves(); } catch (e) { console.error('Erro ao atualizar resistências:', e); }
     try { updateSkills(); } catch (e) { console.error('Erro ao atualizar perícias:', e); }
     try {
-        if (typeof updateSpellDC === 'function') updateSpellDC();
+        if (typeof window.updateSpellDC === 'function') window.updateSpellDC();
     } catch (e) { console.error('Erro ao atualizar CD de magia:', e); }
 }
 
@@ -192,15 +181,10 @@ function updateHeader() {
     if (nameEl) nameEl.textContent = document.getElementById('char-name')?.value || 'Nome do Personagem';
     const sub = document.getElementById('header-subtitle');
     if (sub && !sub.value) {
-        sub.placeholder = [document.getElementById('char-class')?.value, document.getElementById('char-race')?.value, document.getElementById('char-align')?.value].filter(Boolean).join(' · ') || 'Classe · Raça · Alinhamento';
+        sub.placeholder = [document.getElementById('char-class')?.value, document.getElementById('char-race')?.value, document.getElementById('char-alignment')?.value].filter(Boolean).join(' · ') || 'Classe · Raça · Alinhamento';
     }
 }
 
-// IDs dinâmicos por nível da sub-aba de magias (spell-title-0, spell-desc-3, ...)
-// que não devem entrar no loop genérico de campos, pois já são salvos à parte
-// dentro de `_spells`/`_spellSlots`. NÃO inclui os campos fixos de conjuração
-// (spell-class, spell-ability, spell-dc, spell-atk), que são campos normais
-// e precisam ser salvos/restaurados como qualquer outro input.
 const isDetailSpellField = (id) => /^spell-(title|prep|conc|desc|toggle|detail|pane|list|empty)-\d+$/.test(id);
 
 // ── Coleta de Dados da Ficha Inteira ──
@@ -214,7 +198,6 @@ function collectData() {
         }
     });
 
-    // Força explicitamente a coleta correta do nível do personagem
     const lvlEl = document.getElementById('char-level');
     if (lvlEl) {
         data['char-level'] = lvlEl.value || '1';
@@ -238,8 +221,8 @@ function collectData() {
         _feats: typeof feats !== 'undefined' ? feats : [],
         _initiativeOverride: typeof initiativeOverride !== 'undefined' ? initiativeOverride : false,
         _passivePercOverride: typeof passivePercOverride !== 'undefined' ? passivePercOverride : false,
-        _spellDCOverride: typeof spellDCOverride !== 'undefined' ? spellDCOverride : false,
-        _spellAtkOverride: typeof spellAtkOverride !== 'undefined' ? spellAtkOverride : false,
+        _spellDCOverride: !!window.spellDCOverride,
+        _spellAtkOverride: !!window.spellAtkOverride,
         _bgImage: window.imagemFundoCustomizada || '',
     };
 }
@@ -268,7 +251,8 @@ window.addEventListener('DOMContentLoaded', () => {
     attacks = window.SHEET_DATA._attacks || [];
     window.spellSlots = window.SHEET_DATA._spellSlots || {};
     window.spells = window.SHEET_DATA._spells || {};
-    spellDCOverride = window.SHEET_DATA._spellDCOverride || false;
+    window.spellDCOverride = !!window.SHEET_DATA._spellDCOverride;
+    window.spellAtkOverride = !!window.SHEET_DATA._spellAtkOverride;
     inspiration = window.SHEET_DATA._inspiration || false;
     deathSaves = window.SHEET_DATA._deathSaves || { s: [false, false, false], f: [false, false, false] };
     limitedResources = window.SHEET_DATA._limitedResources || [];
@@ -303,7 +287,6 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Restauração garantida do nível salvo
         const lvlEl = document.getElementById('char-level');
         if (lvlEl && window.SHEET_DATA['char-level'] !== undefined) {
             lvlEl.value = window.SHEET_DATA['char-level'];
@@ -331,15 +314,15 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     safeStep('avatar', () => {
-        if (window.SHEET_DATA._avatar && window.SHEET_DATA._avatar.startsWith('data:image')) {
-            const img = document.getElementById('char-avatar');
-            const ph = document.getElementById('avatar-placeholder');
-            const btn = document.getElementById('avatar-reset-btn');
-            if (img && ph) {
-                img.src = window.SHEET_DATA._avatar;
-                img.style.display = 'block';
-                ph.style.display = 'none';
-                if (btn) btn.style.display = 'block';
+        if (window.SHEET_DATA._avatar) {
+            const avatarImg = document.getElementById('char-avatar');
+            if (avatarImg) {
+                avatarImg.src = window.SHEET_DATA._avatar;
+                avatarImg.style.display = 'block';
+                const placeholder = document.getElementById('avatar-placeholder');
+                if (placeholder) placeholder.style.display = 'none';
+                const resetBtn = document.getElementById('avatar-reset-btn');
+                if (resetBtn) resetBtn.style.display = 'block';
             }
         }
     });
@@ -379,73 +362,10 @@ function switchInvTab(idx, tabEl) {
     if (tabEl) tabEl.classList.add('active');
     document.querySelectorAll('.inv-tab-pane').forEach((pane, i) => {
         const isActive = (i === idx);
-        pane.style.display = isActive ? 'block' : 'none';
+        pane.style.display = 'block';
         pane.classList.toggle('active', isActive);
     });
 }
-
-function updateSpellDC() {
-    const pb = getProfBonus();
-    const spellAttrSelect = document.getElementById('spell-ability');
-    const attrKey = spellAttrSelect ? spellAttrSelect.value.toLowerCase() : 'int';
-    const mod = getMod(getAttrVal(attrKey));
-
-    const calculatedDC = 8 + pb + mod;
-    const calculatedAtk = (pb + mod) >= 0 ? `+${pb + mod}` : `${pb + mod}`;
-
-    const dcEl = document.getElementById('spell-dc');
-    if (dcEl) {
-        dcEl.placeholder = calculatedDC;
-        if (!spellDCOverride) dcEl.value = '';
-    }
-
-    const atkEl = document.getElementById('spell-atk');
-    if (atkEl) {
-        atkEl.placeholder = calculatedAtk;
-        if (!spellAtkOverride) atkEl.value = '';
-    }
-}
-
-window.onSpellDCInput = function (el) {
-    if (!el) return;
-    let parsed = parseInt(el.value);
-    if (isNaN(parsed)) {
-        spellDCOverride = false;
-        updateSpellDC();
-    } else {
-        spellDCOverride = true;
-        el.value = parsed;
-    }
-};
-
-window.onSpellAtkInput = function (el) {
-    if (!el) return;
-    let rawValue = el.value.replace('+', '').trim();
-    let parsed = parseInt(rawValue);
-    if (isNaN(parsed)) {
-        spellAtkOverride = false;
-        updateSpellDC();
-    } else {
-        spellAtkOverride = true;
-        el.value = parsed >= 0 ? `+${parsed}` : `${parsed}`;
-    }
-};
-
-window.handleSpellDCBlur = function (el) {
-    if (el.value.trim() === '' || isNaN(parseInt(el.value))) {
-        el.value = '';
-        spellDCOverride = false;
-        updateSpellDC();
-    }
-};
-
-window.handleSpellAtkBlur = function (el) {
-    if (el.value.trim() === '') {
-        el.value = '';
-        spellAtkOverride = false;
-        updateSpellDC();
-    }
-};
 
 window.onArmorClassInput = function (el) {
     if (!el) return;
