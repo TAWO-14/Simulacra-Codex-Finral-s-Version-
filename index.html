@@ -397,8 +397,9 @@
                         <input type="text" id="char-class" placeholder="Guerreiro"
                             style="flex: 1; border: none !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; padding: 6px 9px;">
                         <div style="width: 1px; background: var(--border); margin: 6px 0;"></div>
-                        <input type="number" id="char-level" min="1" max="20" value="1" oninput="onLevelInput(this)"
-                            onchange="onLevelInput(this)" title="Nível"
+
+                        <input type="number" id="char-level" min="1" max="20" value="1" oninput="updateProfBonus()"
+                            onchange="updateProfBonus()" title="Nível"
                             style="width: 44px; border: none !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; text-align: center; font-weight: 700; color: var(--accent2); padding: 6px 0;">
                     </div>
                 </div>
@@ -870,7 +871,7 @@
                         <button type="button" class="trait-tab active" onclick="switchTraitTab(0)">Traços</button>
                         <button type="button" class="trait-tab" onclick="switchTraitTab(1)">Ideais</button>
                         <button type="button" class="trait-tab" onclick="switchTraitTab(2)">Laços</button>
-                        <button type="button" class="trait-tab" onclick="switchTraitTab(3)">Manias</button>
+                        <button type="button" class="trait-tab" onclick="switchTraitTab(3)">Defeitos</button>
                     </div>
                     <div class="trait-tabs-content">
                         <div class="trait-tab-pane active" id="trait-pane-0">
@@ -1331,229 +1332,230 @@
         </div>
     </div>
 </body>
+
 </html>
 
-    <script>
-        (function () {
-            var THEMES = [
-                { v: 'default', label: 'Clássico', emoji: '📜', cat: 'fantasia' },
-                { v: 'barbarian', label: 'Bárbaro', emoji: '🪓', cat: 'fantasia' },
-                { v: 'moon-druid', label: 'Druida da Lua', emoji: '🌙', cat: 'fantasia' },
-                { v: 'dark-elf', label: 'Elfo Negro', emoji: '🌌', cat: 'fantasia' },
-                { v: 'fighter', label: 'Guerreiro', emoji: '🐆', cat: 'fantasia' },
-                { v: 'mage', label: 'Mago', emoji: '🔮', cat: 'fantasia' },
-                { v: 'mystic', label: 'Místico', emoji: '👁️', cat: 'fantasia' },
-                { v: 'necromancer', label: 'Necromante', emoji: '💀', cat: 'fantasia' },
-                { v: 'nord', label: 'Nórdico', emoji: '❄️', cat: 'fantasia' },
-                { v: 'paladin', label: 'Paladino', emoji: '⚔️', cat: 'fantasia' },
-                { v: 'samurai', label: 'Samurai', emoji: '🌸', cat: 'fantasia' },
-                { v: 'owl', label: 'Sábio', emoji: '🦉', cat: 'fantasia' },
-                { v: 'royal', label: 'Realeza', emoji: '👑', cat: 'fantasia' },
+<script>
+    (function () {
+        var THEMES = [
+            { v: 'default', label: 'Clássico', emoji: '📜', cat: 'fantasia' },
+            { v: 'barbarian', label: 'Bárbaro', emoji: '🪓', cat: 'fantasia' },
+            { v: 'moon-druid', label: 'Druida da Lua', emoji: '🌙', cat: 'fantasia' },
+            { v: 'dark-elf', label: 'Elfo Negro', emoji: '🌌', cat: 'fantasia' },
+            { v: 'fighter', label: 'Guerreiro', emoji: '🐆', cat: 'fantasia' },
+            { v: 'mage', label: 'Mago', emoji: '🔮', cat: 'fantasia' },
+            { v: 'mystic', label: 'Místico', emoji: '👁️', cat: 'fantasia' },
+            { v: 'necromancer', label: 'Necromante', emoji: '💀', cat: 'fantasia' },
+            { v: 'nord', label: 'Nórdico', emoji: '❄️', cat: 'fantasia' },
+            { v: 'paladin', label: 'Paladino', emoji: '⚔️', cat: 'fantasia' },
+            { v: 'samurai', label: 'Samurai', emoji: '🌸', cat: 'fantasia' },
+            { v: 'owl', label: 'Sábio', emoji: '🦉', cat: 'fantasia' },
+            { v: 'royal', label: 'Realeza', emoji: '👑', cat: 'fantasia' },
 
-                { v: 'chocolate-sand', label: 'Chocolate', emoji: '🍫', cat: 'cores' },
-                { v: 'Ébano', label: 'Ébano', emoji: '🐦‍⬛', cat: 'cores' },
-                { v: 'deserto', label: 'Deserto', emoji: '🏜️', cat: 'cores' },
-                { v: 'Midnights', label: 'Midnight', emoji: '🌌', cat: 'cores' },
-                { v: 'primavera', label: 'Primavera', emoji: '🌱', cat: 'cores' },
-                { v: 'verao', label: 'Verão', emoji: '☀️', cat: 'cores' },
-                { v: 'redtv', label: 'Outono', emoji: '🧣', cat: 'cores' },
-                { v: 'frost', label: 'Inverno', emoji: '❄️', cat: 'cores' },
-                { v: 'sunset', label: 'Sunset', emoji: '⛅', cat: 'cores' },
-                { v: 'Monocromático', label: 'Xeque-Mate', emoji: '♟️', cat: 'cores' },
-                { v: 'lava', label: 'Lava', emoji: '🌋', cat: 'cores' },
-                { v: 'melodrama', label: 'Melodrama', emoji: '🌌', cat: 'cores' },
-                { v: '1989', label: '1989', emoji: '🕊️', cat: 'cores' },
-                { v: 'tvgirl', label: 'TV Girl', emoji: '📼', cat: 'cores' },
-                { v: 'blackout', label: 'Blackout', emoji: '🪩', cat: 'cores' },
+            { v: 'chocolate-sand', label: 'Chocolate', emoji: '🍫', cat: 'cores' },
+            { v: 'Ébano', label: 'Ébano', emoji: '🐦‍⬛', cat: 'cores' },
+            { v: 'deserto', label: 'Deserto', emoji: '🏜️', cat: 'cores' },
+            { v: 'Midnights', label: 'Midnight', emoji: '🌌', cat: 'cores' },
+            { v: 'primavera', label: 'Primavera', emoji: '🌱', cat: 'cores' },
+            { v: 'verao', label: 'Verão', emoji: '☀️', cat: 'cores' },
+            { v: 'redtv', label: 'Outono', emoji: '🧣', cat: 'cores' },
+            { v: 'frost', label: 'Inverno', emoji: '❄️', cat: 'cores' },
+            { v: 'sunset', label: 'Sunset', emoji: '⛅', cat: 'cores' },
+            { v: 'Monocromático', label: 'Xeque-Mate', emoji: '♟️', cat: 'cores' },
+            { v: 'lava', label: 'Lava', emoji: '🌋', cat: 'cores' },
+            { v: 'melodrama', label: 'Melodrama', emoji: '🌌', cat: 'cores' },
+            { v: '1989', label: '1989', emoji: '🕊️', cat: 'cores' },
+            { v: 'tvgirl', label: 'TV Girl', emoji: '📼', cat: 'cores' },
+            { v: 'blackout', label: 'Blackout', emoji: '🪩', cat: 'cores' },
 
-                { v: 'americana', label: 'Americana', emoji: '🇺🇸', cat: 'retro' },
-                { v: 'cinema-retro', label: 'Cinema', emoji: '🎥', cat: 'retro' },
-                { v: 'cyberpunk', label: 'Cyberpunk', emoji: '🤖', cat: 'retro' },
-                { v: 'fliper', label: 'Fliperama', emoji: '🕹️', cat: 'retro' },
-                { v: 'neon', label: 'Neon', emoji: '📔', cat: 'retro' },
-                { v: 'retro', label: 'Retrô', emoji: '📻', cat: 'retro' },
-                { v: 'monster', label: 'Monster', emoji: 'X', cat: 'retro' },
-                { v: 'cyber-amarelo', label: 'Cyber Yellow', emoji: '⚡', cat: 'retro' },
+            { v: 'americana', label: 'Americana', emoji: '🇺🇸', cat: 'retro' },
+            { v: 'cinema-retro', label: 'Cinema', emoji: '🎥', cat: 'retro' },
+            { v: 'cyberpunk', label: 'Cyberpunk', emoji: '🤖', cat: 'retro' },
+            { v: 'fliper', label: 'Fliperama', emoji: '🕹️', cat: 'retro' },
+            { v: 'neon', label: 'Neon', emoji: '📔', cat: 'retro' },
+            { v: 'retro', label: 'Retrô', emoji: '📻', cat: 'retro' },
+            { v: 'monster', label: 'Monster', emoji: 'X', cat: 'retro' },
+            { v: 'cyber-amarelo', label: 'Cyber Yellow', emoji: '⚡', cat: 'retro' },
 
-                { v: 'lavanda', label: 'Lavanda', emoji: '🪻', cat: 'jardim' },
-                { v: 'girassol', label: 'Girassol', emoji: '🌻', cat: 'jardim' },
-                { v: 'roseiral', label: 'Roseiral', emoji: '🌹', cat: 'jardim' },
-                { v: 'hortensia', label: 'Hortensia', emoji: '🪻', cat: 'jardim' },
-                { v: 'lótus', label: 'Lótus', emoji: '🪷', cat: 'jardim' },
-                { v: 'jasmim', label: 'Jasmim', emoji: '🌼', cat: 'jardim' },
-                { v: 'cerejeira', label: 'Cerejeira', emoji: '🌸', cat: 'jardim' },
-                { v: 'orquidea', label: 'Orquidea', emoji: '🪻', cat: 'jardim' },
-                { v: 'apotecario', label: 'Apotecário', emoji: '⚗️', cat: 'jardim' },
-                { v: 'cottagecore', label: 'Cottagecore', emoji: '🍄', cat: 'jardim' },
-                { v: 'bruxa-verde', label: 'Bruxa Verde', emoji: '🐸', cat: 'jardim' },
-                { v: 'colmeia', label: 'Colmeia', emoji: '🍯', cat: 'jardim' },
-            ];
+            { v: 'lavanda', label: 'Lavanda', emoji: '🪻', cat: 'jardim' },
+            { v: 'girassol', label: 'Girassol', emoji: '🌻', cat: 'jardim' },
+            { v: 'roseiral', label: 'Roseiral', emoji: '🌹', cat: 'jardim' },
+            { v: 'hortensia', label: 'Hortensia', emoji: '🪻', cat: 'jardim' },
+            { v: 'lótus', label: 'Lótus', emoji: '🪷', cat: 'jardim' },
+            { v: 'jasmim', label: 'Jasmim', emoji: '🌼', cat: 'jardim' },
+            { v: 'cerejeira', label: 'Cerejeira', emoji: '🌸', cat: 'jardim' },
+            { v: 'orquidea', label: 'Orquidea', emoji: '🪻', cat: 'jardim' },
+            { v: 'apotecario', label: 'Apotecário', emoji: '⚗️', cat: 'jardim' },
+            { v: 'cottagecore', label: 'Cottagecore', emoji: '🍄', cat: 'jardim' },
+            { v: 'bruxa-verde', label: 'Bruxa Verde', emoji: '🐸', cat: 'jardim' },
+            { v: 'colmeia', label: 'Colmeia', emoji: '🍯', cat: 'jardim' },
+        ];
 
-            var CATS = [
-                { key: 'todos', label: 'Todos' },
-                { key: 'fantasia', label: 'Classes & Fantasia' },
-                { key: 'cores', label: 'Cores & Climas' },
-                { key: 'retro', label: 'Retrô & Moderno' },
-                { key: 'jardim', label: 'Jardim do Ranger' }
-            ];
+        var CATS = [
+            { key: 'todos', label: 'Todos' },
+            { key: 'fantasia', label: 'Classes & Fantasia' },
+            { key: 'cores', label: 'Cores & Climas' },
+            { key: 'retro', label: 'Retrô & Moderno' },
+            { key: 'jardim', label: 'Jardim do Ranger' }
+        ];
 
-            var activeCat = 'todos';
-            var activeValue = 'default';
-            var recent = [];
-            try {
-                var saved = localStorage.getItem('themeGalleryRecent');
-                if (saved) recent = JSON.parse(saved);
-            } catch (e) { /* localStorage indisponível: segue sem histórico */ }
+        var activeCat = 'todos';
+        var activeValue = 'default';
+        var recent = [];
+        try {
+            var saved = localStorage.getItem('themeGalleryRecent');
+            if (saved) recent = JSON.parse(saved);
+        } catch (e) { /* localStorage indisponível: segue sem histórico */ }
 
-            var overlay = document.getElementById('themes-modal-overlay');
-            var grid = document.getElementById('theme-grid');
-            var tabsEl = document.getElementById('theme-tabs');
-            var recentEl = document.getElementById('theme-recent');
-            var searchInput = document.getElementById('theme-search');
-            var emptyEl = document.getElementById('theme-empty');
-            var triggerBtn = document.getElementById('theme-trigger-btn');
-            var triggerEmoji = document.getElementById('theme-trigger-emoji');
-            var triggerLabel = document.getElementById('theme-trigger-label');
+        var overlay = document.getElementById('themes-modal-overlay');
+        var grid = document.getElementById('theme-grid');
+        var tabsEl = document.getElementById('theme-tabs');
+        var recentEl = document.getElementById('theme-recent');
+        var searchInput = document.getElementById('theme-search');
+        var emptyEl = document.getElementById('theme-empty');
+        var triggerBtn = document.getElementById('theme-trigger-btn');
+        var triggerEmoji = document.getElementById('theme-trigger-emoji');
+        var triggerLabel = document.getElementById('theme-trigger-label');
 
-            function renderTabs() {
-                tabsEl.innerHTML = '';
-                CATS.forEach(function (c) {
-                    var b = document.createElement('button');
-                    b.type = 'button';
-                    b.className = 'theme-tab' + (c.key === activeCat ? ' active' : '');
-                    b.textContent = c.label;
-                    b.addEventListener('click', function () {
-                        activeCat = c.key;
-                        renderTabs();
-                        renderGrid();
-                    });
-                    tabsEl.appendChild(b);
+        function renderTabs() {
+            tabsEl.innerHTML = '';
+            CATS.forEach(function (c) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'theme-tab' + (c.key === activeCat ? ' active' : '');
+                b.textContent = c.label;
+                b.addEventListener('click', function () {
+                    activeCat = c.key;
+                    renderTabs();
+                    renderGrid();
                 });
-            }
+                tabsEl.appendChild(b);
+            });
+        }
 
-            function renderRecent() {
-                if (!recent.length || searchInput.value.trim()) {
-                    recentEl.innerHTML = '';
-                    return;
-                }
-                var items = recent
-                    .map(function (v) { return THEMES.filter(function (t) { return t.v === v; })[0]; })
-                    .filter(Boolean)
-                    .slice(0, 6);
-                if (!items.length) {
-                    recentEl.innerHTML = '';
-                    return;
-                }
+        function renderRecent() {
+            if (!recent.length || searchInput.value.trim()) {
                 recentEl.innerHTML = '';
-                var label = document.createElement('div');
-                label.className = 'theme-recent-label';
-                label.textContent = 'Usados recentemente';
-                var row = document.createElement('div');
-                row.className = 'theme-recent-row';
-                items.forEach(function (t) {
-                    var chip = document.createElement('button');
-                    chip.type = 'button';
-                    chip.className = 'theme-recent-chip';
-                    chip.innerHTML = '<span>' + t.emoji + '</span><span>' + t.label + '</span>';
-                    chip.addEventListener('click', function () { selectTheme(t); });
-                    row.appendChild(chip);
-                });
-                recentEl.appendChild(label);
-                recentEl.appendChild(row);
+                return;
             }
-
-            function renderGrid() {
-                var q = searchInput.value.trim().toLowerCase();
-                var filtered = THEMES.filter(function (t) {
-                    var matchesCat = activeCat === 'todos' || t.cat === activeCat;
-                    var matchesQ = !q || t.label.toLowerCase().indexOf(q) !== -1;
-                    return matchesCat && matchesQ;
-                });
-                grid.innerHTML = '';
-                emptyEl.classList.toggle('hidden', filtered.length > 0);
-                filtered.forEach(function (t) {
-                    var card = document.createElement('button');
-                    card.type = 'button';
-                    card.className = 'theme-card' + (t.v === activeValue ? ' active' : '');
-                    card.innerHTML = '<span class="theme-card-emoji">' + t.emoji + '</span>' +
-                        '<span class="theme-card-label">' + t.label + '</span>';
-                    card.addEventListener('click', function () { selectTheme(t); });
-                    grid.appendChild(card);
-                });
+            var items = recent
+                .map(function (v) { return THEMES.filter(function (t) { return t.v === v; })[0]; })
+                .filter(Boolean)
+                .slice(0, 6);
+            if (!items.length) {
+                recentEl.innerHTML = '';
+                return;
             }
-
-            function selectTheme(t) {
-                activeValue = t.v;
-                triggerEmoji.textContent = t.emoji;
-                triggerLabel.textContent = t.label;
-
-                recent = [t.v].concat(recent.filter(function (v) { return v !== t.v; })).slice(0, 6);
-                try { localStorage.setItem('themeGalleryRecent', JSON.stringify(recent)); } catch (e) { }
-
-                if (typeof changeTheme === 'function') changeTheme(t.v);
-                closeModal();
-            }
-
-            function openModal() {
-                overlay.classList.remove('hidden');
-                renderTabs();
-                renderRecent();
-                renderGrid();
-                searchInput.value = '';
-                setTimeout(function () { searchInput.focus(); }, 50);
-            }
-
-            function closeModal() {
-                overlay.classList.add('hidden');
-            }
-
-            triggerBtn.addEventListener('click', openModal);
-            document.getElementById('themes-modal-close').addEventListener('click', closeModal);
-            overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape' && !overlay.classList.contains('hidden')) closeModal();
+            recentEl.innerHTML = '';
+            var label = document.createElement('div');
+            label.className = 'theme-recent-label';
+            label.textContent = 'Usados recentemente';
+            var row = document.createElement('div');
+            row.className = 'theme-recent-row';
+            items.forEach(function (t) {
+                var chip = document.createElement('button');
+                chip.type = 'button';
+                chip.className = 'theme-recent-chip';
+                chip.innerHTML = '<span>' + t.emoji + '</span><span>' + t.label + '</span>';
+                chip.addEventListener('click', function () { selectTheme(t); });
+                row.appendChild(chip);
             });
-            searchInput.addEventListener('input', function () { renderRecent(); renderGrid(); });
-            document.getElementById('theme-custom-open').addEventListener('click', function () {
-                closeModal();
-                if (typeof changeTheme === 'function') changeTheme('custom');
-                if (typeof openThemeModal === 'function') openThemeModal();
+            recentEl.appendChild(label);
+            recentEl.appendChild(row);
+        }
+
+        function renderGrid() {
+            var q = searchInput.value.trim().toLowerCase();
+            var filtered = THEMES.filter(function (t) {
+                var matchesCat = activeCat === 'todos' || t.cat === activeCat;
+                var matchesQ = !q || t.label.toLowerCase().indexOf(q) !== -1;
+                return matchesCat && matchesQ;
             });
-
-            // Se o theme-manager.js expuser o tema atualmente salvo (ex: leitura de
-            // localStorage/cookie), sincronize aqui para o botão já abrir mostrando
-            // o tema certo em vez de sempre "Clássico". Exemplo:
-            // var saved = localStorage.getItem('dnd-theme');
-            // var found = THEMES.filter(function(t){ return t.v === saved; })[0];
-            // if (found) selectThemeSilently(found); // função a criar, sem chamar changeTheme de novo
-
-            // ... resto do seu código ...
-            document.getElementById('theme-custom-open').addEventListener('click', function () {
-                closeModal();
-                if (typeof changeTheme === 'function') changeTheme('custom');
-                if (typeof openThemeModal === 'function') openThemeModal();
+            grid.innerHTML = '';
+            emptyEl.classList.toggle('hidden', filtered.length > 0);
+            filtered.forEach(function (t) {
+                var card = document.createElement('button');
+                card.type = 'button';
+                card.className = 'theme-card' + (t.v === activeValue ? ' active' : '');
+                card.innerHTML = '<span class="theme-card-emoji">' + t.emoji + '</span>' +
+                    '<span class="theme-card-label">' + t.label + '</span>';
+                card.addEventListener('click', function () { selectTheme(t); });
+                grid.appendChild(card);
             });
+        }
 
-            // NOVA FUNÇÃO (Adicione aqui, dentro da IIFE):
-            window.updateThemeButtonUI = function (themeClass) {
-                var themeValue = themeClass.replace('theme-', '');
+        function selectTheme(t) {
+            activeValue = t.v;
+            triggerEmoji.textContent = t.emoji;
+            triggerLabel.textContent = t.label;
 
-                if (themeValue === 'custom') {
-                    triggerEmoji.textContent = '🎨';
-                    triggerLabel.textContent = 'Personalizado';
-                    return;
-                }
+            recent = [t.v].concat(recent.filter(function (v) { return v !== t.v; })).slice(0, 6);
+            try { localStorage.setItem('themeGalleryRecent', JSON.stringify(recent)); } catch (e) { }
 
-                // Busca o tema na sua array THEMES que já existe
-                var found = THEMES.filter(function (t) { return t.v === themeValue; })[0];
-                if (found) {
-                    triggerEmoji.textContent = found.emoji;
-                    triggerLabel.textContent = found.label;
-                }
-            };
+            if (typeof changeTheme === 'function') changeTheme(t.v);
+            closeModal();
+        }
 
-        })(); // Fim da sua IIFE
-    </script>
+        function openModal() {
+            overlay.classList.remove('hidden');
+            renderTabs();
+            renderRecent();
+            renderGrid();
+            searchInput.value = '';
+            setTimeout(function () { searchInput.focus(); }, 50);
+        }
+
+        function closeModal() {
+            overlay.classList.add('hidden');
+        }
+
+        triggerBtn.addEventListener('click', openModal);
+        document.getElementById('themes-modal-close').addEventListener('click', closeModal);
+        overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && !overlay.classList.contains('hidden')) closeModal();
+        });
+        searchInput.addEventListener('input', function () { renderRecent(); renderGrid(); });
+        document.getElementById('theme-custom-open').addEventListener('click', function () {
+            closeModal();
+            if (typeof changeTheme === 'function') changeTheme('custom');
+            if (typeof openThemeModal === 'function') openThemeModal();
+        });
+
+        // Se o theme-manager.js expuser o tema atualmente salvo (ex: leitura de
+        // localStorage/cookie), sincronize aqui para o botão já abrir mostrando
+        // o tema certo em vez de sempre "Clássico". Exemplo:
+        // var saved = localStorage.getItem('dnd-theme');
+        // var found = THEMES.filter(function(t){ return t.v === saved; })[0];
+        // if (found) selectThemeSilently(found); // função a criar, sem chamar changeTheme de novo
+
+        // ... resto do seu código ...
+        document.getElementById('theme-custom-open').addEventListener('click', function () {
+            closeModal();
+            if (typeof changeTheme === 'function') changeTheme('custom');
+            if (typeof openThemeModal === 'function') openThemeModal();
+        });
+
+        // NOVA FUNÇÃO (Adicione aqui, dentro da IIFE):
+        window.updateThemeButtonUI = function (themeClass) {
+            var themeValue = themeClass.replace('theme-', '');
+
+            if (themeValue === 'custom') {
+                triggerEmoji.textContent = '🎨';
+                triggerLabel.textContent = 'Personalizado';
+                return;
+            }
+
+            // Busca o tema na sua array THEMES que já existe
+            var found = THEMES.filter(function (t) { return t.v === themeValue; })[0];
+            if (found) {
+                triggerEmoji.textContent = found.emoji;
+                triggerLabel.textContent = found.label;
+            }
+        };
+
+    })(); // Fim da sua IIFE
+</script>
 </body>
 
 </html>
