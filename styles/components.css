@@ -87,9 +87,9 @@
 
 /* old save-btn kept for compat */
 .save-btn {
-  background: linear-gradient(135deg, #0a1a2a, #102030);
-  border: 1px solid #2a4a6a;
-  color: #6ab4d9;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  color: var(--accent2);
   padding: 8px 20px;
   border-radius: 4px;
   cursor: pointer;
@@ -101,8 +101,9 @@
 }
 
 .save-btn:hover {
-  background: linear-gradient(135deg, #102030, #1a3a5a);
-  box-shadow: 0 0 12px rgba(106, 180, 217, 0.3);
+  background: var(--bg3);
+  border-color: var(--accent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent2) 30%, transparent);
 }
 
 .tabs {
@@ -111,7 +112,6 @@
   border-bottom: 1px solid var(--border);
   padding: 0;
   gap: 0;
-  justify-content: center;
   justify-content: center;
   align-items: center;
 }
@@ -1268,9 +1268,6 @@
   overflow-y: auto;
   width: 100%;
   box-sizing: border-box;
-}
-
-.rn-preview {
   text-align: justify !important;
 }
 
@@ -1398,13 +1395,6 @@
 .collapsible.closed::before {
   transform: rotate(-90deg);
 }
-
-.rn-preview .rn-p {
-  font-size: 13px;
-  color: var(--text);
-  margin: 1px 0;
-}
-
 
 .rn-preview .rn-p {
   font-size: 13px;
@@ -1641,11 +1631,6 @@
   box-shadow: none !important;
 }
 
-.feat-name-input:focus {
-  background: rgba(255, 255, 255, 0.03) !important;
-  border-bottom-color: var(--accent2) !important;
-}
-
 .feat-name-input::placeholder {
   color: var(--text3);
   font-weight: 400;
@@ -1758,11 +1743,13 @@
 }
 
 /* Painéis de Conteúdo */
-.trait-tab-pane {
+.trait-tab-pane,
+.inv-tab-pane {
   display: none;
 }
 
-.trait-tab-pane.active {
+.trait-tab-pane.active,
+.inv-tab-pane.active {
   display: block;
 }
 
@@ -2266,28 +2253,6 @@
     box-shadow: 0 2px 4px var(--shadow);
 }
 
-.spell-sort-select {
-    background: var(--bg);
-    color: var(--accent3);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 3px 8px;
-    font-size: 11px;
-    outline: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.spell-sort-select:hover {
-    border-color: var(--border);
-    color: var(--accent2);
-}
-
-.spell-sort-select option {
-    background: var(--bg);
-    color: var(--accent)
-}
-
 /* Container do cabeçalho */
 .codex-header {
     display: flex;
@@ -2296,32 +2261,71 @@
     margin-bottom: 12px;
 }
 
-/* Estilo compacto do botão de ordenação integrado às variáveis do tema */
+/* Estilo do botão de ordenação unificado e limpo */
 select.spell-sort-select {
-    width: auto !important;
-    max-width: 130px !important;
-    height: 28px !important;
-    background: var(--input-bg) !important;
-    color: var(--text2) !important;
-    border: 1px solid var(--input-border) !important;
-    border-radius: 6px !important;
-    padding: 0 8px !important;
-    font-size: 11px !important;
-    font-weight: 500 !important;
-    outline: none !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
+    width: auto;
+    max-width: 130px;
+    height: 28px;
+    background: var(--input-bg);
+    color: var(--text2);
+    border: 1px solid var(--input-border);
+    border-radius: 6px;
+    padding: 0 8px;
+    font-size: 11px;
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 select.spell-sort-select:hover,
 select.spell-sort-select:focus {
-    border-color: var(--accent) !important;
-    color: var(--text) !important;
-    background: var(--bg3) !important;
-    box-shadow: 0 0 8px var(--glow2) !important;
+    border-color: var(--accent);
+    color: var(--text);
+    background: var(--bg3);
+    box-shadow: 0 0 8px var(--glow2);
 }
 
 select.spell-sort-select option {
-    background: var(--bg2) !important;
-    color: var(--text) !important;
+    background: var(--bg2);
+    color: var(--text);
+}
+
+/* Estilização idêntica do placeholder nos inputs de magia */
+.spell-stat-input::placeholder {
+  color: var(--accent2);
+  opacity: 0.85;
+  font-family: 'Cinzel', serif;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Garante que ao focar o campo vazio ele mantenha a elegância */
+.spell-stat-input {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--field-radius);
+  color: var(--accent2);
+  caret-color: var(--accent2);
+  text-align: center;
+}
+
+/* Estilo da seleção de texto para não ficar aquele azul padrão do navegador */
+.spell-stat-input::selection {
+  background: var(--glow);
+  color: var(--accent2);
+}
+
+/* ============================================================
+   FIX DEFINITIVO: PAINÉIS DE TRAÇOS E INVENTÁRIO
+   ============================================================ */
+.trait-tab-pane,
+.inv-tab-pane {
+    display: none !important;
+}
+
+.trait-tab-pane.active,
+.inv-tab-pane.active {
+    display: block !important;
 }
