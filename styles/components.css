@@ -1123,6 +1123,15 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
+.lres-num, .lres-num-used {
+  width: 44px !important;
+  min-width: 44px !important;
+  max-width: 44px !important;
+  flex-shrink: 0 !important;
+  text-align: center;
+  padding: 4px 0 !important;
+}
+
 .add-btn {
   font-family: 'Cinzel', serif;
   font-size: 11px;
