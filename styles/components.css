@@ -242,63 +242,154 @@
   align-items: start;
 }
 
+/* =========================================
+   ATRIBUTOS — placa gravada + selo de valor
+   Substitui TUDO entre "ATRIBUTOS (Design Clássico D&D 5e)"
+   e a regra ".save-row" no components.css
+   ========================================= */
+#attrs-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  justify-content: stretch !important;
+  gap: 22px 14px !important;
+  padding: 4px 0 14px;
+}
+
 .attr-box {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  text-align: center;
-  padding: 8px 6px;
   position: relative;
-  cursor: default;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 98px;
+  padding: 14px 6px 22px;
+  text-align: center;
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  background:
+    radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%),
+    linear-gradient(180deg, var(--input-bg), color-mix(in srgb, var(--input-bg) 70%, #000));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--accent2) 18%, transparent),
+    inset 0 -8px 16px rgba(0, 0, 0, 0.35),
+    0 3px 8px rgba(0, 0, 0, 0.45);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Moldura interna fina (efeito de placa gravada) */
+.attr-box::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+  border-radius: 7px;
+  pointer-events: none;
+}
+
+.attr-box:hover,
+.attr-box:focus-within {
+  border-color: var(--accent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--accent2) 28%, transparent),
+    inset 0 -8px 16px rgba(0, 0, 0, 0.35),
+    0 0 14px color-mix(in srgb, var(--accent) 28%, transparent);
 }
 
 .attr-box .attr-name {
   font-family: 'Cinzel', serif;
-  font-size: 9px;
-  letter-spacing: 2px;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 1.6px;
   text-transform: uppercase;
-  color: var(--text3);
-  margin-bottom: 4px;
+  color: var(--text2);
+  margin-bottom: 6px;
+  white-space: nowrap;
 }
 
-.attr-box .attr-score {
-  font-family: 'Cinzel', serif;
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--accent2);
-  line-height: 1;
-  background: var(--input-bg);
-  border: 1px solid var(--input-border);
-  border-radius: 3px;
-  width: 60px;
-  margin: 0 auto 4px;
-  display: block;
-  text-align: center;
-}
-
+/* O modificador é o destaque da caixa */
 .attr-box .attr-mod {
   font-family: 'Cinzel', serif;
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--text);
-  background: var(--panel);
-  border: 2px solid var(--border2);
-  border-radius: 50%;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-  transition: all 0.2s;
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--accent2);
+  background: transparent;
+  border: none;
+  width: auto;
+  height: auto;
+  margin: 0;
+  box-shadow: none;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.6);
+  font-variant-numeric: lining-nums tabular-nums;
+  transition: color 0.2s, text-shadow 0.2s;
 }
 
 .attr-box:hover .attr-mod {
-  border-color: var(--accent);
-  color: var(--accent2);
-  box-shadow: 0 0 10px var(--glow);
+  color: var(--accent);
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.6),
+    0 0 14px color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
+/* O input do valor vira um selo oval sobre a borda inferior */
+.attr-box .attr-score {
+  position: absolute;
+  bottom: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+
+  width: 50px;
+  height: 26px;
+  padding: 0;
+  margin: 0;
+
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text);
+  caret-color: var(--accent2);
+
+  background: linear-gradient(180deg, var(--bg3), var(--bg2));
+  border: 1.5px solid var(--accent);
+  border-radius: 13px;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--accent2) 25%, transparent),
+    0 3px 6px rgba(0, 0, 0, 0.7);
+  outline: none;
+  cursor: text;
+  transition: border-color 0.2s, box-shadow 0.2s, color 0.2s;
+
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Remove as setinhas de número do navegador */
+.attr-box .attr-score::-webkit-outer-spin-button,
+.attr-box .attr-score::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.attr-box .attr-score:hover {
+  border-color: var(--accent2);
+}
+
+.attr-box .attr-score:focus {
+  color: var(--accent2);
+  border-color: var(--accent2);
+  background: var(--input-bg);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--accent2) 22%, transparent),
+    0 3px 6px rgba(0, 0, 0, 0.7);
+}
+
+.attr-box .attr-score::selection {
+  background: var(--glow);
+  color: var(--accent2);
+}
 .save-row {
   display: flex;
   align-items: center;
@@ -2337,4 +2428,411 @@ select.spell-sort-select option {
 .trait-tab-pane.active,
 .inv-tab-pane.active {
     display: block !important;
+}
+
+/* =====================================================================
+   REFINAMENTO VISUAL DA FICHA
+   Cole este bloco inteiro NO FINAL do components.css.
+   Usa só as suas variáveis de tema (funciona em Inverno, Dourado etc.)
+   ===================================================================== */
+
+
+/* ---------- 1. PAINÉIS E TÍTULOS DE SEÇÃO ---------- */
+.panel {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--bg3) 35%, var(--bg2)), var(--bg2));
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--accent2) 10%, transparent),
+    0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.section-title {
+  position: relative;
+  color: var(--accent);
+  letter-spacing: 3px;
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+}
+
+/* trecho curto mais forte sob o título, marca onde a seção começa */
+.section-title::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent2), transparent);
+}
+
+
+/* ---------- 2. CAMPOS (inputs, selects, textareas) ----------
+   Especificidade baixa de propósito: qualquer classe específica
+   (hp-current, attr-score, lres-num...) continua mandando no seu campo. */
+.page :where(input, select, textarea):not(:where(
+  [type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"],
+  .attr-score, .hp-current, .hp-dynamic-input, .big-num, .lres-num, .lres-num-used,
+  .lres-name, .sl-num-input, .spell-title-input, .spell-stat-input, .feat-name-input,
+  .spell-sort-select, .ui-toggle, .rn-toggle, .rn-head-check
+)) {
+  background: linear-gradient(180deg,
+      color-mix(in srgb, var(--input-bg) 65%, #000),
+      var(--input-bg));
+  border: 1px solid var(--input-border);
+  border-radius: var(--field-radius, 8px);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.35);
+  color: var(--text);
+  caret-color: var(--accent2);
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.page :where(input, select, textarea):hover {
+  border-color: var(--border2);
+}
+
+.page :where(input, select, textarea):focus {
+  outline: none;
+  border-color: var(--accent2);
+  box-shadow:
+    inset 0 2px 5px rgba(0, 0, 0, 0.35),
+    0 0 0 3px color-mix(in srgb, var(--accent2) 20%, transparent);
+}
+
+.page :where(input, textarea)::placeholder {
+  color: var(--text3);
+  opacity: 0.7;
+}
+
+/* Seta do select desenhada em CSS (acompanha a cor do tema) */
+.page select:not(.spell-sort-select):not(.h-select) {
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: 32px;
+  cursor: pointer;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--accent2) 50%) calc(100% - 17px) 52% / 6px 6px no-repeat,
+    linear-gradient(135deg, var(--accent2) 50%, transparent 50%) calc(100% - 11px) 52% / 6px 6px no-repeat,
+    linear-gradient(180deg, color-mix(in srgb, var(--input-bg) 65%, #000), var(--input-bg));
+}
+
+.page input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.page input[type="number"]::-webkit-outer-spin-button,
+.page input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+
+/* ---------- 3. TESTES DE RESISTÊNCIA E PERÍCIAS ---------- */
+.save-row,
+.skill-row {
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.save-row:hover,
+.skill-row:hover {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.save-value,
+.skill-val {
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* bolinha de proficiência com aro, brilha quando marcada */
+.save-check,
+.skill-prof {
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.save-check:hover,
+.skill-prof:hover {
+  border-color: var(--accent2);
+}
+
+.save-check.active,
+.skill-prof.prof {
+  box-shadow: 0 0 7px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.skill-prof.expert {
+  box-shadow: 0 0 9px color-mix(in srgb, var(--accent2) 65%, transparent);
+}
+
+/* sigla do atributo vira uma etiqueta discreta */
+.skill-attr {
+  font-style: normal;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  padding: 1px 6px;
+  border: 1px solid color-mix(in srgb, var(--border2) 70%, transparent);
+  border-radius: 9px;
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--text3);
+}
+
+
+/* ---------- 4. BÔNUS DE PROFICIÊNCIA E INSPIRAÇÃO ---------- */
+.prof-badge,
+.insp-box {
+  width: 54px;
+  height: 54px;
+  border: 2px solid var(--accent);
+  background: radial-gradient(circle at 50% 30%, var(--bg3), var(--input-bg));
+  box-shadow:
+    0 0 0 3px var(--bg2),
+    0 0 0 4px color-mix(in srgb, var(--accent) 40%, transparent),
+    inset 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.insp-box {
+  color: var(--accent2);
+  transition: box-shadow 0.25s, background 0.25s, color 0.25s;
+}
+
+.insp-box:hover {
+  border-color: var(--accent2);
+}
+
+.insp-box.active {
+  background: radial-gradient(circle at 50% 35%, var(--accent2), var(--accent));
+  color: var(--bg);
+  border-color: var(--accent2);
+  box-shadow:
+    0 0 0 3px var(--bg2),
+    0 0 0 4px var(--accent2),
+    0 0 20px color-mix(in srgb, var(--accent2) 55%, transparent);
+}
+
+
+/* ---------- 5. PONTOS DE VIDA, TEMPORÁRIO E ARMADURA ---------- */
+.hp-current,
+.combat-stat .big-num:not(.auto) {
+  border-radius: 8px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--input-bg) 65%, #000), var(--input-bg));
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: color 0.3s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.hp-current:focus,
+.combat-stat .big-num:focus {
+  outline: none;
+  border-color: var(--accent2);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.4),
+    0 0 0 3px color-mix(in srgb, var(--accent2) 20%, transparent);
+}
+
+.hp-btn {
+  border-radius: 8px;
+  color: var(--accent2);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--accent2) 15%, transparent);
+}
+
+.hp-btn:hover {
+  border-color: var(--accent2);
+  background: var(--glow);
+  box-shadow: 0 0 10px var(--glow);
+}
+
+.hp-btn:active {
+  transform: scale(0.94);
+}
+
+/* barra de vida mais grossa, com brilho no topo */
+.hp-bar {
+  height: 12px;
+  border-radius: 6px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.hp-bar-fill {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 0 8px color-mix(in srgb, var(--green) 45%, transparent);
+}
+
+.hp-bar-fill.hurt {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 8px rgba(243, 156, 18, 0.4);
+}
+
+.hp-bar-fill.danger {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 8px color-mix(in srgb, var(--red) 50%, transparent);
+}
+
+/* campos de dados de vida: o "Ex: 5d10 + 2d6" não grita mais */
+.hp-dynamic-input::placeholder {
+  font-family: 'Cinzel', serif;
+  font-size: 0.55em;
+  font-weight: 500;
+  font-style: italic;
+  letter-spacing: 0.5px;
+  color: var(--text3);
+  opacity: 0.55;
+}
+
+
+/* ---------- 6. TESTES CONTRA A MORTE ---------- */
+.death-saves {
+  gap: 18px;
+}
+
+.ds-label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+}
+
+.ds-box {
+  width: 19px;
+  height: 19px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.ds-box:hover {
+  border-color: var(--accent2);
+}
+
+.ds-box.success.filled {
+  box-shadow: 0 0 9px color-mix(in srgb, var(--green) 65%, transparent);
+}
+
+.ds-box.failure.filled {
+  box-shadow: 0 0 9px color-mix(in srgb, var(--red2) 65%, transparent);
+}
+
+
+/* ---------- 7. BOTÕES DE ADICIONAR ---------- */
+.add-btn {
+  padding: 9px 12px;
+  border: 1px dashed var(--border2);
+  border-radius: 8px;
+  color: var(--text2);
+  transition: all 0.2s;
+}
+
+.add-btn:hover {
+  border-style: solid;
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent2);
+  box-shadow: 0 0 10px var(--glow);
+}
+
+.add-btn:active {
+  transform: scale(0.99);
+}
+
+
+/* ---------- 8. RECURSOS LIMITADOS, TRAÇOS E ABAS ---------- */
+.lres-block {
+  padding: 10px 0;
+}
+
+.feat-block {
+  border-radius: 8px;
+}
+
+.tab {
+  letter-spacing: 2.5px;
+}
+
+.tab.active {
+  background: linear-gradient(180deg, transparent, var(--glow));
+}
+
+
+/* ---------- 9. ACESSIBILIDADE ---------- */
+:where(button, [tabindex], .tab, .skill-row, .save-row):focus-visible {
+  outline: 2px solid var(--accent2);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Remove o fundo branco das listas de seleção */
+select option {
+  background-color: var(--bg2);
+  color: var(--text);
+}
+
+/* =====================================================================
+   AJUSTE: PADRONIZAR SOMBREAMENTO DOS CAMPOS
+   Cole NO FINAL do components.css (depois do bloco "Refinamento").
+   Corrige: select "Alinhamento" cinza/gradiente no tema claro e
+   o campo composto "Classe & Nível" sem o mesmo sombreamento dos outros.
+   ===================================================================== */
+
+/* Um único "molde" de campo, usando variáveis que já mudam por tema */
+.page {
+  --field-shadow: inset 0 2px 5px var(--shadow);
+}
+
+/* 1. O gradiente escuro do bloco anterior ficava cinza no tema claro.
+      Agora o fundo é sempre o --input-bg puro. */
+.page :where(input, select, textarea):not(:where(
+  [type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"],
+  .attr-score, .hp-current, .hp-dynamic-input, .big-num, .lres-num, .lres-num-used,
+  .lres-name, .sl-num-input, .spell-title-input, .spell-stat-input, .feat-name-input,
+  .spell-sort-select, .ui-toggle, .rn-toggle, .rn-head-check
+)) {
+  background: var(--input-bg);
+  box-shadow: var(--field-shadow);
+}
+
+/* 2. Select (Alinhamento): fundo chapado igual aos inputs, seta por cima */
+.page select:not(.spell-sort-select):not(.h-select) {
+  background:
+    linear-gradient(45deg, transparent 50%, var(--accent2) 50%) calc(100% - 17px) 52% / 6px 6px no-repeat,
+    linear-gradient(135deg, var(--accent2) 50%, transparent 50%) calc(100% - 11px) 52% / 6px 6px no-repeat,
+    var(--input-bg);
+  box-shadow: var(--field-shadow);
+}
+
+.page select:not(.spell-sort-select):not(.h-select):focus {
+  box-shadow:
+    var(--field-shadow),
+    0 0 0 3px color-mix(in srgb, var(--accent2) 20%, transparent);
+}
+
+/* 3. Classe & Nível: o contêiner (que tem a borda) ganha o mesmo
+      fundo e sombra interna; os inputs de dentro ficam sem superfície
+      própria para não duplicar. */
+.page :where(div, span, label):has(> input[placeholder="Guerreiro"]) {
+  background: var(--input-bg);
+  box-shadow: var(--field-shadow);
+  border-radius: var(--field-radius, 8px);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.page :where(div, span, label):has(> input[placeholder="Guerreiro"]):hover {
+  border-color: var(--border2);
+}
+
+.page :where(div, span, label):has(> input[placeholder="Guerreiro"]):focus-within {
+  border-color: var(--accent2);
+  box-shadow:
+    var(--field-shadow),
+    0 0 0 3px color-mix(in srgb, var(--accent2) 20%, transparent);
+}
+
+.page :where(div, span, label):has(> input[placeholder="Guerreiro"]) > input {
+  background: transparent;
+  box-shadow: none;
+}
+
+.page :where(div, span, label):has(> input[placeholder="Guerreiro"]) > input:focus {
+  box-shadow: none;
 }
