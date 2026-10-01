@@ -1556,6 +1556,21 @@
 
     })(); // Fim da sua IIFE
 </script>
+<script>
+    // Sincronização do Nome do Personagem
+    document.addEventListener('DOMContentLoaded', function () {
+        
+        // Agora usando os IDs reais do seu HTML
+        const inputNome = document.getElementById('char-name'); 
+        const headerNome = document.getElementById('header-name');
+
+        if (inputNome && headerNome) {
+            inputNome.addEventListener('input', function () {
+                headerNome.textContent = this.value || 'Nome do Personagem';
+            });
+        }
+    });
+</script>
 </body>
 
 </html>
