@@ -179,10 +179,6 @@ function cycleSkillProf(id) {
 function updateHeader() {
     const nameEl = document.getElementById('header-name');
     if (nameEl) nameEl.textContent = document.getElementById('char-name')?.value || 'Nome do Personagem';
-    const sub = document.getElementById('header-subtitle');
-    if (sub && !sub.value) {
-        sub.placeholder = [document.getElementById('char-class')?.value, document.getElementById('char-race')?.value, document.getElementById('char-alignment')?.value].filter(Boolean).join(' · ') || 'Classe · Raça · Alinhamento';
-    }
 }
 
 const isDetailSpellField = (id) => /^spell-(title|prep|conc|desc|toggle|detail|pane|list|empty)-\d+$/.test(id);
