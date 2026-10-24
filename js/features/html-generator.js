@@ -21,7 +21,6 @@ const HTMLGenerator = (() => {
       const conteudo = sc.textContent || '';
       const src = sc.getAttribute('src') || '';
       
-      // Remove o próprio script do live-server e os blocos de dados antigos
       if (
         conteudo.includes('IsThisFirstTime_' + 'Log_From_LiveServer') ||
         src.includes('dependency-' + 'loader') ||
@@ -34,8 +33,6 @@ const HTMLGenerator = (() => {
     });
   };
 
-  // 🛑 CORREÇÃO DA ENGORDA (COLORIS): 
-  // Remove os widgets flutuantes que bibliotecas de terceiros injetam no body
   const removerLixoDeTerceiros = (rootEl) => {
     rootEl.querySelectorAll('#clr-picker, .clr-picker').forEach(el => el.remove());
   };
@@ -87,9 +84,8 @@ const HTMLGenerator = (() => {
   const generate = async (data) => {
     const clone = document.documentElement.cloneNode(true);
     
-    // Roda a limpeza absoluta do clone
     removerScriptsAntigos(clone);
-    removerLixoDeTerceiros(clone); // Impede a ficha de "engordar" com Coloris repetidos
+    removerLixoDeTerceiros(clone);
 
     const toastClone = clone.querySelector('#toast');
     if (toastClone) {
@@ -198,15 +194,22 @@ const HTMLGenerator = (() => {
       const rawName = data['char-name'] || document.getElementById('char-name')?.value || 'personagem';
       const safeName = rawName.trim().replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '') || 'ficha';
 
+      // 1. Cria o Blob com o MIME-type adequado
       const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
       const url = URL.createObjectURL(blob);
+
+      // 2. Cria o elemento ancorado e anexa temporariamente ao DOM
       const a = document.createElement('a');
       a.href = url;
       a.download = `Ficha_${safeName}.html`;
-      
-      // 🛑 O appendChild foi removido nas edições anteriores para evitar o erro de Frame. O a.click() aciona o download.
+      a.style.display = 'none';
+
+      document.body.appendChild(a);
       a.click();
-      URL.revokeObjectURL(url);
+      
+      // 3. Remove da árvore de elementos e adia a revogação do Blob para o Firefox registrar o download
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
 
       if (typeof Toast !== 'undefined' && Toast.show) {
         Toast.show('📄 Ficha exportada com sucesso!');
