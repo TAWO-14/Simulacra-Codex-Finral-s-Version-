@@ -173,7 +173,7 @@ const HTMLGenerator = (() => {
     return '<!DOCTYPE html>\n' + clone.outerHTML;
   };
 
-  const download = async () => {
+const download = async () => {
     try {
       if (typeof Toast !== 'undefined' && Toast.show) {
         Toast.show('⏳ Gerando arquivo standalone...');
@@ -193,23 +193,37 @@ const HTMLGenerator = (() => {
 
       const rawName = data['char-name'] || document.getElementById('char-name')?.value || 'personagem';
       const safeName = rawName.trim().replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '') || 'ficha';
+      const fileName = `Ficha_${safeName}.html`;
 
-      // 1. Cria o Blob com o MIME-type adequado
+      // Criação do Blob com o tipo MIME explícito
       const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
 
-      // 2. Cria o elemento ancorado e anexa temporariamente ao DOM
+      // Se o navegador suportar a API moderna FileSystem (Chrome/Brave/Edge), ele usa o salvamento nativo.
+      // Para o Firefox, garantimos a estrutura exata que evita o nome temporário.
+      const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url;
-      a.download = `Ficha_${safeName}.html`;
+      
       a.style.display = 'none';
+      a.href = url;
+      a.setAttribute('download', fileName);
+      a.dataset.downloadurl = ['text/html', fileName, a.href].join(':');
 
       document.body.appendChild(a);
-      a.click();
-      
-      // 3. Remove da árvore de elementos e adia a revogação do Blob para o Firefox registrar o download
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+      // Dispara o evento de clique de forma explícita
+      const event = new MouseEvent('click', {
+        view: window,
+        bubbles: true,
+        cancelable: true
+      });
+      a.dispatchEvent(event);
+
+      // Limpeza diferida: 60 segundos garantem que, mesmo que você demore para
+      // escolher a pasta na caixa "Salvar como", o Firefox não perca a referência do arquivo/nome.
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 60000);
 
       if (typeof Toast !== 'undefined' && Toast.show) {
         Toast.show('📄 Ficha exportada com sucesso!');
