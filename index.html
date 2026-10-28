@@ -783,6 +783,39 @@
 
                     <div class="mt12 mb8">
                         <div style="display: flex; gap: 10px; align-items: stretch;">
+                            <!-- Box: Iniciativa (automática = mod. de Destreza; digite para sobrescrever, duplo clique volta ao automático) -->
+                            <div
+                                style="flex: 1; min-width: 0; background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px; display: flex; align-items: center; justify-content: center; flex-direction: column; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);">
+                                <div style="font-size: 9px; color: var(--text3); letter-spacing: 1px; margin-bottom: 4px;">
+                                    INICIATIVA</div>
+                                <input type="text" id="initiative" class="hp-dynamic-input" value="+0"
+                                    title="Iniciativa (automática: mod. de Destreza). Digite para sobrescrever; duplo clique volta ao automático."
+                                    style="width: 100%; font-size: 22px; font-weight: 700; color: var(--accent2); font-family: 'Cinzel', serif; text-align: center;"
+                                    onfocus="this.dataset.old=this.value; this.value='';"
+                                    onblur="if(this.value==='') this.value=this.dataset.old;"
+                                    onchange="onInitiativeInput(this)"
+                                    ondblclick="document.getElementById('initiative-override').value = '0'; updateInitiative();"
+                                    onkeydown="if(event.key === 'Enter') { event.preventDefault(); this.blur(); }">
+                                <!-- Guarda se a iniciativa foi digitada à mão (0 = automática, 1 = manual) -->
+                                <input type="hidden" id="initiative-override" value="0">
+                            </div>
+
+                            <!-- Box: Deslocamento (texto livre: ex. "9 m" ou "9 m, voo 18 m") -->
+                            <div
+                                style="flex: 1; min-width: 0; background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px; display: flex; align-items: center; justify-content: center; flex-direction: column; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);">
+                                <div style="font-size: 9px; color: var(--text3); letter-spacing: 1px; margin-bottom: 4px;">
+                                    DESLOCAMENTO</div>
+                                <input type="text" id="speed" class="hp-dynamic-input" value="9 m" title="Deslocamento"
+                                    style="width: 100%; font-size: 20px; font-weight: 700; color: var(--accent2); font-family: 'Cinzel', serif; text-align: center;"
+                                    onfocus="this.select();"
+                                    oninput="this.title = this.value || 'Deslocamento';"
+                                    onkeydown="if(event.key === 'Enter') { event.preventDefault(); this.blur(); }">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt12 mb8">
+                        <div style="display: flex; gap: 10px; align-items: stretch;">
                             <!-- Box: Total (Texto Livre para Multiclasse) -->
                             <div
                                 style="flex: 1; background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px; display: flex; align-items: center; justify-content: center; flex-direction: column; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);">
