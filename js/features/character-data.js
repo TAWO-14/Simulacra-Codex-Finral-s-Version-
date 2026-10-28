@@ -86,6 +86,33 @@ function onPassivePercInput(el) {
     }
 }
 
+window.updateInitiative = function () {
+    const el = document.getElementById('initiative');
+    if (!el) return;
+    const hid = document.getElementById('initiative-override');
+    if (hid && hid.value === '1' && el.value !== '') {
+        el.classList.add('is-manual');   // valor digitado à mão: mantém
+        return;
+    }
+    if (hid) hid.value = '0';
+    el.value = fmtMod(getMod(getAttrVal('dex')));
+    el.classList.remove('is-manual');
+};
+
+window.onInitiativeInput = function (el) {
+    if (!el) return;
+    const hid = document.getElementById('initiative-override');
+    const parsed = parseInt(String(el.value).replace('\u2212', '-'), 10);
+    if (isNaN(parsed)) {
+        if (hid) hid.value = '0';
+        window.updateInitiative();
+    } else {
+        if (hid) hid.value = '1';
+        el.value = fmtMod(parsed);
+        el.classList.add('is-manual');
+    }
+};
+
 function onAttrChange() {
     ATTRS.forEach(a => {
         const el = document.getElementById('attr-mod-' + a.id);
@@ -127,6 +154,8 @@ function updateSkills() {
             ppEl.value = 10 + getMod(getAttrVal('wis')) + percBonus + obsBonus;
         }
     }
+
+    if (typeof window.updateInitiative === 'function') window.updateInitiative();
 }
 
 function onLevelChange() {
@@ -138,18 +167,15 @@ function onLevelInput(el) {
     let val = parseInt(el.value, 10);
 
     if (!isNaN(val)) {
-        if (val > 20) el.value = 20;
         if (val < 1) el.value = 1;
     }
 
     updateProfBonus();
 }
-
 function getProfBonus() {
     const lvlInput = document.getElementById('char-level');
     const parsed = lvlInput ? parseInt(lvlInput.value, 10) : 1;
-    const level = isNaN(parsed) || parsed < 1 ? 1 : (parsed > 20 ? 20 : parsed);
-    return Math.ceil(level / 4) + 1;
+    const level = isNaN(parsed) || parsed < 1 ? 1 : (parsed > 30 ? 30 : parsed);    return Math.ceil(level / 4) + 1;
 }
 
 function updateProfBonus() {
