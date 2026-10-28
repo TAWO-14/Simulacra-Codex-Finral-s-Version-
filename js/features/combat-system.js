@@ -172,7 +172,9 @@ function renderLimitedResources() {
     }
     // Se for menor que 20, renderiza os quadradinhos normais (mas mostra o Atual)
     else {
-      counterHTML = `<span class="lres-counter">${current}<span class="lres-sep"> / </span></span>`;
+      // Até 10 usos: mostra quantos foram GASTOS (igual aos quadradinhos preenchidos)
+      const spent = Math.min(safeTotal, Math.max(0, parseInt(res.used) || 0));
+      counterHTML = `<span class="lres-counter" title="Gastos">${spent}<span class="lres-sep"> / </span></span>`;
 
       const segsHTML = Array.from({ length: safeTotal }, (_, p) =>
         `<div class="lres-seg${p < res.used ? ' filled' : ''}" onclick="toggleLresSeg(${i},${p})" title="Usar até aqui"></div>`
